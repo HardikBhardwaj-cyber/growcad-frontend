@@ -1,153 +1,127 @@
 "use client";
 
-import {
-  motion,
-  useScroll,
-  useTransform,
-} from "framer-motion";
-import { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-
-import FloatingCards from "./hero/FloatingCards";
-import MagneticButton from "./hero/MagneticButton";
 import Particles from "./hero/Particles";
-import Bubbles from "./hero/Bubbles";
 import Orb from "./hero/Orb";
-import Stats from "./hero/Stats";
-import TrustStrip from "./hero/TrustStrip";
-import DashboardPreview from "./hero/DashboardPreview";
+import MagneticButton from "./hero/MagneticButton";
 
 export default function Hero() {
   const router = useRouter();
-  const glowRef = useRef<HTMLDivElement>(null);
-
-  const { scrollY } = useScroll();
-
-  const scale = useTransform(scrollY, [0, 700], [1, 0.85]);
-  const opacity = useTransform(scrollY, [0, 500], [1, 0]);
-  const y = useTransform(scrollY, [0, 600], [0, -120]);
-
-  // 🔥 parallax system
-  useEffect(() => {
-    const move = (e: MouseEvent) => {
-      const layers = document.querySelectorAll("[data-depth]");
-
-      layers.forEach((layer) => {
-        const depth = Number(layer.getAttribute("data-depth"));
-        const x =
-          (e.clientX / window.innerWidth - 0.5) * depth;
-        const y =
-          (e.clientY / window.innerHeight - 0.5) * depth;
-
-        (layer as HTMLElement).style.transform =
-          `translate(${x}px, ${y}px)`;
-      });
-
-      if (glowRef.current) {
-        glowRef.current.style.transform = `translate(${e.clientX - 200}px, ${
-          e.clientY - 200
-        }px)`;
-      }
-    };
-
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
-  }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden text-center">
 
-      {/* 🌌 BACKGROUND SYSTEM */}
+      {/* 🌌 BACKGROUND (CLEAN, NOT CLUTTERED) */}
       <Particles />
-      <Bubbles />
 
-      <div className="absolute inset-0 bg-animated opacity-10" />
-      <div className="absolute inset-0 bg-grid opacity-20" />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
 
-      {/* 🔥 DARK FOCUS */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-[3px]" />
-
-      {/* 🔥 GLOW */}
-      <div
-        ref={glowRef}
-        className="pointer-events-none absolute w-[400px] h-[400px] rounded-full bg-purple-600/30 blur-[140px]"
-      />
-
-      {/* 🔥 ORB (LESS INTENSE) */}
-      <div data-depth="20" className="opacity-60">
+      {/* 🔥 SUBTLE ORB */}
+      <div className="absolute inset-0 opacity-40">
         <Orb />
       </div>
 
-      {/* 🔥 FLOATING CARDS */}
-      <div data-depth="30" className="opacity-70">
-        <FloatingCards />
-      </div>
-
       {/* 🚀 MAIN CONTENT */}
-      <motion.div
-        style={{ scale, opacity, y }}
-        className="relative z-10 text-center px-6 max-w-5xl"
-      >
+      <div className="relative z-10 px-6 max-w-4xl mx-auto">
+
+        {/* 🧠 BRAND TAG */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-sm text-purple-400 mb-4 tracking-wide"
+        >
+          GROWCAD — Growth OS for Coaching Institutes
+        </motion.p>
+
         {/* 🧠 HEADLINE */}
         <motion.h1
-          initial={{ opacity: 0, y: 80 }}
+          initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight"
         >
-          Run Your Institute Like a{" "}
+          Compete With Big Coaching Giants.
+          <br />
           <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent">
-            Top AIR Factory
+            Grow Faster. Scale Smarter.
           </span>
         </motion.h1>
 
         {/* ✨ SUBTEXT */}
         <motion.p
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           className="text-gray-400 mt-6 text-lg md:text-xl max-w-2xl mx-auto"
         >
-          Automate attendance, fees, tests, and growth — all in one platform.
+          Automate your institute — fees, attendance, tests, and growth —
+          everything in one powerful platform.
+        </motion.p>
+
+        {/* 💣 EMOTIONAL LINE */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mt-4 text-sm text-purple-300"
+        >
+          Built for small & mid-size institutes to win big.
         </motion.p>
 
         {/* 🎯 CTA */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="flex gap-4 justify-center mt-10 flex-wrap"
+          transition={{ delay: 0.7 }}
+          className="flex flex-col md:flex-row gap-4 justify-center mt-10"
         >
           <MagneticButton
             onClick={() => router.push("/auth/register")}
             primary
           >
-            Start Free — No Setup Needed
+            Start Free — Takes 2 Minutes
           </MagneticButton>
 
           <MagneticButton
             onClick={() => window.open("https://youtube.com")}
           >
-            See How It Works
+            Watch Demo
           </MagneticButton>
         </motion.div>
 
         {/* 💎 TRUST */}
-        <TrustStrip />
-
-        {/* 📊 STATS */}
-        <Stats />
-
-        {/* 🧠 PRODUCT PREVIEW */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 40 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="mt-10"
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+          className="mt-6 text-sm text-gray-500"
         >
-          <DashboardPreview />
+          Trusted by 500+ institutes • 10K+ students • ₹1Cr+ fees managed
+        </motion.p>
+
+        {/* 📊 SIMPLE STATS */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2 }}
+          className="mt-10 flex flex-wrap justify-center gap-8 text-center text-sm text-gray-400"
+        >
+          <div>
+            <p className="text-xl font-bold text-white">10K+</p>
+            Students
+          </div>
+          <div>
+            <p className="text-xl font-bold text-white">500+</p>
+            Institutes
+          </div>
+          <div>
+            <p className="text-xl font-bold text-white">32%</p>
+            Avg Growth
+          </div>
         </motion.div>
-      </motion.div>
+
+      </div>
 
       {/* 🔥 BOTTOM FADE */}
       <div className="absolute bottom-0 w-full h-40 bg-gradient-to-b from-transparent to-black" />
