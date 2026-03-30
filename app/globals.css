@@ -60,3 +60,21 @@ button {
 button:hover {
   opacity: 0.9;
 }
+.bg-grid {
+  background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.bg-animated {
+  background: linear-gradient(270deg, #7c3aed, #3b82f6, #9333ea);
+  background-size: 600% 600%;
+  animation: gradientMove 12s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50% }
+  50% { background-position: 100% 50% }
+  100% { background-position: 0% 50% }
+}
+/* 🔥 GRID BACKGROUND */
