@@ -1,85 +1,96 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
-import Orb from "./hero/Orb";
-import Particles from "./hero/Particles";
+import { motion, useScroll, useTransform } from "framer-motion";
 import MagneticButton from "./hero/MagneticButton";
+import DashboardPreview from "./hero/DashboardPreview";
+import TypingText from "./hero/TypingText";
+import Spotlight from "./hero/Spotlight";
+import FloatingCards from "./hero/FloatingCards";
+import ComparisonToggle from "./hero/ComparisonToggle";
+import WhatsAppCapture from "./hero/WhatsAppCapture";
+import MiniDemo from "./hero/MiniDemo";
+import { usePersona } from "./hooks/usePersona";
+import { useDynamicHeadline } from "./hooks/useDynamicHeadline";
 
 export default function Hero() {
-  const router = useRouter();
+  const { scrollY } = useScroll();
+
+  const scale = useTransform(scrollY, [0, 300], [1, 0.95]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0.7]);
+
+  const persona = usePersona();
+  const headline = useDynamicHeadline(persona);
+
+  const ctaText: Record<typeof persona, string> = {
+    small: "Start Free Trial",
+    medium: "See How It Works",
+    large: "Book Demo",
+    default: "Get Started",
+  };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
+    <motion.section
+      style={{ scale, opacity }}
+      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-[#0a0a0f]"
+    >
+      {/* 🎯 LIGHT EFFECT */}
+      <Spotlight />
 
-      {/* 🌌 Background */}
-      <Particles />
-      <div className="absolute inset-0 opacity-40">
-        <Orb />
-      </div>
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      {/* 🌌 BACKGROUND */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-blue-900/10 to-black" />
 
-      {/* 🔥 CONTENT WRAPPER */}
-      <div className="relative z-10 w-full px-6 flex justify-center">
-        
-        <div className="max-w-3xl text-center">
+      {/* FLOATING ELEMENTS */}
+      <FloatingCards />
 
-          {/* 🟣 BRAND */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-sm md:text-base text-purple-400 tracking-wide mb-8 font-semibold"
-          >
-            GROWCAD — Growth OS for Coaching Institutes
-          </motion.p>
+      <div className="relative z-10 max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
 
-          {/* 🧠 HOOK */}
-          <motion.h1
-            initial={{ opacity: 0, y: 60 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-4xl md:text-6xl font-bold leading-[1.1] text-white mb-6"
-          >
-            Beat Bigger <br />
-            Coaching Institutes
-          </motion.h1>
+        {/* LEFT */}
+        <div className="space-y-6">
 
-          {/* ✨ SUPPORT LINE */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-gray-400 text-lg md:text-xl leading-relaxed mb-10"
-          >
-            Run your institute like a top brand.
-          </motion.p>
+          {/* BADGE */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-gray-300">
+            🚀 Growth OS for Coaching Institutes
+          </div>
 
-          {/* 🎯 CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
-            <MagneticButton
-              onClick={() => router.push("/auth/register")}
-              primary
-            >
-              Start Free
-            </MagneticButton>
+          {/* HEADLINE */}
+          <h1 className="text-4xl md:text-6xl font-bold leading-tight text-white">
+            {headline}
+          </h1>
 
-            <MagneticButton
-              onClick={() => window.open("https://youtube.com")}
-            >
-              Watch Demo
-            </MagneticButton>
-          </motion.div>
+          {/* DYNAMIC TEXT */}
+          <TypingText />
 
+          {/* SUBTEXT */}
+          <p className="text-gray-400 text-lg max-w-xl">
+            From leads to admissions, fees to analytics —
+            everything your institute needs to scale from
+            100 to 5000+ students.
+          </p>
+
+          {/* CTA */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <MagneticButton label={ctaText[persona]} primary />
+            <MagneticButton label="See Live Demo" />
+          </div>
+
+          {/* V5 COMPONENTS */}
+          <ComparisonToggle />
+          <MiniDemo />
+          <WhatsAppCapture />
+
+          {/* TRUST */}
+          <div className="flex items-center gap-6 text-sm text-gray-500 pt-4">
+            <span>✔ No setup cost</span>
+            <span>✔ Multi-branch ready</span>
+            <span>✔ Built for scale</span>
+          </div>
+        </div>
+
+        {/* RIGHT */}
+        <div className="relative">
+          <DashboardPreview />
         </div>
       </div>
-
-      {/* 🔥 Bottom fade */}
-      <div className="absolute bottom-0 w-full h-40 bg-gradient-to-b from-transparent to-black" />
-    </section>
+    </motion.section>
   );
 }

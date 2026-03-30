@@ -39,9 +39,7 @@ export default function HeroCard() {
       {/* 🎯 CTA */}
       <div className="flex flex-col md:flex-row gap-4 justify-center mt-6 md:mt-8">
 
-        <MagneticButton>
-          Start Free — No Setup Needed
-        </MagneticButton>
+        <MagneticButton label="Start Free" primary />
 
         <button className="btn-secondary">
           See How It Works

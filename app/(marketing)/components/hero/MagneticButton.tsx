@@ -1,35 +1,21 @@
 "use client";
 
 export default function MagneticButton({
-  children,
-  onClick,
+  label,
   primary = false,
 }: {
-  children: React.ReactNode;
-  onClick?: () => void;
+  label: string;
   primary?: boolean;
 }) {
-  const handleMove = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-
-    e.currentTarget.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
-  };
-
   return (
     <button
-      onClick={onClick}
-      onMouseMove={handleMove}
-      onMouseLeave={(e) => (e.currentTarget.style.transform = "translate(0,0)")}
-      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1)")}
-      className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+      className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
         primary
-          ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg"
-          : "border border-gray-700 text-white hover:bg-gray-800"
+          ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:scale-105"
+          : "border border-white/20 text-white hover:bg-white/10"
       }`}
     >
-      {children}
+      {label}
     </button>
   );
 }
