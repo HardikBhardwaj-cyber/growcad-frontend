@@ -1,103 +1,86 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useMotionValue } from "framer-motion";
+import { motion } from "framer-motion";
 
 export default function DashboardPreview() {
-  const ref = useRef<HTMLDivElement>(null);
-
-  const rotateX = useMotionValue(0);
-  const rotateY = useMotionValue(0);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const rect = ref.current?.getBoundingClientRect();
-    if (!rect) return;
-
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    rotateY.set((x - rect.width / 2) / 25);
-    rotateX.set(-(y - rect.height / 2) / 25);
-  };
-
-  const handleMouseLeave = () => {
-    rotateX.set(0);
-    rotateY.set(0);
-  };
-
-  const path =
-    "M10 120 L60 90 L110 100 L160 60 L210 70 L260 40 L310 20";
-
   return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{ rotateX, rotateY, transformPerspective: 1200 }}
-      className="relative w-full h-[420px] rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl overflow-visible"
-    >
-      <div className="p-4 grid grid-cols-2 gap-4">
+    <div className="relative rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-6 shadow-2xl overflow-hidden">
 
-        {/* CARDS */}
-        <div className="bg-white/10 border border-white/20 rounded-xl p-4">
-          <p className="text-sm text-gray-300">Revenue</p>
-          <div className="mt-2 h-6 w-20 bg-white/20 rounded animate-pulse" />
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-white font-semibold">Dashboard</h3>
+        <span className="text-green-400 text-sm">● Live</span>
+      </div>
+
+      {/* CARDS */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+
+        <div className="bg-white/10 rounded-xl p-4">
+          <p className="text-gray-400 text-sm">Revenue</p>
+          <motion.h2
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-white text-xl font-bold"
+          >
+            ₹1.2L
+          </motion.h2>
         </div>
 
-        <div className="bg-white/10 border border-white/20 rounded-xl p-4">
-          <p className="text-sm text-gray-300">Students</p>
-          <div className="mt-2 h-6 w-16 bg-white/20 rounded animate-pulse" />
+        <div className="bg-white/10 rounded-xl p-4">
+          <p className="text-gray-400 text-sm">Students</p>
+          <h2 className="text-white text-xl font-bold">324</h2>
         </div>
 
-        {/* LINE CHART */}
-        <div className="bg-white/10 border border-white/20 rounded-xl p-4 col-span-2">
-          <p className="text-sm text-gray-300 mb-3">Growth</p>
-
-          <svg viewBox="0 0 340 140" className="w-full h-[140px]">
-
-            <defs>
-              <linearGradient id="gradient" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#a855f7" />
-                <stop offset="100%" stopColor="#3b82f6" />
-              </linearGradient>
-
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="4" />
-              </filter>
-            </defs>
-
-            <motion.path
-              d={path}
-              fill="none"
-              stroke="url(#gradient)"
-              strokeWidth="6"
-              opacity="0.3"
-              filter="url(#glow)"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 2 }}
-            />
-
-            <motion.path
-              d={path}
-              fill="none"
-              stroke="url(#gradient)"
-              strokeWidth="3"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 2 }}
-            />
-
-            <motion.polygon
-              points="310,20 325,10 320,25"
-              fill="#8b5cf6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.5 }}
-            />
-          </svg>
+        <div className="bg-white/10 rounded-xl p-4">
+          <p className="text-gray-400 text-sm">Conversion</p>
+          <h2 className="text-green-400 text-xl font-bold">+18%</h2>
         </div>
       </div>
-    </motion.div>
+
+      {/* LINE CHART */}
+      <div className="relative h-[180px]">
+
+        <svg viewBox="0 0 400 180" className="w-full h-full">
+
+          <defs>
+            <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#a855f7" />
+              <stop offset="100%" stopColor="#3b82f6" />
+            </linearGradient>
+          </defs>
+
+          <motion.path
+            d="M0 150 L80 100 L160 120 L240 60 L320 80 L400 40"
+            fill="none"
+            stroke="url(#grad)"
+            strokeWidth="3"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 2 }}
+          />
+
+          {/* MOVING DOT */}
+          <motion.circle
+            r="5"
+            fill="#a855f7"
+            animate={{
+              cx: [0, 80, 160, 240, 320, 400],
+              cy: [150, 100, 120, 60, 80, 40],
+            }}
+            transition={{ duration: 2 }}
+          />
+        </svg>
+
+        {/* FLOATING ACTIVITY */}
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 1.5 }}
+          className="absolute top-2 right-2 bg-white/10 px-3 py-1 rounded-lg text-xs text-green-400"
+        >
+          +12 new admissions
+        </motion.div>
+      </div>
+    </div>
   );
 }
