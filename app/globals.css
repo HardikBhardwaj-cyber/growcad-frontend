@@ -96,6 +96,10 @@ button:hover {
 .btn-secondary:hover {
   background: rgba(255,255,255,0.1);
 }
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
 
 @keyframes gradientMove {
   0% { background-position: 0% 50% }

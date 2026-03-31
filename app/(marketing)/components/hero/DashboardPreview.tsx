@@ -16,11 +16,8 @@ export default function DashboardPreview() {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const midX = rect.width / 2;
-    const midY = rect.height / 2;
-
-    rotateY.set((x - midX) / 25);
-    rotateX.set(-(y - midY) / 25);
+    rotateY.set((x - rect.width / 2) / 25);
+    rotateX.set(-(y - rect.height / 2) / 25);
   };
 
   const handleMouseLeave = () => {
@@ -28,7 +25,6 @@ export default function DashboardPreview() {
     rotateY.set(0);
   };
 
-  // 📈 LINE PATH
   const path =
     "M10 120 L60 90 L110 100 L160 60 L210 70 L260 40 L310 20";
 
@@ -37,34 +33,28 @@ export default function DashboardPreview() {
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{
-        rotateX,
-        rotateY,
-        transformPerspective: 1200,
-      }}
+      style={{ rotateX, rotateY, transformPerspective: 1200 }}
       className="relative w-full h-[420px] rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl overflow-visible"
     >
-      <div className="absolute inset-0 p-4 grid grid-cols-2 gap-4">
+      <div className="p-4 grid grid-cols-2 gap-4">
 
-        {/* REVENUE */}
-        <div className="bg-white/10 rounded-xl p-4">
-          <p className="text-sm text-gray-400">Revenue</p>
-          <div className="mt-2 h-6 w-20 bg-white/10 rounded animate-pulse" />
+        {/* CARDS */}
+        <div className="bg-white/10 border border-white/20 rounded-xl p-4">
+          <p className="text-sm text-gray-300">Revenue</p>
+          <div className="mt-2 h-6 w-20 bg-white/20 rounded animate-pulse" />
         </div>
 
-        {/* STUDENTS */}
-        <div className="bg-white/10 rounded-xl p-4">
-          <p className="text-sm text-gray-400">Students</p>
-          <div className="mt-2 h-6 w-16 bg-white/10 rounded animate-pulse" />
+        <div className="bg-white/10 border border-white/20 rounded-xl p-4">
+          <p className="text-sm text-gray-300">Students</p>
+          <div className="mt-2 h-6 w-16 bg-white/20 rounded animate-pulse" />
         </div>
 
-        {/* GROWTH LINE */}
-        <div className="bg-white/10 rounded-xl p-4 col-span-2 relative overflow-visible">
-          <p className="text-sm text-gray-400 mb-3">Growth</p>
+        {/* LINE CHART */}
+        <div className="bg-white/10 border border-white/20 rounded-xl p-4 col-span-2">
+          <p className="text-sm text-gray-300 mb-3">Growth</p>
 
-          <svg viewBox="0 0 340 140" className="w-full h-[140px] overflow-visible">
+          <svg viewBox="0 0 340 140" className="w-full h-[140px]">
 
-            {/* DEFINITIONS */}
             <defs>
               <linearGradient id="gradient" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor="#a855f7" />
@@ -72,15 +62,10 @@ export default function DashboardPreview() {
               </linearGradient>
 
               <filter id="glow">
-                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
-                <feMerge>
-                  <feMergeNode in="coloredBlur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
+                <feGaussianBlur stdDeviation="4" />
               </filter>
             </defs>
 
-            {/* GLOW LINE */}
             <motion.path
               d={path}
               fill="none"
@@ -93,7 +78,6 @@ export default function DashboardPreview() {
               transition={{ duration: 2 }}
             />
 
-            {/* MAIN LINE */}
             <motion.path
               d={path}
               fill="none"
@@ -104,34 +88,16 @@ export default function DashboardPreview() {
               transition={{ duration: 2 }}
             />
 
-            {/* MOVING DOT */}
-            <motion.circle
-              r="5"
-              fill="#a855f7"
-              filter="url(#glow)"
-              style={{
-                offsetPath: `path("${path}")`,
-                offsetDistance: "100%",
-              }}
+            <motion.polygon
+              points="310,20 325,10 320,25"
+              fill="#8b5cf6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.5 }}
             />
-
-            {/* ARROW OUTSIDE */}
-            <motion.polygon
-              points="310,20 325,10 320,25"
-              fill="#8b5cf6"
-              initial={{ opacity: 0, x: -10, y: 10 }}
-              animate={{ opacity: 1, x: 0, y: 0 }}
-              transition={{ delay: 1.8 }}
-            />
           </svg>
         </div>
       </div>
-
-      {/* GLOW */}
-      <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-500/20 blur-3xl rounded-full" />
     </motion.div>
   );
 }
