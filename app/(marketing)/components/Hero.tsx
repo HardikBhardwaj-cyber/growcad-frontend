@@ -1,63 +1,61 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import MagneticButton from "./hero/MagneticButton";
 import DashboardPreview from "./hero/DashboardPreview";
 import TypingText from "./hero/TypingText";
 import Spotlight from "./hero/Spotlight";
-import FloatingCards from "./hero/FloatingCards";
-import ComparisonToggle from "./hero/ComparisonToggle";
-import WhatsAppCapture from "./hero/WhatsAppCapture";
-import MiniDemo from "./hero/MiniDemo";
-import { usePersona } from "./hooks/usePersona";
-import { useDynamicHeadline } from "./hooks/useDynamicHeadline";
+import FloatingBubbles from "./hero/FloatingBubbles";
 
 export default function Hero() {
-  const { scrollY } = useScroll();
-
-  const scale = useTransform(scrollY, [0, 300], [1, 0.95]);
-  const opacity = useTransform(scrollY, [0, 300], [1, 0.7]);
-
-  const persona = usePersona();
-  const headline = useDynamicHeadline(persona);
-
-  const ctaText: Record<typeof persona, string> = {
-    small: "Start Free Trial",
-    medium: "See How It Works",
-    large: "Book Demo",
-    default: "Get Started",
-  };
-
   return (
-    <motion.section
-      style={{ scale, opacity }}
-      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-[#0a0a0f]"
-    >
-      {/* 🎯 LIGHT EFFECT */}
-      <Spotlight />
+    <section className="relative w-full min-h-screen flex items-center bg-[#0a0a0f] overflow-hidden">
 
       {/* 🌌 BACKGROUND */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-blue-900/10 to-black" />
+      <Spotlight />
+      <FloatingBubbles />
 
-      {/* FLOATING ELEMENTS */}
-      <FloatingCards />
+      {/* EDUCATION VISUAL TOUCH */}
+      <div className="absolute top-10 right-10 text-white/5 text-6xl select-none">
+        ∫ √ π
+      </div>
+      <div className="absolute bottom-10 left-10 text-white/5 text-5xl select-none">
+        E = mc²
+      </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+      {/* MAIN */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
 
         {/* LEFT */}
-        <div className="space-y-6">
+        <div className="space-y-8">
 
           {/* BADGE */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-gray-300">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-block px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-gray-300"
+          >
             🚀 Growth OS for Coaching Institutes
-          </div>
+          </motion.div>
 
           {/* HEADLINE */}
-          <h1 className="text-4xl md:text-6xl font-bold leading-tight text-white">
-            {headline}
-          </h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-4xl md:text-6xl font-bold leading-tight"
+          >
+            <span className="text-white">
+              Dominate your coaching market with
+            </span>
 
-          {/* DYNAMIC TEXT */}
+            <br />
+
+            <span className="block mt-2 text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              GROWCAD
+            </span>
+          </motion.h1>
+
+          {/* TYPING */}
           <TypingText />
 
           {/* SUBTEXT */}
@@ -68,18 +66,22 @@ export default function Hero() {
           </p>
 
           {/* CTA */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <MagneticButton label={ctaText[persona]} primary />
+          <div className="flex flex-wrap gap-4">
+            <MagneticButton label="Get Started" primary />
             <MagneticButton label="See Live Demo" />
           </div>
 
-          {/* V5 COMPONENTS */}
-          <ComparisonToggle />
-          <MiniDemo />
-          <WhatsAppCapture />
+          {/* WHATSAPP */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            className="flex items-center gap-3 bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl text-white font-medium w-fit transition"
+          >
+            <span className="text-lg">💬</span>
+            Chat on WhatsApp
+          </motion.button>
 
           {/* TRUST */}
-          <div className="flex items-center gap-6 text-sm text-gray-500 pt-4">
+          <div className="flex gap-6 text-sm text-gray-500 pt-2">
             <span>✔ No setup cost</span>
             <span>✔ Multi-branch ready</span>
             <span>✔ Built for scale</span>
@@ -87,10 +89,15 @@ export default function Hero() {
         </div>
 
         {/* RIGHT */}
-        <div className="relative">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="relative"
+        >
           <DashboardPreview />
-        </div>
+        </motion.div>
       </div>
-    </motion.section>
+    </section>
   );
 }
