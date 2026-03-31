@@ -1,27 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export default function CursorGlow() {
-  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let x = 0, y = 0;
+    let tx = 0, ty = 0;
+
     const move = (e: MouseEvent) => {
-      setPos({ x: e.clientX, y: e.clientY });
+      tx = e.clientX;
+      ty = e.clientY;
+    };
+
+    const loop = () => {
+      x += (tx - x) * 0.08;
+      y += (ty - y) * 0.08;
+
+      if (ref.current) {
+        ref.current.style.transform = `translate(${x - 300}px, ${y - 300}px)`;
+      }
+
+      requestAnimationFrame(loop);
     };
 
     window.addEventListener("mousemove", move);
+    loop();
+
     return () => window.removeEventListener("mousemove", move);
   }, []);
 
   return (
     <div className="pointer-events-none fixed inset-0 z-0">
       <div
-        className="absolute w-[500px] h-[500px] rounded-full blur-[120px] opacity-20 transition-transform duration-300"
+        ref={ref}
+        className="absolute w-[600px] h-[600px] blur-[140px] rounded-full"
         style={{
-          transform: `translate(${pos.x - 250}px, ${pos.y - 250}px)`,
           background:
-            "radial-gradient(circle, rgba(124,58,237,0.4), transparent 70%)",
+            "radial-gradient(circle, rgba(124,58,237,0.35), rgba(59,130,246,0.25), transparent 70%)",
         }}
       />
     </div>
