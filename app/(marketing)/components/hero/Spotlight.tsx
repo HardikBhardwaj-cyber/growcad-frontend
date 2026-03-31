@@ -9,16 +9,21 @@ export default function Spotlight() {
     const move = (e: MouseEvent) => {
       setPos({ x: e.clientX, y: e.clientY });
     };
+
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
   }, []);
 
   return (
-    <div
-      className="pointer-events-none absolute inset-0"
-      style={{
-        background: `radial-gradient(500px at ${pos.x}px ${pos.y}px, rgba(124,58,237,0.15), transparent 80%)`,
-      }}
-    />
+    <div className="pointer-events-none absolute inset-0 z-0">
+      <div
+        className="absolute w-[600px] h-[600px] rounded-full blur-[120px] opacity-30 transition-transform duration-200 ease-out"
+        style={{
+          transform: `translate(${pos.x - 300}px, ${pos.y - 300}px)`,
+          background:
+            "radial-gradient(circle, rgba(124,58,237,0.35), transparent 70%)",
+        }}
+      />
+    </div>
   );
 }

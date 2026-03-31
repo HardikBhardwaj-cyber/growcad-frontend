@@ -1,13 +1,16 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useMotionValue } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export default function DashboardPreview() {
   const ref = useRef<HTMLDivElement>(null);
 
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
+
+  const smoothX = useSpring(rotateX, { stiffness: 100, damping: 20 });
+  const smoothY = useSpring(rotateY, { stiffness: 100, damping: 20 });
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = ref.current?.getBoundingClientRect();
@@ -16,8 +19,8 @@ export default function DashboardPreview() {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    rotateY.set((x - rect.width / 2) / 30);
-    rotateX.set(-(y - rect.height / 2) / 30);
+    rotateY.set((x - rect.width / 2) / 25);
+    rotateX.set(-(y - rect.height / 2) / 25);
   };
 
   const handleMouseLeave = () => {
@@ -30,27 +33,26 @@ export default function DashboardPreview() {
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      initial={{ opacity: 0, y: 60, rotateX: 10 }}
-      animate={{ opacity: 1, y: 0, rotateX: 0 }}
-      transition={{ duration: 0.9, ease: "easeOut" }}
+      animate={{ y: [0, -10, 0] }}
+      transition={{ duration: 6, repeat: Infinity }}
       style={{
-        rotateX,
-        rotateY,
+        rotateX: smoothX,
+        rotateY: smoothY,
         transformPerspective: 1200,
       }}
       className="relative"
     >
       {/* GLOW */}
-      <div className="absolute inset-0 bg-purple-500/20 blur-3xl rounded-full" />
+      <div className="absolute inset-0 bg-purple-500/20 blur-[100px] rounded-full" />
 
       {/* CARD */}
-      <div className="relative rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-6 shadow-2xl">
+      <div className="relative rounded-2xl bg-white/5 border border-white/10 backdrop-blur-2xl p-6 shadow-[0_20px_80px_rgba(124,58,237,0.25)]">
 
         {/* USERS */}
         <div className="flex gap-4 mb-6">
           {["Admin", "Faculty", "Student", "Parent"].map((role, i) => (
             <div key={i} className="flex flex-col items-center text-xs text-gray-300">
-              <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 mb-1" />
+              <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 mb-1 hover:scale-110 transition" />
               {role}
             </div>
           ))}
@@ -71,24 +73,8 @@ export default function DashboardPreview() {
 
         {/* CHART */}
         <div className="relative h-[200px]">
-
           <svg viewBox="0 0 400 200" className="w-full h-full">
 
-            <defs>
-              <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#a855f7" />
-                <stop offset="100%" stopColor="#3b82f6" />
-              </linearGradient>
-            </defs>
-
-            {/* GRID */}
-            <g opacity="0.1">
-              {[...Array(10)].map((_, i) => (
-                <line key={i} x1="0" y1={i * 20} x2="400" y2={i * 20} stroke="white" />
-              ))}
-            </g>
-
-            {/* LINE */}
             <motion.path
               d="M0 160 L80 120 L160 140 L240 80 L320 100 L400 60"
               fill="none"
@@ -99,23 +85,11 @@ export default function DashboardPreview() {
               transition={{ duration: 2 }}
             />
 
-            {/* DOT */}
-            <motion.circle
-              r="5"
-              fill="#a855f7"
-              animate={{
-                cx: [0, 80, 160, 240, 320, 400],
-                cy: [160, 120, 140, 80, 100, 60],
-              }}
-              transition={{ duration: 2 }}
-            />
           </svg>
 
-          {/* FLOAT CARD */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.5 }}
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ repeat: Infinity, duration: 2 }}
             className="absolute bottom-4 right-4 bg-white/10 border border-white/20 p-3 rounded-xl text-sm"
           >
             <p className="text-gray-400">Conversion</p>
