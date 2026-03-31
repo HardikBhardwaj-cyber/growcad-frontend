@@ -12,10 +12,10 @@ export default function FloatingIcons() {
           key={i}
           animate={{ y: [0, 40, 0] }}
           transition={{ repeat: Infinity, duration: 6 + i }}
-          className="absolute text-white/10 text-3xl"
+          className="absolute text-white/5 text-4xl"
           style={{
-            top: `${20 + i * 10}%`,
-            left: `${70 + (i % 2) * 10}%`,
+            top: `${10 + i * 15}%`,
+            left: `${10 + i * 20}%`,
           }}
         >
           {icon}
