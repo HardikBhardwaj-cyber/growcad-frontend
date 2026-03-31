@@ -1,18 +1,52 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useMotionValue } from "framer-motion";
 
 export default function DashboardPreview() {
-  return (
-    <div className="relative">
+  const ref = useRef<HTMLDivElement>(null);
 
-      {/* GLOW BACKGROUND */}
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = ref.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    rotateY.set((x - rect.width / 2) / 30);
+    rotateX.set(-(y - rect.height / 2) / 30);
+  };
+
+  const handleMouseLeave = () => {
+    rotateX.set(0);
+    rotateY.set(0);
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      initial={{ opacity: 0, y: 60, rotateX: 10 }}
+      animate={{ opacity: 1, y: 0, rotateX: 0 }}
+      transition={{ duration: 0.9, ease: "easeOut" }}
+      style={{
+        rotateX,
+        rotateY,
+        transformPerspective: 1200,
+      }}
+      className="relative"
+    >
+      {/* GLOW */}
       <div className="absolute inset-0 bg-purple-500/20 blur-3xl rounded-full" />
 
-      {/* MAIN CARD */}
+      {/* CARD */}
       <div className="relative rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-6 shadow-2xl">
 
-        {/* TOP USERS */}
+        {/* USERS */}
         <div className="flex gap-4 mb-6">
           {["Admin", "Faculty", "Student", "Parent"].map((role, i) => (
             <div key={i} className="flex flex-col items-center text-xs text-gray-300">
@@ -65,16 +99,6 @@ export default function DashboardPreview() {
               transition={{ duration: 2 }}
             />
 
-            {/* GLOW */}
-            <motion.path
-              d="M0 160 L80 120 L160 140 L240 80 L320 100 L400 60"
-              fill="none"
-              stroke="#a855f7"
-              strokeWidth="8"
-              opacity="0.2"
-              filter="blur(10px)"
-            />
-
             {/* DOT */}
             <motion.circle
               r="5"
@@ -99,20 +123,6 @@ export default function DashboardPreview() {
           </motion.div>
         </div>
       </div>
-
-      {/* FLOATING ICONS */}
-      <div className="absolute -left-10 top-20 flex flex-col gap-6">
-        {["🎓", "📈", "💰"].map((icon, i) => (
-          <motion.div
-            key={i}
-            animate={{ y: [0, 20, 0] }}
-            transition={{ repeat: Infinity, duration: 4 + i }}
-            className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-xl backdrop-blur-lg"
-          >
-            {icon}
-          </motion.div>
-        ))}
-      </div>
-    </div>
+    </motion.div>
   );
 }
