@@ -39,10 +39,21 @@ export default function DashboardPreview() {
         </div>
 
         {/* CHART */}
-        <div className="h-[150px] bg-white/5 rounded-xl flex items-center justify-center text-gray-500 text-sm">
-          Live Growth Chart
+        <div className="relative h-[150px]">
+            <div className="absolute inset-0 bg-gradient-to-t from-purple-500/10 to-transparent rounded-xl" />
+
+                <motion.div
+                    className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-purple-500 to-blue-500"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 2 }}
+                />
+
+                <p className="text-gray-400 text-sm absolute bottom-2 left-3">
+                Live Growth
+                </p>
+            </div>
         </div>
-      </div>
     </motion.div>
   );
 }
