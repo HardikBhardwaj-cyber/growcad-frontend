@@ -1,8 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { useTilt } from "../../hooks/useTilt";
+import { useMotion } from "../../systems/MotionProvider";
+import { useCountUp } from "../../hooks/useCountUp";
 
 export default function DashboardPreview() {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -15,6 +17,18 @@ export default function DashboardPreview() {
     handleMove,
     handleLeave,
   } = useTilt(18);
+
+  const { scrollProgress } = useMotion();
+
+  /* 🔥 GRAPH CONTROL (SCROLL BASED) */
+  const pathLength = useTransform(scrollProgress, [0, 0.4], [0, 1]);
+
+  /* 🔥 LIVE DATA */
+  const revenue = useCountUp(120000);
+  const students = useCountUp(324);
+
+  /* 🔥 GROWTH DYNAMIC */
+  const growth = useTransform(scrollProgress, [0, 0.5], [5, 18]);
 
   return (
     <motion.div
@@ -32,7 +46,7 @@ export default function DashboardPreview() {
       className="relative w-[320px] sm:w-[420px] md:w-[480px] rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-6 shadow-[0_50px_150px_rgba(0,0,0,0.7)] overflow-hidden"
     >
 
-      {/* 🔥 GLARE (INSANE EFFECT) */}
+      {/* 🔥 GLARE */}
       <motion.div
         style={{
           background: `radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.15), transparent 60%)`,
@@ -47,32 +61,22 @@ export default function DashboardPreview() {
         className="absolute inset-0 bg-purple-500/10 blur-2xl"
       />
 
-      {/* 🔔 MULTI NOTIFICATIONS */}
-      <div className="absolute top-4 right-4 space-y-2">
-        {["New student enrolled 🎉", "Fee received 💰"].map((text, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{
-              opacity: [0, 1, 0],
-              y: [20, 0, -20],
-            }}
-            transition={{
-              duration: 4,
-              delay: i * 1.5,
-              repeat: Infinity,
-            }}
-            className="text-xs bg-white/10 border border-white/20 px-3 py-1 rounded-lg backdrop-blur-md"
-          >
-            {text}
-          </motion.div>
-        ))}
-      </div>
+      {/* 🔔 SMART NOTIFICATIONS (NO LOOP SPAM) */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{
+          opacity: scrollProgress.get() > 0.2 ? 1 : 0,
+          y: scrollProgress.get() > 0.2 ? 0 : 20,
+        }}
+        className="absolute top-4 right-4 text-xs bg-white/10 border border-white/20 px-3 py-1 rounded-lg backdrop-blur-md"
+      >
+        New student enrolled 🎉
+      </motion.div>
 
-      {/* 👤 USER ROLES */}
+      {/* 👤 USERS */}
       <div className="flex gap-4 mb-6">
-        {["Admin", "Faculty", "Student", "Parent"].map((role, i) => (
-          <div key={i} className="flex flex-col items-center text-xs text-gray-300">
+        {["Admin", "Faculty", "Student", "Parent"].map((role) => (
+          <div key={role} className="flex flex-col items-center text-xs text-gray-300">
             <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 mb-1" />
             {role}
           </div>
@@ -81,27 +85,26 @@ export default function DashboardPreview() {
 
       {/* 📊 STATS */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="bg-white/10 p-4 rounded-xl"
-        >
+        <motion.div whileHover={{ scale: 1.05 }} className="bg-white/10 p-4 rounded-xl">
           <p className="text-gray-400 text-sm">Revenue</p>
-          <h2 className="text-white text-xl font-bold">₹1.2L</h2>
+          <h2 className="text-white text-xl font-bold">
+            ₹{(revenue / 1000).toFixed(1)}K
+          </h2>
         </motion.div>
 
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="bg-white/10 p-4 rounded-xl"
-        >
+        <motion.div whileHover={{ scale: 1.05 }} className="bg-white/10 p-4 rounded-xl">
           <p className="text-gray-400 text-sm">Students</p>
-          <h2 className="text-white text-xl font-bold">324</h2>
+          <h2 className="text-white text-xl font-bold">
+            {students}
+          </h2>
         </motion.div>
       </div>
 
-      {/* 📈 CHART */}
+      {/* 📈 GRAPH */}
       <div className="relative h-[150px]">
 
         <svg viewBox="0 0 400 150" className="w-full h-full">
+
           <defs>
             <linearGradient id="grad">
               <stop offset="0%" stopColor="#a855f7" />
@@ -109,37 +112,22 @@ export default function DashboardPreview() {
             </linearGradient>
           </defs>
 
-          {/* LINE */}
+          {/* 🔥 LINE */}
           <motion.path
             d="M0 120 L80 90 L160 110 L240 60 L320 80 L400 40"
             fill="none"
             stroke="url(#grad)"
             strokeWidth="3"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 2 }}
+            style={{ pathLength }}
           />
 
-          {/* 🔥 MOVING DOT */}
-          <motion.circle
-            r="5"
-            fill="#a855f7"
-            animate={{
-              cx: [0, 80, 160, 240, 320, 400],
-              cy: [120, 90, 110, 60, 80, 40],
-            }}
-            transition={{ duration: 2 }}
-          />
         </svg>
 
-        {/* 🔥 GROWTH */}
-        <motion.div
-          animate={{ opacity: [0, 1, 0] }}
-          transition={{ duration: 3, repeat: Infinity }}
-          className="absolute bottom-2 right-2 text-green-400 text-sm font-semibold"
-        >
-          +18% Growth
+        {/* 🔥 DYNAMIC GROWTH */}
+        <motion.div className="absolute bottom-2 right-2 text-green-400 text-sm font-semibold">
+          +{Math.round(growth.get())}% Growth
         </motion.div>
+
       </div>
 
     </motion.div>
