@@ -11,10 +11,10 @@ export default function HeroLeft() {
       variants={staggerContainer}
       initial="hidden"
       animate="show"
-      className="flex flex-col max-w-[520px] text-center lg:text-left"
+      className="flex flex-col max-w-[560px] text-center lg:text-left"
     >
       {/* 🚀 BADGE */}
-      <motion.div variants={fadeUp} className="mb-6 flex justify-center lg:justify-start">
+      <motion.div variants={fadeUp} className="mb-8 flex justify-center lg:justify-start">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-gray-300 backdrop-blur-md">
           <Sparkles className="w-4 h-4 text-purple-400" />
           <span>Growth OS for Coaching Institutes</span>
@@ -24,7 +24,7 @@ export default function HeroLeft() {
       {/* 🔥 HEADLINE */}
       <motion.h1
         variants={fadeUp}
-        className="leading-[1.05] tracking-tight"
+        className="leading-[1.05] tracking-tight space-y-2"
       >
         {/* LINE 1 */}
         <span className="block text-4xl sm:text-5xl md:text-6xl font-semibold text-white">
@@ -36,12 +36,13 @@ export default function HeroLeft() {
           institutes
         </span>
 
-        {/* GROWCAD (MAIN FOCUS) */}
+        {/* BRAND */}
         <motion.span
-          className="block mt-4 text-6xl sm:text-7xl md:text-8xl font-extrabold 
+          className="block mt-6 text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold 
           bg-gradient-to-r from-purple-400 via-blue-400 to-indigo-500 
-          bg-clip-text text-transparent"
-          animate={{ opacity: [1, 0.85, 1] }}
+          bg-clip-text text-transparent
+          drop-shadow-[0_10px_30px_rgba(124,58,237,0.35)]"
+          animate={{ opacity: [1, 0.9, 1] }}
           transition={{ duration: 3, repeat: Infinity }}
         >
           GROWCAD
@@ -51,7 +52,7 @@ export default function HeroLeft() {
       {/* ✨ SUBTEXT */}
       <motion.p
         variants={fadeUp}
-        className="text-gray-400 mt-6 text-lg leading-relaxed"
+        className="text-gray-300 mt-8 text-lg leading-relaxed max-w-[500px]"
       >
         Automate admissions, manage students, and scale your institute —
         all from one powerful platform built for modern coaching businesses.
@@ -60,12 +61,14 @@ export default function HeroLeft() {
       {/* 🎯 CTA */}
       <motion.div
         variants={fadeUp}
-        className="flex flex-col sm:flex-row gap-4 mt-10 justify-center lg:justify-start"
+        className="flex flex-col sm:flex-row gap-4 mt-10 justify-center lg:justify-start items-center lg:items-start"
       >
         {/* PRIMARY CTA */}
         <div className="relative">
-          <div className="absolute inset-0 blur-xl bg-purple-500/30 opacity-50 rounded-xl" />
-          <MagneticButton className="relative z-10 px-7 py-3 text-base font-semibold">
+          {/* glow */}
+          <div className="absolute inset-0 blur-xl bg-purple-500/40 opacity-60 rounded-xl" />
+
+          <MagneticButton className="relative z-10 px-8 py-3 text-base font-semibold">
             Get Early Access
           </MagneticButton>
         </div>
@@ -80,10 +83,10 @@ export default function HeroLeft() {
         </motion.button>
       </motion.div>
 
-      {/* ✅ TRUST (MAKE IT STRONGER) */}
+      {/* ✅ TRUST */}
       <motion.div
         variants={fadeUp}
-        className="flex flex-wrap justify-center lg:justify-start gap-6 text-sm text-gray-400 mt-10"
+        className="flex flex-wrap justify-center lg:justify-start gap-6 text-sm text-gray-400 mt-12"
       >
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-purple-400" />
