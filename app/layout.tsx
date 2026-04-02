@@ -2,11 +2,17 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Providers from "./providers";
 import Cursor from "@/components/ui/Cursor";
-import SplashIntro from "./(marketing)/components/hero/SplashIntro";
 
 export const metadata = {
-  title: "Growcad",
-  description: "Growth OS for Coaching Institutes",
+  title: "GROWCAD – Growth OS for Coaching Institutes",
+  description:
+    "Automate admissions, manage students, and scale your coaching institute with GROWCAD.",
+  keywords: [
+    "coaching management software",
+    "institute CRM",
+    "student management system",
+    "Growcad",
+  ],
 };
 
 export default function RootLayout({
@@ -16,23 +22,32 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-[#0a0a0f] text-white antialiased">
+      <body className="bg-[#0a0a0f] text-white antialiased overflow-x-hidden">
 
         <Providers>
 
-          {/* 🔥 SPLASH ONLY ON FIRST LOAD */}
-          <SplashIntro />
-
-          {/* 🔥 CURSOR SYSTEM */}
-          <Cursor />
+          {/* 🔥 GLOBAL CURSOR (TOP LAYER) */}
+          <div className="pointer-events-none fixed inset-0 z-[9999]">
+            <Cursor />
+          </div>
 
           {/* 🔥 MAIN APP */}
-          <div className="relative">
+          <div className="relative z-10">
             {children}
           </div>
 
-          {/* 🔥 TOAST */}
-          <Toaster position="top-right" />
+          {/* 🔥 TOAST SYSTEM */}
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: "rgba(15,23,42,0.9)",
+                color: "#fff",
+                border: "1px solid rgba(255,255,255,0.1)",
+                backdropFilter: "blur(10px)",
+              },
+            }}
+          />
 
         </Providers>
 

@@ -1,46 +1,140 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function EmailCapture() {
   const [email, setEmail] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [state, setState] = useState<"idle" | "loading" | "success" | "error">("idle");
 
-  const handleSubmit = () => {
-    if (!email) return;
+  /* ================= VALIDATION ================= */
 
-    setSuccess(true);
+  const isValidEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-    // later: connect backend
-    console.log("Email:", email);
+  /* ================= SUBMIT ================= */
+
+  const handleSubmit = async () => {
+    if (!isValidEmail(email)) {
+      setState("error");
+      return;
+    }
+
+    setState("loading");
+
+    // 🔥 simulate API
+    await new Promise((res) => setTimeout(res, 1200));
+
+    setState("success");
   };
 
+  /* ================= UI ================= */
+
   return (
-    <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
+    <div className="w-full max-w-md">
 
-      {/* ✨ INPUT */}
-      <input
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Enter your email"
-        className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 outline-none backdrop-blur-md focus:border-purple-400 transition"
-      />
+      {/* 🔥 INPUT + BUTTON */}
+      <div className="flex flex-col sm:flex-row gap-3">
 
-      {/* 🔥 BUTTON */}
-      <motion.button
-        onClick={handleSubmit}
-        whileTap={{ scale: 0.95 }}
-        className="px-6 py-3 rounded-xl bg-linear-to-r from-purple-500 to-blue-500 text-white font-semibold relative overflow-hidden"
-      >
+        {/* INPUT */}
+        <div className="relative flex-1">
+          <input
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (state === "error") setState("idle");
+            }}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            placeholder="Enter your email"
+            className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder-gray-400 outline-none backdrop-blur-md transition
+              ${
+                state === "error"
+                  ? "border-red-400"
+                  : "border-white/10 focus:border-purple-400"
+              }
+            `}
+          />
 
-        {success ? "You're In 🚀" : "Get Early Access"}
+          {/* 🔥 FOCUS GLOW */}
+          <div className="absolute inset-0 rounded-xl pointer-events-none blur-xl opacity-0 focus-within:opacity-40 bg-purple-500/20 transition" />
+        </div>
 
-        {/* HOVER SHINE */}
-        <span className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition" />
+        {/* BUTTON */}
+        <motion.button
+          onClick={handleSubmit}
+          disabled={state === "loading"}
+          whileTap={{ scale: 0.95 }}
+          className="relative px-6 py-3 rounded-xl font-semibold text-white overflow-hidden"
+        >
+          {/* 🔥 BACKGROUND */}
+          <div className="absolute inset-0 bg-linear-to-r from-purple-500 to-blue-500" />
 
-      </motion.button>
+          {/* 🔥 CONTENT */}
+          <AnimatePresence mode="wait">
+            {state === "loading" && (
+              <motion.span
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="relative z-10"
+              >
+                Loading...
+              </motion.span>
+            )}
 
+            {state === "success" && (
+              <motion.span
+                key="success"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="relative z-10"
+              >
+                You are In 🚀
+              </motion.span>
+            )}
+
+            {state === "idle" && (
+              <motion.span
+                key="idle"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="relative z-10"
+              >
+                Get Early Access
+              </motion.span>
+            )}
+
+            {state === "error" && (
+              <motion.span
+                key="error"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="relative z-10 text-red-200"
+              >
+                Invalid Email
+              </motion.span>
+            )}
+          </AnimatePresence>
+
+          {/* 🔥 SHIMMER */}
+          <span className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition" />
+        </motion.button>
+      </div>
+
+      {/* 🔥 ERROR TEXT */}
+      {state === "error" && (
+        <p className="text-red-400 text-xs mt-2">
+          Please enter a valid email address.
+        </p>
+      )}
+
+      {/* 🔥 TRUST */}
+      {state !== "error" && (
+        <p className="text-gray-500 text-xs mt-2">
+          No spam. Early access only.
+        </p>
+      )}
     </div>
   );
 }

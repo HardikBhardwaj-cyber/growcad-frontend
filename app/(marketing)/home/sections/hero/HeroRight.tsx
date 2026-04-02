@@ -1,29 +1,33 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useMotion } from "../../systems/MotionProvider";
 import DashboardPreview from "./DashboardPreview";
 
 export default function HeroRight() {
+  const { depth3X, depth3Y, drift } = useMotion();
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 120, scale: 0.85 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
+      style={{
+        x: depth3X,
+        y: depth3Y,
+        translateY: drift,
+      }}
+      initial={{ opacity: 0, scale: 0.92, y: 80 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{
         duration: 1,
-        ease: [0.22, 1, 0.36, 1],
-        delay: 0.3,
+        ease: [0.16, 1, 0.3, 1],
+        delay: 0.4,
       }}
-      className="relative flex justify-center lg:justify-end mt-12 lg:mt-0"
+      className="relative flex justify-center lg:justify-end"
     >
 
-      {/* 🔥 BACK GLOW (DEPTH) */}
-      <div className="absolute w-[500px] h-[500px] bg-purple-500/30 blur-[140px] rounded-full" />
-
-      {/* 🔥 FLOATING DASHBOARD */}
+      {/* 🔥 DEPTH WRAPPER */}
       <motion.div
         animate={{
-          y: [0, -20, 0],
-          rotate: [-3, -2, -3],
+          y: [0, -12, 0],
         }}
         transition={{
           duration: 6,
@@ -31,9 +35,15 @@ export default function HeroRight() {
           ease: "easeInOut",
         }}
         className="relative"
+        style={{
+          transformPerspective: 1200,
+        }}
       >
         <DashboardPreview />
       </motion.div>
+
+      {/* 🔥 BACK GLOW */}
+      <div className="absolute w-[600px] h-[600px] bg-purple-600/20 blur-[160px] rounded-full -z-10" />
 
     </motion.div>
   );

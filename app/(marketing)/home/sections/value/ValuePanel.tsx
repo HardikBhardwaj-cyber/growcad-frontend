@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { fadeUp, stagger } from "../../systems/variants";
+import { fadeUp, staggerContainer } from "../../systems/variants";
 
 const features = [
   {
@@ -22,13 +22,14 @@ export default function ValuePanel() {
   return (
     <section className="relative py-28 md:py-36 overflow-hidden">
 
-      {/* 🔥 BACKGROUND GLOW */}
+      {/* 🔥 BACKGROUND DEPTH */}
       <div className="absolute inset-0 flex justify-center">
-        <div className="w-[700px] h-[700px] bg-purple-600/10 blur-[140px] rounded-full" />
+        <div className="w-[800px] h-[800px] bg-purple-600/10 blur-[160px] rounded-full" />
+        <div className="absolute w-[500px] h-[500px] bg-blue-500/10 blur-[140px] rounded-full" />
       </div>
 
       <motion.div
-        variants={stagger}
+        variants={staggerContainer}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
@@ -38,39 +39,57 @@ export default function ValuePanel() {
         {/* 🔥 HEADING */}
         <motion.h2
           variants={fadeUp}
-          className="text-3xl sm:text-4xl md:text-5xl font-bold"
+          className="text-3xl sm:text-5xl md:text-6xl font-bold leading-tight"
         >
           Everything your institute needs to{" "}
-          <span className="text-transparent bg-clip-text bg-linear-to-r from-purple-400 to-blue-400">
+          <span className="relative inline-block text-transparent bg-clip-text bg-linear-to-r from-purple-400 via-blue-400 to-purple-400">
             grow faster
+
+            {/* glow */}
+            <span className="absolute inset-0 blur-xl opacity-30 bg-gradient-to-r from-purple-500 to-blue-500" />
           </span>
         </motion.h2>
 
         {/* ✨ SUBTEXT */}
         <motion.p
           variants={fadeUp}
-          className="text-gray-400 mt-4 text-base sm:text-lg max-w-2xl mx-auto"
+          className="text-gray-400 mt-5 text-base sm:text-lg max-w-2xl mx-auto"
         >
-          Replace multiple tools with one powerful system designed for coaching institutes.
+          Replace multiple tools with one powerful system designed specifically
+          for coaching institutes.
         </motion.p>
 
         {/* 💎 CARDS */}
         <motion.div
-          variants={stagger}
-          className="grid md:grid-cols-3 gap-6 mt-14"
+          variants={staggerContainer}
+          className="grid md:grid-cols-3 gap-8 mt-16"
         >
           {features.map((item, i) => (
             <motion.div
               key={i}
               variants={fadeUp}
-              whileHover={{ y: -8 }}
-              className="group relative p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl transition"
+              whileHover={{ y: -10, scale: 1.03 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="group relative p-7 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-[0_0_40px_rgba(124,58,237,0.1)]"
             >
 
               {/* 🔥 HOVER GLOW */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition">
                 <div className="absolute inset-0 bg-purple-500/10 blur-2xl rounded-2xl" />
               </div>
+
+              {/* 🔥 ICON */}
+              <motion.div
+                animate={{
+                  scale: [1, 1.1, 1],
+                  opacity: [0.8, 1, 0.8],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                }}
+                className="w-12 h-12 mx-auto mb-5 rounded-xl bg-linear-to-r from-purple-500 to-blue-500 flex items-center justify-center shadow-[0_0_25px_rgba(124,58,237,0.4)]"
+              />
 
               {/* ✨ CONTENT */}
               <div className="relative z-10">

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* 🔥 ROOT DESIGN TOKENS */
+/* ================= 🔥 DESIGN TOKENS ================= */
 :root {
   --bg-primary: #0a0a0f;
   --bg-secondary: #0f172a;
@@ -12,67 +12,92 @@
   --text-secondary: #94a3b8;
 
   --border-color: #1f2937;
+
+  /* 🔥 NEW */
+  --radius: 16px;
+  --blur: 12px;
 }
 
-/* 🔥 RESET */
-* {
+/* ================= 🔥 RESET ================= */
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* 🔥 BODY */
+/* ================= 🔥 BODY ================= */
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: Inter, sans-serif;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* 🔥 SMOOTH SCROLL */
+/* ================= 🔥 SCROLL ================= */
 html {
   scroll-behavior: smooth;
 }
 
-/* 🔥 SELECTION (PREMIUM TOUCH) */
+/* ================= 🔥 SELECTION ================= */
 ::selection {
-  background: #7c3aed;
+  background: var(--color-primary);
   color: white;
 }
 
-/* 🔥 SCROLLBAR */
+/* ================= 🔥 SCROLLBAR ================= */
 ::-webkit-scrollbar {
   width: 6px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(#7c3aed, #3b82f6);
+  background: linear-gradient(var(--color-primary), var(--color-secondary));
   border-radius: 10px;
 }
 
-/* 🔥 GLASS SYSTEM */
+/* ================= 🔥 GLASS SYSTEM ================= */
 .glass {
   background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(var(--blur));
   border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
 }
 
-/* 🔥 GRID BACKGROUND */
+/* 🔥 STRONG GLASS (CTA / CARDS) */
+.glass-strong {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* ================= 🔥 BACKGROUNDS ================= */
 .bg-grid {
-  background-image: 
+  background-image:
     linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
-/* 🔥 GRADIENT TEXT */
+/* 🔥 RADIAL FADE (DEPTH) */
+.bg-radial {
+  background: radial-gradient(circle at center, rgba(124,58,237,0.15), transparent 70%);
+}
+
+/* ================= 🔥 TEXT SYSTEM ================= */
 .gradient-text {
   background: linear-gradient(90deg, #7c3aed, #3b82f6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* 🔥 BUTTON SYSTEM */
+/* 🔥 PREMIUM TEXT GLOW */
+.text-glow {
+  text-shadow: 0 0 20px rgba(124, 58, 237, 0.6);
+}
+
+/* ================= 🔥 BUTTON SYSTEM ================= */
 .btn-primary {
   background: linear-gradient(135deg, #7c3aed, #3b82f6);
   padding: 12px 24px;
@@ -82,8 +107,8 @@ html {
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 25px rgba(124, 58, 237, 0.6);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.7);
 }
 
 .btn-secondary {
@@ -98,36 +123,70 @@ html {
   background: rgba(255,255,255,0.1);
 }
 
-/* 🔥 SHIMMER */
+/* ================= 🔥 ANIMATIONS ================= */
+
+/* SHIMMER */
 @keyframes shimmer {
   0% { transform: translateX(-120%); }
   100% { transform: translateX(120%); }
 }
 
-/* 🔥 GRADIENT ANIMATION */
+/* GRADIENT FLOW */
 @keyframes gradientMove {
   0% { background-position: 0% 50% }
   50% { background-position: 100% 50% }
   100% { background-position: 0% 50% }
 }
 
-/* 🔥 FLOATING ANIMATION */
+/* FLOAT */
 @keyframes float {
   0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-12px); }
   100% { transform: translateY(0px); }
 }
 
-/* 🔥 FADE UP (GLOBAL UTILITY) */
-.fade-up {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeUp 0.6s ease forwards;
+/* PULSE GLOW */
+@keyframes glowPulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
 }
 
-@keyframes fadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ================= 🔥 UTILITY CLASSES ================= */
+
+/* SHIMMER EFFECT */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2.5s infinite;
+}
+
+/* FLOAT */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* GRADIENT TEXT ANIMATION */
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradientMove 6s linear infinite;
+}
+
+/* GLOW PULSE */
+.animate-glow {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* ================= 🔥 PERFORMANCE ================= */
+
+/* GPU acceleration for animations */
+.will-change {
+  will-change: transform, opacity;
 }

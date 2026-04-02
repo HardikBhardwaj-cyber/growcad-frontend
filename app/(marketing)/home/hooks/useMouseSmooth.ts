@@ -1,12 +1,53 @@
 "use client";
 
+import {
+  useMotionValue,
+  useVelocity,
+  useTransform,
+  MotionValue,
+} from "framer-motion";
 import { useEffect, useRef } from "react";
 
-type Position = { x: number; y: number };
+type Position = {
+  x: number;
+  y: number;
+};
 
-export function useMouseSmooth(speed = 0.08) {
-  const current = useRef<Position>({ x: 0, y: 0 });
+export function useMouseSmooth(speed: number = 0.08) {
+  /* ================= TARGET ================= */
+
   const target = useRef<Position>({ x: 0, y: 0 });
+
+  /* ================= MOTION VALUES ================= */
+
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  /* 🔥 LAG LAYER */
+  const lagX = useMotionValue(0);
+  const lagY = useMotionValue(0);
+
+  /* ================= VELOCITY ================= */
+
+  const vx = useVelocity(x);
+  const vy = useVelocity(y);
+
+  /* ✅ FIX: FORCE TYPE */
+  const speedValue: MotionValue<number> = useTransform(
+    [vx, vy],
+    (latest) => {
+      const [vxVal, vyVal] = latest as number[];
+
+      return Math.min(
+        Math.sqrt(vxVal * vxVal + vyVal * vyVal),
+        1000
+      );
+    }
+  );
+
+  /* ================= LOOP ================= */
+
+  const raf = useRef<number | null>(null);
 
   useEffect(() => {
     const handleMove = (e: MouseEvent) => {
@@ -15,17 +56,44 @@ export function useMouseSmooth(speed = 0.08) {
     };
 
     const loop = () => {
-      current.current.x += (target.current.x - current.current.x) * speed;
-      current.current.y += (target.current.y - current.current.y) * speed;
+      const tx = target.current.x;
+      const ty = target.current.y;
 
-      requestAnimationFrame(loop);
+      /* 🔥 MAIN SMOOTH */
+      const cx = x.get() + (tx - x.get()) * speed;
+      const cy = y.get() + (ty - y.get()) * speed;
+
+      x.set(cx);
+      y.set(cy);
+
+      /* 🔥 LAG (DEPTH) */
+      const lx = lagX.get() + (cx - lagX.get()) * (speed * 0.5);
+      const ly = lagY.get() + (cy - lagY.get()) * (speed * 0.5);
+
+      lagX.set(lx);
+      lagY.set(ly);
+
+      raf.current = requestAnimationFrame(loop);
     };
 
     window.addEventListener("mousemove", handleMove);
-    loop();
+    raf.current = requestAnimationFrame(loop);
 
-    return () => window.removeEventListener("mousemove", handleMove);
-  }, [speed]);
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      if (raf.current) cancelAnimationFrame(raf.current);
+    };
+  }, [speed, x, y, lagX, lagY]);
 
-  return current;
+  /* ================= RETURN ================= */
+
+  return {
+    x,
+    y,
+    lagX,
+    lagY,
+    vx,
+    vy,
+    speed: speedValue,
+  };
 }

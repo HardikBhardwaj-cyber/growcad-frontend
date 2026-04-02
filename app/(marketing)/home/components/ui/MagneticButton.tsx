@@ -1,39 +1,68 @@
 "use client";
 
-import { useRef } from "react";
+import { motion, useMotionValue, useSpring } from "framer-motion";
+import { ReactNode } from "react";
 
-export default function MagneticButton({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const ref = useRef<HTMLButtonElement | null>(null);
+type Props = {
+  children: ReactNode;
+  className?: string;
+};
 
-  const move = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!ref.current) return; // ✅ FIX
+export default function MagneticButton({ children, className = "" }: Props) {
+  /* 🔥 MOTION VALUES */
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
 
-    const rect = ref.current.getBoundingClientRect();
+  /* 🔥 SMOOTH SPRING */
+  const smoothX = useSpring(x, { stiffness: 150, damping: 15 });
+  const smoothY = useSpring(y, { stiffness: 150, damping: 15 });
 
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
+  /* 🔥 MOUSE MOVE */
+  const handleMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
 
-    ref.current.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+
+    x.set((px - 0.5) * 30);
+    y.set((py - 0.5) * 30);
   };
 
-  const leave = () => {
-    if (!ref.current) return; // ✅ FIX
-
-    ref.current.style.transform = "translate(0,0)";
+  /* 🔥 RESET */
+  const handleLeave = () => {
+    x.set(0);
+    y.set(0);
   };
 
   return (
-    <button
-      ref={ref}
-      onMouseMove={move}
-      onMouseLeave={leave}
-      className="px-6 py-3 rounded-xl bg-linear-to-r from-purple-500 to-blue-500 text-white font-semibold transition"
+    <motion.button
+      style={{
+        x: smoothX,
+        y: smoothY,
+      }}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      whileTap={{ scale: 0.95 }}
+      className={`relative px-6 py-3 rounded-xl font-semibold text-white overflow-hidden ${className}`}
     >
-      {children}
-    </button>
+      {/* 🔥 GRADIENT BACKGROUND */}
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500" />
+
+      {/* 🔥 GLOW LAYER */}
+      <motion.div
+        animate={{
+          opacity: [0.4, 0.8, 0.4],
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute inset-0 bg-purple-500 blur-xl opacity-50"
+      />
+
+      {/* 🔥 CONTENT */}
+      <span className="relative z-10">{children}</span>
+    </motion.button>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { fadeUp, stagger } from "../../systems/variants";
+import { fadeUp, staggerContainer } from "../../systems/variants";
 
 const trustPoints = [
   {
@@ -20,54 +20,81 @@ const trustPoints = [
 
 export default function TrustPanel() {
   return (
-    <section className="relative py-24 md:py-32 overflow-hidden">
+    <section className="relative py-28 md:py-36 overflow-hidden">
 
-      {/* 🔥 SOFT BACKGROUND GLOW */}
+      {/* 🔥 BACKGROUND LAYERS */}
       <div className="absolute inset-0 flex justify-center">
-        <div className="w-[600px] h-[600px] bg-blue-500/10 blur-[120px] rounded-full" />
+        <div className="w-[700px] h-[700px] bg-blue-500/10 blur-[140px] rounded-full" />
+        <div className="absolute w-[500px] h-[500px] bg-purple-500/10 blur-[120px] rounded-full" />
       </div>
 
+      {/* 🔥 MAIN */}
       <motion.div
-        variants={stagger}
+        variants={staggerContainer}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
-        className="relative max-w-5xl mx-auto px-6 text-center"
+        className="relative max-w-6xl mx-auto px-6 text-center"
       >
 
         {/* 🔥 HEADING */}
         <motion.h2
           variants={fadeUp}
-          className="text-3xl sm:text-4xl font-semibold"
+          className="text-3xl sm:text-5xl font-semibold leading-tight"
         >
           Built with{" "}
-          <span className="text-transparent bg-clip-text bg-linear-to-r from-purple-400 to-blue-400">
+          <span className="relative inline-block text-transparent bg-clip-text bg-linear-to-r from-purple-400 to-blue-400">
             trust & scale
+
+            {/* glow */}
+            <span className="absolute inset-0 blur-xl opacity-30 bg-gradient-to-r from-purple-500 to-blue-500" />
           </span>{" "}
           in mind
         </motion.h2>
 
+        {/* ✨ SUBTEXT */}
+        <motion.p
+          variants={fadeUp}
+          className="text-gray-400 mt-4 max-w-xl mx-auto"
+        >
+          Everything is designed to help coaching institutes grow faster,
+          operate smarter, and scale without limits.
+        </motion.p>
+
         {/* 💎 TRUST GRID */}
         <motion.div
-          variants={stagger}
-          className="grid md:grid-cols-3 gap-6 mt-12"
+          variants={staggerContainer}
+          className="grid md:grid-cols-3 gap-8 mt-14"
         >
           {trustPoints.map((item, i) => (
             <motion.div
               key={i}
               variants={fadeUp}
-              className="relative p-5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xl"
+              whileHover={{ y: -8, scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="relative p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-[0_0_40px_rgba(124,58,237,0.1)]"
             >
 
-              {/* 🔥 ICON */}
-              <div className="w-10 h-10 mx-auto mb-4 rounded-full bg-linear-to-r from-purple-500 to-blue-500 opacity-80" />
+              {/* 🔥 ICON WITH GLOW */}
+              <motion.div
+                animate={{
+                  scale: [1, 1.1, 1],
+                  opacity: [0.8, 1, 0.8],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                }}
+                className="w-12 h-12 mx-auto mb-5 rounded-full bg-linear-to-r from-purple-500 to-blue-500 flex items-center justify-center shadow-[0_0_25px_rgba(124,58,237,0.4)]"
+              />
 
-              {/* ✨ TEXT */}
-              <h3 className="text-white font-medium">
+              {/* ✨ TITLE */}
+              <h3 className="text-white font-semibold text-lg">
                 {item.title}
               </h3>
 
-              <p className="text-gray-400 text-sm mt-2">
+              {/* ✨ DESC */}
+              <p className="text-gray-400 text-sm mt-2 leading-relaxed">
                 {item.desc}
               </p>
 
