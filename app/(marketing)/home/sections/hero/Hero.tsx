@@ -8,82 +8,57 @@ import { useMotion } from "../../systems/MotionProvider";
 export default function Hero() {
   const { scrollProgress } = useMotion();
 
-  /* 🔥 SCROLL STORYTELLING */
-  const opacity = useTransform(scrollProgress, [0, 0.4], [1, 0.6]);
-  const scale = useTransform(scrollProgress, [0, 0.4], [1, 0.96]);
-  const y = useTransform(scrollProgress, [0, 0.4], [0, -60]);
+  const opacity = useTransform(scrollProgress, [0, 0.4], [1, 0.7]);
+  const scale = useTransform(scrollProgress, [0, 0.4], [1, 0.97]);
+  const y = useTransform(scrollProgress, [0, 0.4], [0, -40]);
 
   return (
     <motion.section
       style={{ opacity, scale, y }}
-      className="relative min-h-screen flex items-center overflow-hidden"
+      className="relative min-h-screen flex items-center overflow-hidden bg-[#0a0a0f]"
     >
-
-      {/* 🌌 GLOBAL BACKGROUND SYSTEM */}
+      {/* 🔥 DEPTH BACKGROUND */}
 
       {/* GRID */}
-      <div className="absolute inset-0 bg-grid opacity-[0.035]" />
+      <div className="absolute inset-0 bg-grid opacity-[0.03]" />
 
-      {/* PRIMARY GLOW */}
+      {/* MAIN RADIAL GLOW */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_40%,rgba(124,58,237,0.25),transparent_60%)]" />
+
+      {/* SECONDARY LIGHT */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.15),transparent_50%)]" />
+
+      {/* NOISE TEXTURE (IMPORTANT) */}
+      <div className="absolute inset-0 opacity-[0.02] mix-blend-overlay bg-[url('/noise.png')]" />
+
+      {/* FLOATING ORB */}
       <motion.div
-        animate={{
-          scale: [1, 1.08, 1],
-          opacity: [0.2, 0.35, 0.2],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute top-1/2 left-1/2 w-[1000px] h-[1000px] -translate-x-1/2 -translate-y-1/2 bg-purple-600/20 blur-[200px] rounded-full"
+        animate={{ y: [0, -30, 0], x: [0, 20, 0] }}
+        transition={{ duration: 12, repeat: Infinity }}
+        className="absolute left-[10%] top-[25%] w-3 h-3 bg-purple-400 rounded-full blur-sm opacity-60"
       />
 
-      {/* SECONDARY GLOW */}
-      <motion.div
-        animate={{
-          scale: [1, 1.1, 1],
-          opacity: [0.1, 0.2, 0.1],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute top-[30%] right-[10%] w-[500px] h-[500px] bg-blue-500/20 blur-[160px] rounded-full"
-      />
-
-      {/* FLOATING PARTICLES */}
-      <motion.div
-        animate={{ y: [0, -40, 0], x: [0, 20, 0] }}
-        transition={{ duration: 10, repeat: Infinity }}
-        className="absolute left-[8%] top-[20%] w-3 h-3 bg-purple-400 rounded-full blur-sm opacity-50"
-      />
-
-      {/* 🔥 MAIN WRAPPER */}
-      <div className="relative w-full max-w-[1400px] mx-auto px-6 md:px-10 lg:px-20">
-
-        {/* 🔥 FLEX CENTER SYSTEM */}
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center min-h-[80vh]">
+      {/* 🔥 CONTENT */}
+      <div className="relative w-full max-w-[1300px] mx-auto px-6 md:px-10 lg:px-16">
+        <div className="grid lg:grid-cols-[1.1fr_0.9fr] items-center min-h-[85vh]">
 
           {/* LEFT */}
           <div className="flex justify-center lg:justify-start">
-            <div className="max-w-xl w-full">
+            <div className="max-w-[520px] w-full">
               <HeroLeft />
             </div>
           </div>
 
           {/* RIGHT */}
-          <div className="flex justify-center lg:justify-end">
+          <div className="flex justify-center lg:justify-end mt-10 lg:mt-0">
             <HeroRight />
           </div>
 
         </div>
-
       </div>
 
-      {/* 🔥 BOTTOM FADE (CONNECT NEXT SECTION) */}
+      {/* BOTTOM FADE */}
       <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-b from-transparent to-[#0a0a0f]" />
-
     </motion.section>
   );
 }
