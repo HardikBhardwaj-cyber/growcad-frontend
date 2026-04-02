@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { fadeUp, stagger } from "../../systems/variants";
 
-const values = [
+const features = [
   {
     title: "Automate Admissions",
     desc: "Capture leads, manage enquiries, and convert students automatically.",
@@ -20,66 +20,74 @@ const values = [
 
 export default function ValuePanel() {
   return (
-    <section className="relative py-24">
+    <section className="relative py-28 md:py-36 overflow-hidden">
 
-      <div className="max-w-6xl mx-auto px-6 text-center">
+      {/* 🔥 BACKGROUND GLOW */}
+      <div className="absolute inset-0 flex justify-center">
+        <div className="w-[700px] h-[700px] bg-purple-600/10 blur-[140px] rounded-full" />
+      </div>
 
-        {/* HEADING */}
+      <motion.div
+        variants={stagger}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        className="relative max-w-6xl mx-auto px-6 text-center"
+      >
+
+        {/* 🔥 HEADING */}
         <motion.h2
           variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          className="text-4xl md:text-5xl font-bold"
+          className="text-3xl sm:text-4xl md:text-5xl font-bold"
         >
           Everything your institute needs to{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-purple-400 to-blue-400">
             grow faster
           </span>
         </motion.h2>
 
-        {/* SUBTEXT */}
+        {/* ✨ SUBTEXT */}
         <motion.p
           variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          className="text-gray-400 mt-4 text-lg max-w-2xl mx-auto"
+          className="text-gray-400 mt-4 text-base sm:text-lg max-w-2xl mx-auto"
         >
           Replace multiple tools with one powerful system designed for coaching institutes.
         </motion.p>
 
-        {/* CARDS */}
+        {/* 💎 CARDS */}
         <motion.div
           variants={stagger}
-          initial="hidden"
-          whileInView="show"
           className="grid md:grid-cols-3 gap-6 mt-14"
         >
-          {values.map((item, i) => (
+          {features.map((item, i) => (
             <motion.div
               key={i}
               variants={fadeUp}
-              className="relative p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl hover:border-purple-400/40 transition group"
+              whileHover={{ y: -8 }}
+              className="group relative p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl transition"
             >
-              {/* GLOW ON HOVER */}
+
+              {/* 🔥 HOVER GLOW */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition">
                 <div className="absolute inset-0 bg-purple-500/10 blur-2xl rounded-2xl" />
               </div>
 
-              {/* CONTENT */}
+              {/* ✨ CONTENT */}
               <div className="relative z-10">
-                <h3 className="text-xl font-semibold text-white">
+                <h3 className="text-white text-lg font-semibold">
                   {item.title}
                 </h3>
 
-                <p className="text-gray-400 mt-3 text-sm leading-relaxed">
+                <p className="text-gray-400 text-sm mt-3 leading-relaxed">
                   {item.desc}
                 </p>
               </div>
+
             </motion.div>
           ))}
         </motion.div>
 
-      </div>
+      </motion.div>
     </section>
   );
 }

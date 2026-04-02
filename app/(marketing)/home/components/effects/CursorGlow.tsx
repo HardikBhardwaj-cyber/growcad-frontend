@@ -1,46 +1,55 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useMouseSmooth } from "../../hooks/useMouseSmooth";
 
 export default function CursorGlow() {
-  const ref = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement | null>(null);
+  const glowInnerRef = useRef<HTMLDivElement | null>(null);
+
+  const pos = useMouseSmooth(0.1);
 
   useEffect(() => {
-    let x = 0, y = 0;
-    let tx = 0, ty = 0;
+    const animate = () => {
+      const { x, y } = pos.current;
 
-    const move = (e: MouseEvent) => {
-      tx = e.clientX;
-      ty = e.clientY;
-    };
-
-    const loop = () => {
-      x += (tx - x) * 0.08;
-      y += (ty - y) * 0.08;
-
-      if (ref.current) {
-        ref.current.style.transform = `translate(${x - 300}px, ${y - 300}px)`;
+      if (glowRef.current) {
+        glowRef.current.style.transform = `translate(${x - 300}px, ${y - 300}px)`;
       }
 
-      requestAnimationFrame(loop);
+      if (glowInnerRef.current) {
+        glowInnerRef.current.style.transform = `translate(${x - 120}px, ${y - 120}px)`;
+      }
+
+      requestAnimationFrame(animate);
     };
 
-    window.addEventListener("mousemove", move);
-    loop();
-
-    return () => window.removeEventListener("mousemove", move);
-  }, []);
+    animate();
+  }, [pos]);
 
   return (
     <div className="pointer-events-none fixed inset-0 z-0">
+
+      {/* OUTER AURA (SOFT BIG GLOW) */}
       <div
-        ref={ref}
-        className="absolute w-[600px] h-[600px] blur-[140px] rounded-full"
+        ref={glowRef}
+        className="absolute w-[600px] h-[600px] rounded-full blur-[160px] opacity-70"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(124,58,237,0.25), rgba(59,130,246,0.15), transparent 70%)",
+        }}
+      />
+
+      {/* INNER CORE (STRONGER CENTER) */}
+      <div
+        ref={glowInnerRef}
+        className="absolute w-[240px] h-[240px] rounded-full blur-[80px] opacity-60"
         style={{
           background:
             "radial-gradient(circle, rgba(124,58,237,0.35), rgba(59,130,246,0.25), transparent 70%)",
         }}
       />
+
     </div>
   );
 }

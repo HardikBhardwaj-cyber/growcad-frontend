@@ -4,7 +4,6 @@ import Providers from "./providers";
 import Cursor from "@/components/ui/Cursor";
 import SplashIntro from "./(marketing)/components/hero/SplashIntro";
 
-
 export const metadata = {
   title: "Growcad",
   description: "Growth OS for Coaching Institutes",
@@ -17,13 +16,26 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <SplashIntro />
+      <body className="bg-[#0a0a0f] text-white antialiased">
+
         <Providers>
+
+          {/* 🔥 SPLASH ONLY ON FIRST LOAD */}
+          <SplashIntro />
+
+          {/* 🔥 CURSOR SYSTEM */}
           <Cursor />
-          {children}
+
+          {/* 🔥 MAIN APP */}
+          <div className="relative">
+            {children}
+          </div>
+
+          {/* 🔥 TOAST */}
           <Toaster position="top-right" />
+
         </Providers>
+
       </body>
     </html>
   );
