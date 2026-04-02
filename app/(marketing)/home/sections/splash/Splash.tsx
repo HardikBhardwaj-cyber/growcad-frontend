@@ -77,12 +77,12 @@ export default function Splash() {
             </motion.p>
 
             {/* 🔥 PROGRESS BAR */}
-            <div className="mt-8 h-[3px] w-44 mx-auto bg-white/10 rounded-full overflow-hidden">
+            <div className="mt-16 h-[3px] w-44 mx-auto bg-white/10 rounded-full overflow-hidden">
               <motion.div
                 initial={{ x: "-100%" }}
                 animate={{ x: "100%" }}
                 transition={{
-                  duration: 1.8,
+                  duration: 2.0,
                   ease: [0.16, 1, 0.3, 1],
                 }}
                 className="h-full w-full bg-linear-to-r from-purple-500 to-blue-500"
