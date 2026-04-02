@@ -4,73 +4,56 @@ import { motion } from "framer-motion";
 import { fadeUp, staggerContainer } from "../../systems/variants";
 import MagneticButton from "../../components/ui/MagneticButton";
 
+import { Sparkles, CheckCircle2 } from "lucide-react";
+
 export default function HeroLeft() {
   return (
     <motion.div
       variants={staggerContainer}
       initial="hidden"
       animate="show"
-      className="flex flex-col max-w-xl text-center lg:text-left"
+      className="flex flex-col max-w-xl text-center lg:text-left pl-2 lg:pl-6"
     >
 
       {/* 🚀 BADGE */}
-      <motion.div variants={fadeUp} className="mb-6">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-gray-300 backdrop-blur-md relative overflow-hidden">
+      <motion.div variants={fadeUp} className="mb-6 flex justify-center lg:justify-start">
+        <div className="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-gray-300 backdrop-blur-md hover:bg-white/10 transition">
 
-          <span className="relative z-10">
-            🚀 Growth OS for Coaching Institutes
-          </span>
+          <Sparkles className="w-4 h-4 text-purple-400" />
 
-          {/* 🔥 shimmer */}
-          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shimmer_2.5s_infinite]" />
+          <span>Growth OS for Coaching Institutes</span>
+
         </div>
       </motion.div>
 
       {/* 🔥 HEADLINE */}
       <motion.h1 variants={fadeUp} className="leading-[1.05]">
 
-        <motion.span
-          className="block text-3xl sm:text-4xl md:text-5xl font-medium text-white"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
+        <span className="block text-3xl sm:text-4xl md:text-5xl font-medium text-white">
           Beat bigger coaching institutes
-        </motion.span>
+        </span>
 
-        <motion.span
-          className="block mt-2 text-3xl sm:text-4xl md:text-5xl text-white"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
+        <span className="block mt-2 text-3xl sm:text-4xl md:text-5xl text-white">
           with
-        </motion.span>
+        </span>
 
         {/* 💎 GROWCAD */}
         <motion.span
           className="relative block mt-4 text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-purple-400 via-blue-400 to-purple-400"
-          initial={{ opacity: 0, scale: 0.9 }}
           animate={{
-            opacity: 1,
-            scale: 1,
             backgroundPosition: ["0% 50%", "100% 50%"],
           }}
           transition={{
-            opacity: { delay: 0.4 },
-            scale: { delay: 0.4 },
-            backgroundPosition: {
-              duration: 6,
-              repeat: Infinity,
-              ease: "linear",
-            },
+            duration: 6,
+            repeat: Infinity,
+            ease: "linear",
           }}
           style={{ backgroundSize: "200% 200%" }}
         >
           GROWCAD
 
-          {/* 🔥 glow */}
-          <span className="absolute inset-0 blur-2xl opacity-30 bg-gradient-to-r from-purple-500 to-blue-500" />
+          {/* 🔥 SOFT GLOW */}
+          <span className="absolute inset-0 blur-2xl opacity-25 bg-gradient-to-r from-purple-500 to-blue-500" />
         </motion.span>
 
       </motion.h1>
@@ -90,10 +73,17 @@ export default function HeroLeft() {
         className="flex flex-col sm:flex-row gap-4 mt-8 justify-center lg:justify-start"
       >
 
-        {/* 🔥 PRIMARY */}
-        <MagneticButton className="shadow-[0_0_30px_rgba(124,58,237,0.4)]">
-          Get Early Access
-        </MagneticButton>
+        {/* 🔥 PRIMARY CTA */}
+        <div className="relative">
+
+          {/* glow layer */}
+          <div className="absolute inset-0 blur-xl bg-purple-500/30 opacity-40 rounded-xl animate-pulse" />
+
+          <MagneticButton className="relative z-10">
+            Get Early Access
+          </MagneticButton>
+
+        </div>
 
         {/* 🔥 SECONDARY */}
         <motion.button
@@ -106,14 +96,27 @@ export default function HeroLeft() {
 
       </motion.div>
 
-      {/* ✅ TRUST */}
+      {/* ✅ TRUST STRIP */}
       <motion.div
         variants={fadeUp}
-        className="flex flex-wrap justify-center lg:justify-start gap-5 text-sm text-gray-500 mt-6"
+        className="flex flex-wrap justify-center lg:justify-start gap-6 text-sm text-gray-500 mt-8"
       >
-        <span className="hover:text-white transition">✔ No setup cost</span>
-        <span className="hover:text-white transition">✔ Multi-branch ready</span>
-        <span className="hover:text-white transition">✔ Built for scale</span>
+
+        <div className="flex items-center gap-2 hover:text-white transition">
+          <CheckCircle2 className="w-4 h-4 text-purple-400" />
+          <span>No setup cost</span>
+        </div>
+
+        <div className="flex items-center gap-2 hover:text-white transition">
+          <CheckCircle2 className="w-4 h-4 text-purple-400" />
+          <span>Multi-branch ready</span>
+        </div>
+
+        <div className="flex items-center gap-2 hover:text-white transition">
+          <CheckCircle2 className="w-4 h-4 text-purple-400" />
+          <span>Built for scale</span>
+        </div>
+
       </motion.div>
 
     </motion.div>

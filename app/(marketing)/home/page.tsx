@@ -16,55 +16,58 @@ export default function HomePage() {
   return (
     <MotionProvider>
 
-      {/* 🔥 GLOBAL EFFECT LAYERS */}
+      {/* 🔥 GLOBAL EFFECT */}
       <CursorGlow />
 
       <main className="relative bg-[#0a0a0f] text-white overflow-hidden">
 
-        {/* 🌌 BACKGROUND SYSTEM (GLOBAL) */}
+        {/* 🌌 GLOBAL BACKGROUND */}
         <div className="fixed inset-0 -z-50">
           <GridBackground />
         </div>
 
-        {/* ✨ NOISE TEXTURE */}
-        <div className="pointer-events-none fixed inset-0 -z-40 opacity-[0.035] mix-blend-overlay bg-[url('/noise.png')]" />
+        {/* ✨ NOISE */}
+        <div className="pointer-events-none fixed inset-0 -z-40 opacity-[0.03] mix-blend-overlay bg-[url('/noise.png')]" />
 
-        {/* 🔥 GLOBAL LIGHT FADE (TOP) */}
-        <div className="pointer-events-none absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-[#0a0a0f] to-transparent z-10" />
+        {/* 🔥 TOP FADE */}
+        <div className="pointer-events-none absolute top-0 w-full h-40 bg-gradient-to-b from-[#0a0a0f] to-transparent z-10" />
 
-        {/* 🔥 GLOBAL LIGHT FADE (BOTTOM) */}
-        <div className="pointer-events-none absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-[#0a0a0f] to-transparent z-10" />
+        {/* 🔥 BOTTOM FADE */}
+        <div className="pointer-events-none absolute bottom-0 w-full h-40 bg-gradient-to-t from-[#0a0a0f] to-transparent z-10" />
 
         {/* 🚀 SPLASH */}
         <Splash />
 
-        {/* 🔥 CONTENT FLOW */}
-        <div className="relative z-20 flex flex-col">
+        {/* ===================================== */}
+        {/* 🔥 STORY FLOW SYSTEM STARTS HERE */}
+        {/* ===================================== */}
+
+        <div className="relative z-20">
 
           {/* 💎 HERO */}
-          <section className="relative">
+          <div className="relative z-10">
             <Hero />
-          </section>
+          </div>
 
-          {/* 🎯 COMING SOON */}
-          <section className="relative">
+          {/* 🎯 COMING SOON (OVERLAP HERO) */}
+          <div className="relative z-20 -mt-[35vh]">
             <ComingSoon />
-          </section>
+          </div>
 
-          {/* ⚡ VALUE */}
-          <section className="relative">
+          {/* ⚡ VALUE (STACK CONTINUITY) */}
+          <div className="relative z-30 -mt-[25vh]">
             <ValuePanel />
-          </section>
+          </div>
 
           {/* 🔐 TRUST */}
-          <section className="relative">
+          <div className="relative z-40 -mt-[25vh]">
             <TrustPanel />
-          </section>
+          </div>
 
           {/* 🚀 FINAL CTA */}
-          <section className="relative">
+          <div className="relative z-50 -mt-[25vh] mb-[20vh]">
             <FinalCTA />
-          </section>
+          </div>
 
         </div>
 
