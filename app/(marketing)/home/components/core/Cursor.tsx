@@ -1,78 +1,96 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap } from "@/lib/gsap";
+import { useEffect, useRef, useState } from "react";
 
 export default function Cursor() {
-  const cursorRef = useRef<HTMLDivElement | null>(null);
+  const dotRef = useRef<HTMLDivElement | null>(null);
+  const glowRef = useRef<HTMLDivElement | null>(null);
 
+  const mouse = useRef({ x: 0, y: 0 });
+  const pos = useRef({ x: 0, y: 0 });
+
+  const [hovering, setHovering] = useState(false);
+
+  // 🔥 TRACK MOUSE
   useEffect(() => {
-    const cursor = cursorRef.current;
-    if (!cursor) return;
-
-    // 🔥 Cursor follow (smooth)
     const move = (e: MouseEvent) => {
-      gsap.to(cursor, {
-        x: e.clientX,
-        y: e.clientY,
-        duration: 0.2,
-        ease: "power3.out",
-      });
+      mouse.current.x = e.clientX;
+      mouse.current.y = e.clientY;
     };
 
     window.addEventListener("mousemove", move);
+    return () => window.removeEventListener("mousemove", move);
+  }, []);
 
-    // 🔥 Hover interactions
-    const hoverables = document.querySelectorAll("a, button, [data-cursor]");
+  // 🔥 SMOOTH FOLLOW (LERP)
+  useEffect(() => {
+    let raf: number;
 
-    const listeners: {
-      el: Element;
-      enter: () => void;
-      leave: () => void;
-    }[] = [];
+    const animate = () => {
+      pos.current.x += (mouse.current.x - pos.current.x) * 0.15;
+      pos.current.y += (mouse.current.y - pos.current.y) * 0.15;
 
-    hoverables.forEach((el) => {
-      const enter = () => {
-        gsap.to(cursor, {
-          scale: 2,
-          duration: 0.3,
-          ease: "power3.out",
-        });
-      };
+      if (dotRef.current && glowRef.current) {
+        dotRef.current.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0)`;
+        glowRef.current.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0)`;
+      }
 
-      const leave = () => {
-        gsap.to(cursor, {
-          scale: 1,
-          duration: 0.3,
-          ease: "power3.out",
-        });
-      };
+      raf = requestAnimationFrame(animate);
+    };
 
-      el.addEventListener("mouseenter", enter);
-      el.addEventListener("mouseleave", leave);
+    animate();
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
-      listeners.push({ el, enter, leave });
+  // 🔥 HOVER DETECTION (MAGNETIC SYNC)
+  useEffect(() => {
+    const handleEnter = () => setHovering(true);
+    const handleLeave = () => setHovering(false);
+
+    const elements = document.querySelectorAll(
+      "button, a, .magnetic"
+    );
+
+    elements.forEach((el) => {
+      el.addEventListener("mouseenter", handleEnter);
+      el.addEventListener("mouseleave", handleLeave);
     });
 
-    // 🧹 Cleanup (VERY IMPORTANT)
     return () => {
-      window.removeEventListener("mousemove", move);
-
-      listeners.forEach(({ el, enter, leave }) => {
-        el.removeEventListener("mouseenter", enter);
-        el.removeEventListener("mouseleave", leave);
+      elements.forEach((el) => {
+        el.removeEventListener("mouseenter", handleEnter);
+        el.removeEventListener("mouseleave", handleLeave);
       });
     };
   }, []);
 
   return (
-    <div
-      ref={cursorRef}
-      className="fixed top-0 left-0 z-9999 pointer-events-none
-                 w-5 h-5 rounded-full
-                 bg-white
-                 mix-blend-difference
-                 -translate-x-1/2 -translate-y-1/2"
-    />
+    <>
+      {/* 🔥 GLOW LAYER */}
+      <div
+        ref={glowRef}
+        className={`
+          pointer-events-none fixed top-0 left-0 z-[9998]
+          w-48 h-48 rounded-full
+          bg-purple-500/20 blur-3xl
+          transition-all duration-300 ease-out
+          will-change-transform
+          ${hovering ? "scale-150 bg-blue-500/30" : "scale-100"}
+        `}
+      />
+
+      {/* 🔥 DOT */}
+      <div
+        ref={dotRef}
+        className={`
+          pointer-events-none fixed top-0 left-0 z-[9999]
+          w-3 h-3 rounded-full bg-white
+          mix-blend-difference
+          transition-transform duration-200 ease-out
+          will-change-transform
+          ${hovering ? "scale-150" : "scale-100"}
+        `}
+      />
+    </>
   );
 }

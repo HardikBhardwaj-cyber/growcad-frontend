@@ -5,7 +5,7 @@ import { gsap } from "@/lib/gsap";
 
 export default function Magnetic({
   children,
-  strength = 0.3,
+  strength = 0.35,
 }: {
   children: React.ReactNode;
   strength?: number;
@@ -18,13 +18,13 @@ export default function Magnetic({
 
     const rect = el.getBoundingClientRect();
 
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
+    const x = e.clientX - (rect.left + rect.width / 2);
+    const y = e.clientY - (rect.top + rect.height / 2);
 
     gsap.to(el, {
       x: x * strength,
       y: y * strength,
-      duration: 0.4,
+      duration: 0.35,
       ease: "power3.out",
     });
   };
@@ -36,7 +36,7 @@ export default function Magnetic({
     gsap.to(el, {
       x: 0,
       y: 0,
-      duration: 0.6,
+      duration: 0.7,
       ease: "elastic.out(1, 0.4)", // 🔥 premium bounce
     });
   };
@@ -46,7 +46,7 @@ export default function Magnetic({
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="inline-block"
+      className="inline-block magnetic will-change-transform"
     >
       {children}
     </div>

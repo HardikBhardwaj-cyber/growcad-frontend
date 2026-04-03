@@ -1,36 +1,64 @@
 "use client";
 
-import { useEffect } from "react";
-import Lenis from "lenis";
-import { gsap } from "@/lib/gsap";
+import { ReactNode, useEffect, useRef } from "react";
+import Lenis from "@studio-freight/lenis";
 import { ScrollTrigger } from "@/lib/gsap";
 
 export default function SmoothScroll({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
+  const lenisRef = useRef<Lenis | null>(null);
+
   useEffect(() => {
+    // 🔥 INIT LENIS
     const lenis = new Lenis({
-      lerp: 0.8,
+      duration: 1.2,
       smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 1,
     });
 
-    function raf(time: number) {
+    lenisRef.current = lenis;
+
+    // 🔥 RAF LOOP
+    let rafId: number;
+
+    const raf = (time: number) => {
       lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+      ScrollTrigger.update(); // 🔥 sync GSAP
+      rafId = requestAnimationFrame(raf);
+    };
 
-    requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
 
-    // 🔗 Sync GSAP ScrollTrigger
+    // 🔥 SCROLLTRIGGER SYNC (VERY IMPORTANT)
     lenis.on("scroll", ScrollTrigger.update);
 
-    
+    // 🔥 FIX SCROLLTRIGGER + LENIS CONFLICT
+    ScrollTrigger.scrollerProxy(document.body, {
+      scrollTop(value) {
+        if (arguments.length && lenis) {
+          lenis.scrollTo(value as number);
+        }
+        return window.scrollY;
+      },
+      getBoundingClientRect() {
+        return {
+          top: 0,
+          left: 0,
+          width: window.innerWidth,
+          height: window.innerHeight,
+        };
+      },
+    });
 
-    gsap.ticker.lagSmoothing(0);
+    ScrollTrigger.refresh();
 
+    // 🔥 CLEANUP
     return () => {
+      cancelAnimationFrame(rafId);
       lenis.destroy();
     };
   }, []);
