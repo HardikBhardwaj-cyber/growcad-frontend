@@ -1,8 +1,8 @@
-import Hero from "./components/sections/Hero";
-import Value from "./components/sections/Value";
-import Trust from "./components/sections/Trust";
-import Pricing from "./components/sections/Pricing";
-import CTA from "./components/sections/CTA";
+import Hero from "./home/components/sections/Hero";
+import Value from "./home/components/sections/Value";
+import Trust from "./home/components/sections/Trust";
+import Pricing from "./home/components/sections/Pricing";
+import CTA from "./home/components/sections/CTA";
 
 export default function Page() {
   return (

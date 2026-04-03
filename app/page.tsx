@@ -1,4 +1,4 @@
-import MarketingHome from "./(marketing)/home/page";
+import MarketingHome from "./(marketing)/page";
 
 export default function Page() {
   return <MarketingHome />;
