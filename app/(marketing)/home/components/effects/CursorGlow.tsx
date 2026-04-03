@@ -45,7 +45,7 @@ export default function CursorGlow() {
   return (
     <div
       ref={glowRef}
-      className="pointer-events-none fixed top-0 left-0 w-[400px] h-[400px] rounded-full bg-white/10 blur-[120px] z-0"
+      className="pointer-events-none fixed top-0 left-0 w-400px h-400px rounded-full bg-white/10 blur-[120px] z-0"
     />
   );
 }

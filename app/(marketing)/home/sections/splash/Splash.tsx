@@ -21,14 +21,14 @@ export default function Splash() {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
-          className="fixed inset-0 z-[999] flex items-center justify-center bg-black"
+          className="fixed inset-0 z-999 flex items-center justify-center bg-black"
         >
           {/* Glow Background */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.4 }}
             transition={{ duration: 1 }}
-            className="absolute w-[400px] h-[400px] bg-white/10 blur-[120px] rounded-full"
+            className="absolute w-400px h-400px bg-white/10 blur-[120px] rounded-full"
           />
 
           {/* Logo / Brand */}
@@ -67,7 +67,7 @@ export default function Splash() {
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: 2, ease: "easeInOut" }}
-            className="absolute bottom-0 left-0 right-0 h-[2px] bg-white origin-left"
+            className="absolute bottom-0 left-0 right-0 h-2px bg-white origin-left"
           />
         </motion.div>
       )}

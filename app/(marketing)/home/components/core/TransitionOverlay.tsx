@@ -29,7 +29,7 @@ export default function TransitionOverlay() {
   return (
     <div
       ref={overlay}
-      className="fixed inset-0 bg-black z-[9999] pointer-events-none"
+      className="fixed inset-0 bg-black z-9999 pointer-events-none"
     />
   );
 }

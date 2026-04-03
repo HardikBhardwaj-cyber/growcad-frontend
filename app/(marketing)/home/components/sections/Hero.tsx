@@ -9,26 +9,33 @@ import DashboardPreview from "./DashboardPreview";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden min-h-screen flex items-center">
+    <section className="relative min-h-screen flex items-center overflow-hidden">
 
-      {/* 🌌 Background layers */}
-      <Particles />
-      <BubbleField />
-      <BlobCanvas />
+      {/* 🌌 BACKGROUND SYSTEM */}
+      <div className="absolute inset-0 -z-10">
+        <Particles />
+        <BubbleField />
+        <BlobCanvas />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        {/* 💡 LIGHTING */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(124,58,237,0.25),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,rgba(59,130,246,0.2),transparent_50%)]" />
+      </div>
 
-        {/* LEFT CONTENT */}
-        <div className="space-y-8">
+      {/* 🧠 MAIN GRID */}
+      <div className="max-w-7xl mx-auto px-8 w-full grid md:grid-cols-2 gap-20 items-center">
+
+        {/* LEFT */}
+        <div className="space-y-10">
 
           <motion.h1
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-5xl md:text-6xl font-bold text-white leading-tight"
+            transition={{ duration: 1 }}
+            className="text-6xl md:text-7xl font-bold leading-[1.1]"
           >
             Grow Your Institute <br />
-            <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+            <span className="gradient-text text-glow">
               10x Faster
             </span>
           </motion.h1>
@@ -37,7 +44,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-white/70 text-lg max-w-lg"
+            className="text-white/60 text-xl max-w-xl leading-relaxed"
           >
             Automate admissions, manage students, and scale your coaching
             business with one powerful platform.
@@ -48,18 +55,26 @@ export default function Hero() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
+            className="flex gap-4"
           >
             <Magnetic>
-              <button className="px-8 py-4 rounded-xl bg-white text-black font-semibold">
-                Get Started
+              <button className="btn-primary px-10 py-4 text-lg">
+                Start Free Trial
               </button>
             </Magnetic>
-          </motion.div>
 
+            <button className="btn-secondary px-8 py-4 text-lg">
+              View Demo
+            </button>
+          </motion.div>
         </div>
 
-        {/* RIGHT DASHBOARD */}
-        <DashboardPreview />
+        {/* RIGHT */}
+        <div className="relative">
+          <div className="scale-[1.1] md:scale-[1.2]">
+            <DashboardPreview />
+          </div>
+        </div>
 
       </div>
     </section>

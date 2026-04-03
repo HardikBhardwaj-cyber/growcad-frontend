@@ -45,7 +45,7 @@ export default function RootLayout({
         <Providers>
 
           {/* 🔥 GLOBAL CURSOR (TOP LAYER) */}
-          <div className="pointer-events-none fixed inset-0 z-[9999]">
+          <div className="pointer-events-none fixed inset-0 z-9999">
             <Cursor />
           </div>
 

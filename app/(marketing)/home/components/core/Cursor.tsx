@@ -68,7 +68,7 @@ export default function Cursor() {
   return (
     <div
       ref={cursorRef}
-      className="fixed top-0 left-0 z-[9999] pointer-events-none
+      className="fixed top-0 left-0 z-9999 pointer-events-none
                  w-5 h-5 rounded-full
                  bg-white
                  mix-blend-difference

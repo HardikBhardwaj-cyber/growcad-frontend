@@ -30,7 +30,7 @@ export default function Splash() {
   if (!visible) return null;
 
   return (
-    <div className="splash-screen fixed inset-0 z-[99999] bg-black flex items-center justify-center">
+    <div className="splash-screen fixed inset-0 z-99999 bg-black flex items-center justify-center">
       <h1 className="splash-logo text-white text-4xl font-bold tracking-wide">
         GROWCAD
       </h1>

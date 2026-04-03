@@ -14,7 +14,7 @@ export default function HeroRight() {
       <div className="relative w-full max-w-3xl flex justify-center items-center">
 
         {/* ---------------- BACKGROUND GLOW ---------------- */}
-        <div className="absolute w-[500px] h-[500px] bg-white/10 blur-[140px] rounded-full opacity-40" />
+        <div className="absolute w-500px h-500px bg-white/10 blur-[140px] rounded-full opacity-40" />
 
         {/* ---------------- FLOATING ORB (TOP) ---------------- */}
         <motion.div

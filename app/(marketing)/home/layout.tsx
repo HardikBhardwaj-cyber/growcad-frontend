@@ -20,7 +20,7 @@ export default function MarketingLayout({
     <SmoothScroll>
       
       {/* 🔥 PAGE TRANSITION OVERLAY (TOP LAYER) */}
-      <div className="fixed inset-0 z-[9998] pointer-events-none">
+      <div className="fixed inset-0 z-9998 pointer-events-none">
         <TransitionOverlay />
       </div>
 
