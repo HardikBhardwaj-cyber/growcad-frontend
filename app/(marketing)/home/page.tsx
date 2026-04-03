@@ -1,30 +1,28 @@
-import { MotionProvider } from "./systems/MotionProvider";
-
-import Splash from "./sections/splash/Splash";
-import Hero from "./sections/hero/Hero";
-// (Next we’ll add ComingSoon, Value, Trust, CTA here)
+import Hero from "./components/sections/Hero";
+import Value from "./components/sections/Value";
+import Trust from "./components/sections/Trust";
+import Pricing from "./components/sections/Pricing";
+import CTA from "./components/sections/CTA";
 
 export default function Page() {
   return (
-    <MotionProvider>
-      {/* Splash Screen */}
-      <Splash />
+    <main className="bg-black text-white overflow-hidden">
 
-      {/* Main Content */}
-      <main className="relative bg-black text-white overflow-hidden">
-        
-        {/* Hero (Scroll Story Section) */}
-        <Hero />
+      {/* 🔥 HERO */}
+      <Hero />
 
-        {/* القادمة (Next Sections will plug here) */}
-        {/*
-          <ComingSoon />
-          <ValuePanel />
-          <TrustPanel />
-          <FinalCTA />
-        */}
+      {/* 🚀 VALUE SECTION */}
+      <Value />
 
-      </main>
-    </MotionProvider>
+      {/* 🤝 TRUST */}
+      <Trust />
+
+      {/* 💰 PRICING */}
+      <Pricing />
+
+      {/* 🎯 FINAL CTA */}
+      <CTA />
+
+    </main>
   );
 }

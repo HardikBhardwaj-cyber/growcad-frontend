@@ -15,6 +15,10 @@
 
   --radius: 16px;
   --blur: 12px;
+
+  /* 🔥 NEW: depth tokens */
+  --glow-primary: rgba(124, 58, 237, 0.4);
+  --glow-secondary: rgba(59, 130, 246, 0.4);
 }
 
 /* ================= 🔥 RESET ================= */
@@ -41,8 +45,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* 🔥 Prevent layout shift */
   text-rendering: optimizeLegibility;
+
+  /* 🔥 NEW: subtle gradient depth */
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(124,58,237,0.08), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(59,130,246,0.08), transparent 40%);
 }
 
 /* ================= 🔥 SELECTION ================= */
@@ -68,14 +76,19 @@ body {
   -webkit-backdrop-filter: blur(var(--blur));
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius);
+
+  /* 🔥 NEW: subtle depth */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
-/* Strong glass (cards / CTA) */
 .glass-strong {
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.15);
+
+  /* 🔥 NEW: premium shadow */
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 }
 
 /* ================= 🔥 BACKGROUNDS ================= */
@@ -109,6 +122,9 @@ body {
   font-weight: 600;
   transition: all 0.3s ease;
   will-change: transform;
+
+  /* 🔥 NEW: depth */
+  box-shadow: 0 10px 30px rgba(124,58,237,0.3);
 }
 
 .btn-primary:hover {
@@ -195,4 +211,12 @@ body {
 * {
   backface-visibility: hidden;
   transform: translateZ(0);
+}
+
+/* 🔥 NEW: reduce motion support (PRO UX) */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }
