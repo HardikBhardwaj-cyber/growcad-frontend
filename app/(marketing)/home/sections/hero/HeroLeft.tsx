@@ -1,74 +1,80 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { fadeUp, staggerContainer } from "../../systems/variants";
-import MagneticButton from "../../components/ui/MagneticButton";
-import { Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function HeroLeft() {
   return (
-    <motion.div
-      variants={staggerContainer}
-      initial="hidden"
-      animate="show"
-      className="flex flex-col max-w-[560px] text-left"
-    >
-      {/* 🔥 BADGE */}
-      <motion.div variants={fadeUp} className="mb-10">
-        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full 
-        bg-white/5 border border-white/10 text-[12px] text-gray-300 backdrop-blur-md">
-          <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-          Growth OS for Coaching Institutes
-        </div>
-      </motion.div>
+    <div className="w-full flex justify-center">
+      {/* Container for proper spacing */}
+      <div className="max-w-xl w-full px-6 md:px-0 space-y-8">
+        
+        {/* Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm"
+        >
+          <span className="text-xs text-neutral-300 tracking-wide">
+            Coming Soon
+          </span>
+        </motion.div>
 
-      {/* 🔥 HEADLINE (SPLIT FOR READABILITY) */}
-      <motion.h1
-        variants={fadeUp}
-        className="leading-[1.08] tracking-tight space-y-2"
-      >
-        <span className="block text-4xl sm:text-5xl md:text-6xl font-semibold text-white">
-          Become a top
-        </span>
+        {/* Heading */}
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="text-4xl md:text-6xl font-semibold leading-[1.1] tracking-tight text-white"
+        >
+          Growcad
+          <br />
+          <span className="text-neutral-400 font-medium text-2xl md:text-4xl">
+            Growth OS for Coaching Institutes
+          </span>
+        </motion.h1>
 
-        <span className="block text-4xl sm:text-5xl md:text-6xl font-semibold text-white">
-          coaching institute
-        </span>
+        {/* Description */}
+        <motion.p
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-neutral-400 text-lg leading-relaxed max-w-lg"
+        >
+          Automate admissions, manage students, and scale your institute —
+          without increasing operational complexity.
+        </motion.p>
 
-        <span className="block text-4xl sm:text-5xl md:text-6xl font-semibold text-white">
-          with
-        </span>
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="flex flex-col sm:flex-row gap-4 pt-2"
+        >
+          {/* Primary Button */}
+          <button className="group inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white text-black font-medium hover:scale-[1.03] transition-all duration-300">
+            Join Waitlist
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </button>
 
-        <span className="block mt-4 text-5xl sm:text-6xl md:text-7xl lg:text-[82px] font-extrabold 
-        bg-gradient-to-r from-purple-400 via-blue-400 to-indigo-500 
-        bg-clip-text text-transparent leading-[0.95]">
-          GROWCAD
-        </span>
-      </motion.h1>
+          {/* Secondary Button */}
+          <button className="px-6 py-3 rounded-xl border border-white/10 text-white hover:bg-white/5 transition-all duration-300">
+            View Demo
+          </button>
+        </motion.div>
 
-      {/* 🔥 SUBTEXT */}
-      <motion.p
-        variants={fadeUp}
-        className="text-gray-400 mt-6 text-base leading-relaxed max-w-[420px]"
-      >
-        Run your entire institute from one powerful system.
-      </motion.p>
-
-      {/* 🔥 CTA */}
-      <motion.div
-        variants={fadeUp}
-        className="flex items-center gap-5 mt-10"
-      >
-        {/* PRIMARY */}
-        <MagneticButton className="px-8 py-3.5 text-sm font-semibold shadow-[0_0_30px_rgba(124,58,237,0.6)]">
-          Get Early Access
-        </MagneticButton>
-
-        {/* SECONDARY */}
-        <button className="text-sm text-gray-400 hover:text-white transition">
-          See Live Demo →
-        </button>
-      </motion.div>
-    </motion.div>
+        {/* Subtle Trust Line */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.6 }}
+          transition={{ duration: 1, delay: 0.5 }}
+          className="text-sm text-neutral-500 pt-4"
+        >
+          Built for modern coaching institutes • Early access opening soon
+        </motion.div>
+      </div>
+    </div>
   );
 }

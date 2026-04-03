@@ -1,48 +1,42 @@
 "use client";
 
-import { useMotionValue, useSpring } from "framer-motion";
+import { useState, useCallback } from "react";
 
-/* ================= HOOK ================= */
+export function useTilt(maxTilt: number = 15) {
+  const [rotate, setRotate] = useState({ x: 0, y: 0 });
 
-export function useTilt(intensity: number = 10) {
-  const rx = useMotionValue(0);
-  const ry = useMotionValue(0);
+  const handleMove = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      const rect = e.currentTarget.getBoundingClientRect();
 
-  const rotateX = useSpring(rx, {
-    stiffness: 140,
-    damping: 18,
-    mass: 0.4,
-  });
+      // Mouse position inside element
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
-  const rotateY = useSpring(ry, {
-    stiffness: 140,
-    damping: 18,
-    mass: 0.4,
-  });
+      // Convert to -1 → 1 range
+      const midX = rect.width / 2;
+      const midY = rect.height / 2;
 
-  /* ================= MOVE ================= */
+      const percentX = (x - midX) / midX;
+      const percentY = (y - midY) / midY;
 
-  const handleMove = (e: MouseEvent, rect: DOMRect) => {
-    const px = (e.clientX - rect.left) / rect.width;
-    const py = (e.clientY - rect.top) / rect.height;
+      // Apply tilt
+      const rotateY = percentX * maxTilt;
+      const rotateX = -percentY * maxTilt;
 
-    const x = (py - 0.5) * -intensity;
-    const y = (px - 0.5) * intensity;
+      setRotate({ x: rotateX, y: rotateY });
+    },
+    [maxTilt]
+  );
 
-    rx.set(x);
-    ry.set(y);
-  };
-
-  /* ================= RESET ================= */
-
-  const handleLeave = () => {
-    rx.set(0);
-    ry.set(0);
-  };
+  const handleLeave = useCallback(() => {
+    // Reset smoothly
+    setRotate({ x: 0, y: 0 });
+  }, []);
 
   return {
-    rotateX,
-    rotateY,
+    rotateX: rotate.x,
+    rotateY: rotate.y,
     handleMove,
     handleLeave,
   };

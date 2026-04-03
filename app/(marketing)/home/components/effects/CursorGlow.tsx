@@ -1,42 +1,51 @@
 "use client";
 
-import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function CursorGlow() {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
+  const glowRef = useRef<HTMLDivElement | null>(null);
 
-  const sx = useSpring(x, { stiffness: 120, damping: 25 });
-  const sy = useSpring(y, { stiffness: 120, damping: 25 });
+  // Target position (real mouse)
+  const mouse = useRef({ x: 0, y: 0 });
+
+  // Smooth position (animated)
+  const current = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    const move = (e: MouseEvent) => {
-      x.set(e.clientX);
-      y.set(e.clientY);
+    const handleMouseMove = (e: MouseEvent) => {
+      mouse.current.x = e.clientX;
+      mouse.current.y = e.clientY;
     };
 
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
+    window.addEventListener("mousemove", handleMouseMove);
+
+    const lerp = (start: number, end: number, factor: number) => {
+      return start + (end - start) * factor;
+    };
+
+    const animate = () => {
+      // Smooth follow (0.08 = smoothness)
+      current.current.x = lerp(current.current.x, mouse.current.x, 0.08);
+      current.current.y = lerp(current.current.y, mouse.current.y, 0.08);
+
+      if (glowRef.current) {
+        glowRef.current.style.transform = `translate3d(${current.current.x - 200}px, ${current.current.y - 200}px, 0)`;
+      }
+
+      requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
   }, []);
 
   return (
-    <>
-      {/* 🔥 SOFT LIGHT ONLY */}
-      <motion.div
-        style={{ translateX: sx, translateY: sy }}
-        className="pointer-events-none fixed top-0 left-0 z-[9999]"
-      >
-        <div className="w-[220px] h-[220px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-500/15 blur-[80px]" />
-      </motion.div>
-
-      {/* 🔹 CORE DOT (SUBTLE) */}
-      <motion.div
-        style={{ translateX: sx, translateY: sy }}
-        className="pointer-events-none fixed top-0 left-0 z-[9999]"
-      >
-        <div className="w-2 h-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-400/80" />
-      </motion.div>
-    </>
+    <div
+      ref={glowRef}
+      className="pointer-events-none fixed top-0 left-0 w-[400px] h-[400px] rounded-full bg-white/10 blur-[120px] z-0"
+    />
   );
 }

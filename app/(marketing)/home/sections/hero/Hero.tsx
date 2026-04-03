@@ -1,77 +1,91 @@
 "use client";
 
-import { motion, useTransform } from "framer-motion";
+import {
+  motion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import { useRef } from "react";
+
 import HeroLeft from "./HeroLeft";
 import HeroRight from "./HeroRight";
-import { useMotion } from "../../systems/MotionProvider";
+import GridBackground from "../../components/effects/GridBackground";
+import CursorGlow from "../../components/effects/CursorGlow";
 
 export default function Hero() {
-  const { scrollProgress } = useMotion();
+  const ref = useRef<HTMLDivElement | null>(null);
 
-  /* 🔥 SCROLL FEEL (SMOOTHER + PREMIUM) */
-  const opacity = useTransform(scrollProgress, [0, 0.4], [1, 0.85]);
-  const scale = useTransform(scrollProgress, [0, 0.4], [1, 0.985]);
-  const y = useTransform(scrollProgress, [0, 0.4], [0, -25]);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+  });
+
+  /* ---------------- STORY PHASES ---------------- */
+
+  // Phase 1 → Normal
+  // Phase 2 → Fade left
+  // Phase 3 → Focus on dashboard
+
+  const leftOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+  const leftY = useTransform(scrollYProgress, [0, 0.3], [0, -100]);
+
+  const rightScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
+  const rightY = useTransform(scrollYProgress, [0, 1], [0, -120]);
+
+  const overlayOpacity = useTransform(scrollYProgress, [0.4, 0.7], [0, 1]);
 
   return (
-    <motion.section
-      style={{ opacity, scale, y }}
-      className="relative min-h-screen flex items-center overflow-hidden bg-[#0a0a0f]"
-    >
-      {/* ================= 🌌 BACKGROUND SYSTEM ================= */}
+    <section ref={ref} className="relative h-[200vh] bg-black">
 
-      {/* GRID */}
-      <div className="absolute inset-0 bg-grid opacity-[0.018]" />
+      {/* Sticky Viewport */}
+      <div className="sticky top-0 h-screen overflow-hidden">
 
-      {/* PRIMARY LIGHT (FOCUS RIGHT) */}
-      <div className="absolute inset-0 
-      bg-[radial-gradient(circle_at_70%_45%,rgba(124,58,237,0.22),transparent_60%)]" />
+        {/* Background */}
+        <GridBackground />
+        <CursorGlow />
 
-      {/* SECONDARY LIGHT (LEFT BALANCE) */}
-      <div className="absolute inset-0 
-      bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.08),transparent_50%)]" />
+        {/* Content Container */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 lg:px-16 h-full flex items-center">
 
-      {/* NOISE */}
-      <div className="absolute inset-0 opacity-[0.015] mix-blend-overlay bg-[url('/noise.png')]" />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
 
-      {/* FLOATING ORB */}
-      <motion.div
-        animate={{ y: [0, -18, 0], x: [0, 12, 0] }}
-        transition={{ duration: 16, repeat: Infinity }}
-        className="absolute left-[10%] top-[32%] w-2 h-2 bg-purple-400 rounded-full blur-sm opacity-40"
-      />
-
-      {/* ================= 🚀 CONTENT ================= */}
-
-      <div className="relative w-full max-w-[1500px] mx-auto 
-      px-6 md:px-16 lg:px-28 xl:px-40">
-
-        <div className="grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] items-center min-h-[88vh]">
-
-          {/* 🔥 LEFT (SHIFTED RIGHT FOR BREATHING SPACE) */}
-          <div className="flex justify-start">
-            <div className="max-w-[540px] w-full">
+            {/* LEFT STORY */}
+            <motion.div
+              style={{ opacity: leftOpacity, y: leftY }}
+              className="lg:col-span-5 flex justify-center lg:justify-start"
+            >
               <HeroLeft />
-            </div>
-          </div>
+            </motion.div>
 
-          {/* 🔥 RIGHT (FOCUS AREA) */}
-          <div className="flex justify-center lg:justify-end mt-14 lg:mt-0">
-            <HeroRight />
-          </div>
+            {/* RIGHT STORY */}
+            <motion.div
+              style={{ scale: rightScale, y: rightY }}
+              className="lg:col-span-7 flex justify-center"
+            >
+              <HeroRight />
+            </motion.div>
 
+          </div>
         </div>
+
+        {/* STORY OVERLAY (Phase 2) */}
+        <motion.div
+          style={{ opacity: overlayOpacity }}
+          className="absolute inset-0 flex items-center justify-center text-center px-6"
+        >
+          <div className="max-w-2xl">
+            <h2 className="text-3xl md:text-5xl font-semibold text-white leading-tight">
+              Run your entire institute
+              <br />
+              from one powerful system
+            </h2>
+
+            <p className="text-neutral-400 mt-4 text-lg">
+              Admissions, students, payments, analytics — everything unified.
+            </p>
+          </div>
+        </motion.div>
+
       </div>
-
-      {/* ================= 🔥 DEPTH OVERLAY ================= */}
-
-      {/* TOP FADE */}
-      <div className="absolute top-0 left-0 w-full h-32 
-      bg-gradient-to-b from-[#0a0a0f] to-transparent pointer-events-none" />
-
-      {/* BOTTOM FADE */}
-      <div className="absolute bottom-0 left-0 w-full h-40 
-      bg-gradient-to-b from-transparent to-[#0a0a0f]" />
-    </motion.section>
+    </section>
   );
 }

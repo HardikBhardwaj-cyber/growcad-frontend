@@ -13,7 +13,6 @@
 
   --border-color: #1f2937;
 
-  /* 🔥 NEW */
   --radius: 16px;
   --blur: 12px;
 }
@@ -27,18 +26,23 @@
   box-sizing: border-box;
 }
 
-/* ================= 🔥 BODY ================= */
+/* ================= 🔥 HTML / BODY ================= */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: Inter, sans-serif;
+  font-family: Inter, system-ui, sans-serif;
   overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-}
 
-/* ================= 🔥 SCROLL ================= */
-html {
-  scroll-behavior: smooth;
+  /* 🔥 Premium smoothing */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* 🔥 Prevent layout shift */
+  text-rendering: optimizeLegibility;
 }
 
 /* ================= 🔥 SELECTION ================= */
@@ -61,14 +65,16 @@ html {
 .glass {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius);
 }
 
-/* 🔥 STRONG GLASS (CTA / CARDS) */
+/* Strong glass (cards / CTA) */
 .glass-strong {
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
@@ -80,7 +86,6 @@ html {
   background-size: 40px 40px;
 }
 
-/* 🔥 RADIAL FADE (DEPTH) */
 .bg-radial {
   background: radial-gradient(circle at center, rgba(124,58,237,0.15), transparent 70%);
 }
@@ -92,7 +97,6 @@ html {
   -webkit-text-fill-color: transparent;
 }
 
-/* 🔥 PREMIUM TEXT GLOW */
 .text-glow {
   text-shadow: 0 0 20px rgba(124, 58, 237, 0.6);
 }
@@ -104,6 +108,7 @@ html {
   border-radius: 12px;
   font-weight: 600;
   transition: all 0.3s ease;
+  will-change: transform;
 }
 
 .btn-primary:hover {
@@ -145,16 +150,15 @@ html {
   100% { transform: translateY(0px); }
 }
 
-/* PULSE GLOW */
+/* GLOW PULSE */
 @keyframes glowPulse {
   0% { opacity: 0.6; }
   50% { opacity: 1; }
   100% { opacity: 0.6; }
 }
 
-/* ================= 🔥 UTILITY CLASSES ================= */
+/* ================= 🔥 UTILITIES ================= */
 
-/* SHIMMER EFFECT */
 .shimmer {
   position: relative;
   overflow: hidden;
@@ -168,25 +172,27 @@ html {
   animation: shimmer 2.5s infinite;
 }
 
-/* FLOAT */
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
 
-/* GRADIENT TEXT ANIMATION */
 .animate-gradient {
   background-size: 200% 200%;
   animation: gradientMove 6s linear infinite;
 }
 
-/* GLOW PULSE */
 .animate-glow {
   animation: glowPulse 3s ease-in-out infinite;
 }
 
 /* ================= 🔥 PERFORMANCE ================= */
 
-/* GPU acceleration for animations */
 .will-change {
   will-change: transform, opacity;
+}
+
+/* Prevent animation jank */
+* {
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }

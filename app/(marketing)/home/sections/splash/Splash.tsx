@@ -4,108 +4,71 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 
 export default function Splash() {
-  const [show, setShow] = useState(true);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShow(false), 2800);
-
-    // 🔊 OPTIONAL SOUND
-    const audio = new Audio("/intro.mp3");
-    audio.volume = 0.2;
-    audio.play().catch(() => {});
+    const timer = setTimeout(() => {
+      setIsVisible(false);
+    }, 2200); // duration of splash
 
     return () => clearTimeout(timer);
   }, []);
 
   return (
     <AnimatePresence>
-      {show && (
+      {isVisible && (
         <motion.div
           initial={{ opacity: 1 }}
-          exit={{
-            opacity: 0,
-            scale: 1.05,
-            filter: "blur(10px)",
-          }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0a0a0f] overflow-hidden"
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+          className="fixed inset-0 z-[999] flex items-center justify-center bg-black"
         >
-
-          {/* 🔥 FLASH BURST */}
+          {/* Glow Background */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.4, 0] }}
-            transition={{ duration: 0.8 }}
-            className="absolute inset-0 bg-purple-500"
+            animate={{ opacity: 0.4 }}
+            transition={{ duration: 1 }}
+            className="absolute w-[400px] h-[400px] bg-white/10 blur-[120px] rounded-full"
           />
 
-          {/* 🔥 DEPTH GLOW */}
+          {/* Logo / Brand */}
           <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1.4, opacity: 1 }}
-            transition={{ duration: 1.4, ease: "easeOut" }}
-            className="absolute w-[700px] h-[700px] bg-purple-600/20 blur-[200px] rounded-full"
-          />
-
-          <motion.div
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 4, repeat: Infinity }}
-            className="absolute w-[400px] h-[400px] bg-blue-500/10 blur-[160px] rounded-full"
-          />
-
-          {/* 🔥 CONTENT */}
-          <div className="relative flex flex-col items-center gap-14">
-
-            {/* 🔥 LOGO (MULTI STAGE) */}
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{
+              duration: 0.8,
+              ease: [0.16, 1, 0.3, 1], // premium easing
+            }}
+            className="relative flex flex-col items-center"
+          >
+            {/* Brand Name */}
             <motion.h1
-              initial={{
-                scale: 0.7,
-                opacity: 0,
-                filter: "blur(12px)",
-              }}
-              animate={{
-                scale: [0.7, 1.05, 1],
-                opacity: 1,
-                filter: "blur(0px)",
-                backgroundPosition: ["0% 50%", "100% 50%"],
-              }}
-              transition={{
-                duration: 1.4,
-                ease: [0.16, 1, 0.3, 1],
-                backgroundPosition: {
-                  duration: 5,
-                  repeat: Infinity,
-                  ease: "linear",
-                },
-              }}
-              className="relative text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-purple-400 via-blue-400 to-purple-400"
-              style={{ backgroundSize: "200% 200%" }}
+              initial={{ letterSpacing: "0.2em", opacity: 0 }}
+              animate={{ letterSpacing: "0.05em", opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.8 }}
+              className="text-white text-4xl md:text-5xl font-semibold tracking-tight"
             >
               GROWCAD
-
-              {/* 🔥 PULSE GLOW */}
-              <motion.span
-                animate={{ opacity: [0.2, 0.5, 0.2] }}
-                transition={{ duration: 2.5, repeat: Infinity }}
-                className="absolute inset-0 blur-2xl bg-gradient-to-r from-purple-500 to-blue-500"
-              />
             </motion.h1>
 
-            {/* 🔥 PROGRESS */}
-            <div className="w-full max-w-[420px] h-[3px] bg-white/10 rounded-full overflow-hidden">
-              <motion.div
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{
-                  duration: 2.2,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                className="h-full origin-left bg-linear-to-r from-purple-500 to-blue-500"
-              />
-            </div>
+            {/* Tagline */}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 0.6, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+              className="text-neutral-400 text-sm mt-2 tracking-wide"
+            >
+              Growth OS for Coaching Institutes
+            </motion.p>
+          </motion.div>
 
-          </div>
-
+          {/* Bottom Loader Line */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 2, ease: "easeInOut" }}
+            className="absolute bottom-0 left-0 right-0 h-[2px] bg-white origin-left"
+          />
         </motion.div>
       )}
     </AnimatePresence>
