@@ -1,7 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ReactNode, useRef } from "react";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+import { ReactNode } from "react";
 
 type ButtonProps = {
   children: ReactNode;
@@ -9,40 +14,47 @@ type ButtonProps = {
   className?: string;
 };
 
-/* ================= COMPONENT ================= */
-
 export default function Button({
   children,
   variant = "primary",
   className = "",
 }: ButtonProps) {
-  const ref = useRef<HTMLButtonElement>(null);
+  /* ================= MAGNETIC SYSTEM ================= */
 
-  /* 🔥 MAGNETIC EFFECT */
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+
+  const sx = useSpring(mx, { stiffness: 200, damping: 20 });
+  const sy = useSpring(my, { stiffness: 200, damping: 20 });
 
   const handleMove = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const rect = ref.current?.getBoundingClientRect();
-    if (!rect) return;
+    const rect = e.currentTarget.getBoundingClientRect();
 
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
+    const x = e.clientX - (rect.left + rect.width / 2);
+    const y = e.clientY - (rect.top + rect.height / 2);
 
-    ref.current!.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+    mx.set(x * 0.25);
+    my.set(y * 0.25);
   };
 
   const handleLeave = () => {
-    if (!ref.current) return;
-    ref.current.style.transform = "translate(0px, 0px)";
+    mx.set(0);
+    my.set(0);
   };
 
-  /* 🔥 STYLES */
+  /* ================= LIGHT EFFECT ================= */
+
+  const lightX = useTransform(mx, [-50, 50], [0, 100]);
+  const lightY = useTransform(my, [-50, 50], [0, 100]);
+
+  /* ================= BASE ================= */
 
   const base =
-    "relative inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold overflow-hidden transition-all duration-300";
+    "relative inline-flex items-center justify-center px-7 py-3 rounded-xl font-semibold overflow-hidden will-change-transform";
 
   const styles = {
     primary:
-      "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-[0_0_20px_rgba(124,58,237,0.4)]",
+      "text-white bg-gradient-to-r from-purple-500 to-blue-500 shadow-[0_10px_40px_rgba(124,58,237,0.4)]",
 
     secondary:
       "bg-white/5 border border-white/10 text-white/80 backdrop-blur-md",
@@ -53,19 +65,44 @@ export default function Button({
 
   return (
     <motion.button
-      ref={ref}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
-      whileTap={{ scale: 0.95 }}
+      style={{
+        x: sx,
+        y: sy,
+      }}
+      whileHover={{ scale: 1.04 }}
+      whileTap={{ scale: 0.94 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className={`${base} ${styles[variant]} ${className}`}
     >
-      {/* 🔥 SHIMMER EFFECT */}
-      <span className="absolute inset-0 overflow-hidden rounded-xl">
-        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100 animate-[shimmer_2s_infinite]" />
-      </span>
+      {/* 🔥 SHIMMER (ONLY ON HOVER) */}
+      <motion.div
+        initial={{ x: "-120%" }}
+        whileHover={{ x: "120%" }}
+        transition={{ duration: 1, ease: "easeInOut" }}
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+      />
+
+      {/* 🔥 CURSOR LIGHT */}
+      <motion.div
+        style={{
+          background: useTransform(
+            [lightX, lightY],
+            ([x, y]) =>
+              `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.2), transparent 60%)`
+          ),
+        }}
+        className="absolute inset-0 pointer-events-none"
+      />
+
+      {/* 🔥 DEPTH OVERLAY */}
+      <div className="absolute inset-0 bg-black/10 opacity-0 hover:opacity-100 transition" />
 
       {/* 🔥 CONTENT */}
-      <span className="relative z-10">{children}</span>
+      <span className="relative z-10 tracking-wide">
+        {children}
+      </span>
     </motion.button>
   );
 }

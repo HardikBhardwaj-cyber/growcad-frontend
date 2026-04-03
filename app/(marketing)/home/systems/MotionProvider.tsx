@@ -7,13 +7,15 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
+  useScroll,
+  useVelocity,
   MotionValue,
 } from "framer-motion";
 import {
   createContext,
   useContext,
   useEffect,
-  useRef,
+  useState,
   ReactNode,
 } from "react";
 
@@ -36,8 +38,8 @@ type MotionContextType = {
   drift: MotionValue<number>;
   velocity: MotionValue<number>;
 
-  mouseX: MotionValue<number>; // 0 → 1
-  mouseY: MotionValue<number>; // 0 → 1
+  mouseX: MotionValue<number>;
+  mouseY: MotionValue<number>;
 };
 
 /* ================= CONTEXT ================= */
@@ -51,64 +53,60 @@ export default function MotionProvider({
 }: {
   children: ReactNode;
 }) {
-  /* 🔥 RAW INPUT */
+  /* ================= VIEWPORT ================= */
+
+  const [vh, setVh] = useState(1000);
+  const [vw, setVw] = useState(1920);
+
+  useEffect(() => {
+    const update = () => {
+      setVh(window.innerHeight);
+      setVw(window.innerWidth);
+    };
+
+    update();
+    window.addEventListener("resize", update);
+
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  /* ================= MOUSE ================= */
+
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
 
-  const mouseX = useMotionValue(0);
+  const mouseX = useMotionValue(0); // 0 → 1
   const mouseY = useMotionValue(0);
-
-  const scrollY = useMotionValue(0);
-
-  /* ================= VELOCITY ================= */
-
-  const rawVelocity = useMotionValue(0);
-  const velocity = useSpring(rawVelocity, {
-    stiffness: 120,
-    damping: 25,
-  });
-
-  const last = useRef({ x: 0, y: 0, t: 0 });
-
-  /* ================= EVENTS ================= */
 
   useEffect(() => {
     const move = (e: MouseEvent) => {
-      const now = performance.now();
-      const dt = Math.max(now - last.current.t, 16);
+      const nx = (e.clientX / vw - 0.5) * 2;
+      const ny = (e.clientY / vh - 0.5) * 2;
 
-      const dx = e.clientX - last.current.x;
-      const dy = e.clientY - last.current.y;
-
-      const v = Math.sqrt(dx * dx + dy * dy) / dt;
-      rawVelocity.set(v);
-
-      last.current = { x: e.clientX, y: e.clientY, t: now };
-
-      // normalized (-1 → 1)
-      const nx = (e.clientX / window.innerWidth - 0.5) * 2;
-      const ny = (e.clientY / window.innerHeight - 0.5) * 2;
-
-      // normalized (0 → 1)
-      mouseX.set(e.clientX / window.innerWidth);
-      mouseY.set(e.clientY / window.innerHeight);
+      mouseX.set(e.clientX / vw);
+      mouseY.set(e.clientY / vh);
 
       mx.set(nx * 60);
       my.set(ny * 60);
     };
 
-    const scroll = () => {
-      scrollY.set(window.scrollY);
-    };
-
     window.addEventListener("mousemove", move);
-    window.addEventListener("scroll", scroll);
 
-    return () => {
-      window.removeEventListener("mousemove", move);
-      window.removeEventListener("scroll", scroll);
-    };
-  }, [mx, my, scrollY, rawVelocity, mouseX, mouseY]);
+    return () => window.removeEventListener("mousemove", move);
+  }, [mx, my, mouseX, mouseY, vw, vh]);
+
+  /* ================= VELOCITY ================= */
+
+  const vx = useVelocity(mx);
+  const vy = useVelocity(my);
+
+  const velocity = useTransform(
+    [vx, vy],
+    (latest: number[]) => {
+      const [vxVal, vyVal] = latest;
+      return Math.min(Math.sqrt(vxVal * vxVal + vyVal * vyVal), 1000);
+    }
+  );
 
   /* ================= INERTIA ================= */
 
@@ -132,20 +130,18 @@ export default function MotionProvider({
   const depth3X = useTransform(fastX, (v) => v * 0.1);
   const depth3Y = useTransform(fastY, (v) => v * 0.1);
 
-  /* ================= ROTATION (NEW 🔥) ================= */
+  /* ================= ROTATION ================= */
 
-  const rotateX = useTransform(fastY, [-60, 60], [8, -8]);
-  const rotateY = useTransform(fastX, [-60, 60], [-8, 8]);
+  const rotateX = useTransform(fastY, [-60, 60], [6, -6]);
+  const rotateY = useTransform(fastX, [-60, 60], [-6, 6]);
 
   /* ================= SCROLL ================= */
 
-  const scrollDepth = useTransform(scrollY, (v) => v * -0.2);
+  const { scrollYProgress } = useScroll();
 
-  const scrollProgress = useTransform(
-    scrollY,
-    [0, typeof window !== "undefined" ? window.innerHeight : 1000],
-    [0, 1]
-  );
+  const scrollDepth = useTransform(scrollYProgress, [0, 1], [0, -200]);
+
+  const scrollProgress = scrollYProgress;
 
   /* ================= DRIFT ================= */
 
@@ -163,7 +159,7 @@ export default function MotionProvider({
     return () => cancelAnimationFrame(raf);
   }, [time]);
 
-  const drift = useTransform(time, (t) => Math.sin(t) * 10);
+  const drift = useTransform(time, (t) => Math.sin(t) * 8);
 
   /* ================= CONTEXT ================= */
 

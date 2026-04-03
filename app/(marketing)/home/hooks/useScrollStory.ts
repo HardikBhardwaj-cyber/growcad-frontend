@@ -1,34 +1,57 @@
 "use client";
 
-import { useScroll, useTransform } from "framer-motion";
+import {
+  useScroll,
+  useTransform,
+  MotionValue,
+} from "framer-motion";
+import type { UseScrollOptions } from "framer-motion";
+import { RefObject } from "react";
 
-export function useScrollStory() {
-  const { scrollYProgress } = useScroll();
+/* ================= TYPES ================= */
 
-  /* HERO → VALUE */
-  const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.9]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0.4]);
+type ScrollOffset = NonNullable<UseScrollOptions["offset"]>;
 
-  /* VALUE APPEAR */
-  const valueY = useTransform(scrollYProgress, [0.15, 0.35], [100, 0]);
-  const valueOpacity = useTransform(scrollYProgress, [0.15, 0.35], [0, 1]);
+type ScrollStory = {
+  progress: MotionValue<number>;
 
-  /* TRUST APPEAR */
-  const trustY = useTransform(scrollYProgress, [0.3, 0.5], [100, 0]);
-  const trustOpacity = useTransform(scrollYProgress, [0.3, 0.5], [0, 1]);
+  y: MotionValue<number>;
+  opacity: MotionValue<number>;
+  scale: MotionValue<number>;
 
-  /* FINAL CTA */
-  const ctaScale = useTransform(scrollYProgress, [0.6, 0.9], [0.9, 1]);
-  const ctaOpacity = useTransform(scrollYProgress, [0.6, 0.9], [0, 1]);
+  blur: MotionValue<number>;
+};
+
+/* ================= HOOK ================= */
+
+export function useScrollStory(
+  ref: RefObject<HTMLElement>,
+  offset: ScrollOffset = ["start end", "end start"]
+): ScrollStory {
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset,
+  });
+
+  const progress = scrollYProgress;
+
+  const y = useTransform(progress, [0, 1], [80, -80]);
+
+  const opacity = useTransform(
+    progress,
+    [0, 0.2, 0.8, 1],
+    [0, 1, 1, 0]
+  );
+
+  const scale = useTransform(progress, [0, 1], [0.96, 1]);
+
+  const blur = useTransform(progress, [0, 1], [10, 0]);
 
   return {
-    heroScale,
-    heroOpacity,
-    valueY,
-    valueOpacity,
-    trustY,
-    trustOpacity,
-    ctaScale,
-    ctaOpacity,
+    progress,
+    y,
+    opacity,
+    scale,
+    blur,
   };
 }

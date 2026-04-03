@@ -23,7 +23,7 @@ export function useMouseSmooth(speed: number = 0.08) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  /* 🔥 LAG LAYER */
+  // 🔥 LAG LAYER (depth illusion)
   const lagX = useMotionValue(0);
   const lagY = useMotionValue(0);
 
@@ -32,24 +32,23 @@ export function useMouseSmooth(speed: number = 0.08) {
   const vx = useVelocity(x);
   const vy = useVelocity(y);
 
-  /* ✅ FIX: FORCE TYPE */
-  const speedValue: MotionValue<number> = useTransform(
+  // 🔥 SAFE SPEED CALCULATION
+  const speedValue = useTransform(
     [vx, vy],
     (latest) => {
-      const [vxVal, vyVal] = latest as number[];
+        const [vxVal, vyVal] = latest as [number, number];
 
-      return Math.min(
-        Math.sqrt(vxVal * vxVal + vyVal * vyVal),
-        1000
-      );
+        const velocity = Math.sqrt(vxVal * vxVal + vyVal * vyVal);
+        return Math.min(velocity, 1000);
     }
   );
 
-  /* ================= LOOP ================= */
+  /* ================= RAF LOOP ================= */
 
   const raf = useRef<number | null>(null);
 
   useEffect(() => {
+    // ✅ SAFE: only runs on client
     const handleMove = (e: MouseEvent) => {
       target.current.x = e.clientX;
       target.current.y = e.clientY;
@@ -59,14 +58,14 @@ export function useMouseSmooth(speed: number = 0.08) {
       const tx = target.current.x;
       const ty = target.current.y;
 
-      /* 🔥 MAIN SMOOTH */
+      /* 🔥 MAIN SMOOTH (LERP) */
       const cx = x.get() + (tx - x.get()) * speed;
       const cy = y.get() + (ty - y.get()) * speed;
 
       x.set(cx);
       y.set(cy);
 
-      /* 🔥 LAG (DEPTH) */
+      /* 🔥 LAG (SECOND LAYER DEPTH) */
       const lx = lagX.get() + (cx - lagX.get()) * (speed * 0.5);
       const ly = lagY.get() + (cy - lagY.get()) * (speed * 0.5);
 
@@ -88,12 +87,12 @@ export function useMouseSmooth(speed: number = 0.08) {
   /* ================= RETURN ================= */
 
   return {
-    x,
+    x,        // smooth cursor
     y,
-    lagX,
+    lagX,     // delayed cursor (depth)
     lagY,
-    vx,
-    vy,
-    speed: speedValue,
+    vx,       // velocity X
+    vy,       // velocity Y
+    speed: speedValue, // combined speed
   };
 }

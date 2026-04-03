@@ -4,66 +4,137 @@ import {
   useScroll,
   useTransform,
   useSpring,
+  useVelocity,
   MotionValue,
 } from "framer-motion";
+import { RefObject } from "react";
 
-type OffsetTuple = [
-  "start end" | "start start" | "center end" | "end start",
-  "end start" | "end end" | "center start" | "start end"
-];
+/* ================= TYPES ================= */
+
+type ScrollOffset =
+  | ["start end", "end start"]
+  | ["start start", "end end"]
+  | ["center end", "center start"]
+  | (string | number)[];
 
 type Options = {
-  offset?: OffsetTuple;
+  target?: RefObject<HTMLElement>;
+  offset?: ScrollOffset;
+
+  intensity?: number;
+  smooth?: boolean;
+
+  /* 🔥 NEW: CONTROL RANGE */
+  range?: [number, number];
 };
 
+/* ================= HOOK ================= */
+
 export function useScrollTransform(options?: Options) {
+  const {
+    target,
+    offset = ["start end", "end start"],
+    intensity = 1,
+    smooth = true,
+    range = [0, 1],
+  } = options || {};
+
   /* ================= SCROLL ================= */
 
-  const offset: OffsetTuple =
-    options?.offset ?? ["start end", "end start"];
-
   const { scrollYProgress } = useScroll({
-    offset,
+    target,
+    offset:
+      offset as NonNullable<
+        Parameters<typeof useScroll>[0]
+      >["offset"],
   });
 
-  /* ================= SMOOTH ================= */
+  /* ================= VELOCITY ================= */
 
-  const smooth = useSpring(scrollYProgress, {
-    stiffness: 80,
-    damping: 20,
+  const velocity = useVelocity(scrollYProgress);
+
+  /* ================= SPRING ================= */
+
+  const spring = useSpring(scrollYProgress, {
+    stiffness: 90,
+    damping: 22,
+    mass: 0.6,
   });
+
+  const progress = smooth ? spring : scrollYProgress;
+
+  /* ================= RANGE CONTROL ================= */
+
+  const ranged = useTransform(progress, range, [0, 1]);
 
   /* ================= TRANSFORMS ================= */
 
   const y: MotionValue<number> = useTransform(
-    smooth,
+    ranged,
     [0, 1],
-    [80, -80]
+    [80 * intensity, -80 * intensity]
+  );
+
+  const x: MotionValue<number> = useTransform(
+    ranged,
+    [0, 1],
+    [-40 * intensity, 40 * intensity]
   );
 
   const opacity: MotionValue<number> = useTransform(
-    smooth,
-    [0, 0.3, 1],
-    [0, 1, 0.6]
+    ranged,
+    [0, 0.15, 0.85, 1],
+    [0, 1, 1, 0]
   );
 
   const scale: MotionValue<number> = useTransform(
-    smooth,
+    ranged,
     [0, 1],
-    [0.95, 1]
+    [0.96, 1]
+  );
+
+  /* 🔥 BETTER BLUR CURVE */
+  const blurValue = useTransform(
+    ranged,
+    [0, 0.5, 1],
+    [12, 4, 0]
   );
 
   const blur: MotionValue<string> = useTransform(
-    smooth,
-    [0, 1],
-    ["blur(10px)", "blur(0px)"]
+    blurValue,
+    (b) => `blur(${b}px)`
   );
 
+  /* 🔥 DEPTH ROTATION */
+  const rotateX: MotionValue<number> = useTransform(
+    ranged,
+    [0, 1],
+    [6 * intensity, -6 * intensity]
+  );
+
+  const rotateY: MotionValue<number> = useTransform(
+    ranged,
+    [0, 1],
+    [-6 * intensity, 6 * intensity]
+  );
+
+  /* ================= RETURN ================= */
+
   return {
-    progress: smooth,
+    progress: ranged,
+
+    x,
     y,
+
     opacity,
     scale,
+
     blur,
+    blurValue,
+
+    rotateX,
+    rotateY,
+
+    velocity,
   };
 }

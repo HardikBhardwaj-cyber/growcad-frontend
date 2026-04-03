@@ -1,6 +1,11 @@
 "use client";
 
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import { ReactNode } from "react";
 
 type Props = {
@@ -8,61 +13,84 @@ type Props = {
   className?: string;
 };
 
-export default function MagneticButton({ children, className = "" }: Props) {
-  /* 🔥 MOTION VALUES */
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
+export default function MagneticButton({
+  children,
+  className = "",
+}: Props) {
+  /* ================= MAGNETIC ================= */
 
-  /* 🔥 SMOOTH SPRING */
-  const smoothX = useSpring(x, { stiffness: 150, damping: 15 });
-  const smoothY = useSpring(y, { stiffness: 150, damping: 15 });
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
 
-  /* 🔥 MOUSE MOVE */
+  const sx = useSpring(mx, { stiffness: 220, damping: 18 });
+  const sy = useSpring(my, { stiffness: 220, damping: 18 });
+
   const handleMove = (e: React.MouseEvent<HTMLButtonElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
 
-    const px = (e.clientX - rect.left) / rect.width;
-    const py = (e.clientY - rect.top) / rect.height;
+    const x = e.clientX - (rect.left + rect.width / 2);
+    const y = e.clientY - (rect.top + rect.height / 2);
 
-    x.set((px - 0.5) * 30);
-    y.set((py - 0.5) * 30);
+    // 🔥 reduced = premium
+    mx.set(x * 0.18);
+    my.set(y * 0.18);
   };
 
-  /* 🔥 RESET */
   const handleLeave = () => {
-    x.set(0);
-    y.set(0);
+    mx.set(0);
+    my.set(0);
   };
+
+  /* ================= LIGHT ================= */
+
+  const lightX = useTransform(mx, [-40, 40], [0, 100]);
+  const lightY = useTransform(my, [-40, 40], [0, 100]);
+
+  /* ================= COMPONENT ================= */
 
   return (
     <motion.button
-      style={{
-        x: smoothX,
-        y: smoothY,
-      }}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
-      whileTap={{ scale: 0.95 }}
-      className={`relative px-6 py-3 rounded-xl font-semibold text-white overflow-hidden ${className}`}
+      style={{
+        x: sx,
+        y: sy,
+      }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.93 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className={`relative px-7 py-3 rounded-xl font-semibold text-white overflow-hidden will-change-transform ${className}`}
     >
-      {/* 🔥 GRADIENT BACKGROUND */}
+      {/* 🔥 BASE GRADIENT */}
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500" />
 
-      {/* 🔥 GLOW LAYER */}
+      {/* 🔥 SHIMMER (ONLY ON HOVER) */}
       <motion.div
-        animate={{
-          opacity: [0.4, 0.8, 0.4],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute inset-0 bg-purple-500 blur-xl opacity-50"
+        initial={{ x: "-120%" }}
+        whileHover={{ x: "120%" }}
+        transition={{ duration: 1, ease: "easeInOut" }}
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
       />
 
+      {/* 🔥 CURSOR LIGHT */}
+      <motion.div
+        style={{
+          background: useTransform(
+            [lightX, lightY],
+            ([x, y]) =>
+              `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.25), transparent 60%)`
+          ),
+        }}
+        className="absolute inset-0 pointer-events-none"
+      />
+
+      {/* 🔥 DEPTH OVERLAY */}
+      <div className="absolute inset-0 bg-black/10 opacity-0 hover:opacity-100 transition" />
+
       {/* 🔥 CONTENT */}
-      <span className="relative z-10">{children}</span>
+      <span className="relative z-10 tracking-wide">
+        {children}
+      </span>
     </motion.button>
   );
 }
