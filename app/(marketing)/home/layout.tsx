@@ -1,8 +1,8 @@
 "use client";
 
-import SmoothScroll from "./home/components/core/SmoothScroll";
-import PageTransition from "./home/components/core/PageTransition";
-import TransitionOverlay from "./home/components/core/TransitionOverlay";
+import SmoothScroll from "./components/core/SmoothScroll";
+import PageTransition from "./components/core/PageTransition";
+import TransitionOverlay from "./components/core/TransitionOverlay";
 import { useEffect } from "react";
 
 export default function MarketingLayout({
