@@ -22,8 +22,8 @@ export default function MagneticButton({
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
 
-  const sx = useSpring(mx, { stiffness: 220, damping: 18 });
-  const sy = useSpring(my, { stiffness: 220, damping: 18 });
+  const sx = useSpring(mx, { stiffness: 160, damping: 16 });
+  const sy = useSpring(my, { stiffness: 160, damping: 16 });
 
   const handleMove = (e: React.MouseEvent<HTMLButtonElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -31,9 +31,9 @@ export default function MagneticButton({
     const x = e.clientX - (rect.left + rect.width / 2);
     const y = e.clientY - (rect.top + rect.height / 2);
 
-    // 🔥 reduced = premium
-    mx.set(x * 0.18);
-    my.set(y * 0.18);
+    // 🔥 softer magnetic
+    mx.set(x * 0.15);
+    my.set(y * 0.15);
   };
 
   const handleLeave = () => {
@@ -43,8 +43,8 @@ export default function MagneticButton({
 
   /* ================= LIGHT ================= */
 
-  const lightX = useTransform(mx, [-40, 40], [0, 100]);
-  const lightY = useTransform(my, [-40, 40], [0, 100]);
+  const lightX = useTransform(mx, [-40, 40], [20, 80]);
+  const lightY = useTransform(my, [-40, 40], [20, 80]);
 
   /* ================= COMPONENT ================= */
 
@@ -56,39 +56,39 @@ export default function MagneticButton({
         x: sx,
         y: sy,
       }}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.93 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className={`relative px-7 py-3 rounded-xl font-semibold text-white overflow-hidden will-change-transform ${className}`}
+      whileHover={{ scale: 1.03 }} // 🔥 calmer
+      whileTap={{ scale: 0.96 }}
+      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+      className={`relative px-8 py-3.5 rounded-xl font-semibold text-white overflow-hidden will-change-transform ${className}`}
     >
       {/* 🔥 BASE GRADIENT */}
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500" />
 
-      {/* 🔥 SHIMMER (ONLY ON HOVER) */}
+      {/* 🔥 SOFT SHIMMER */}
       <motion.div
         initial={{ x: "-120%" }}
         whileHover={{ x: "120%" }}
-        transition={{ duration: 1, ease: "easeInOut" }}
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+        transition={{ duration: 1.2, ease: "easeInOut" }}
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
       />
 
-      {/* 🔥 CURSOR LIGHT */}
+      {/* 🔥 CURSOR LIGHT (SOFTER) */}
       <motion.div
         style={{
           background: useTransform(
             [lightX, lightY],
             ([x, y]) =>
-              `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.25), transparent 60%)`
+              `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.18), transparent 65%)`
           ),
         }}
         className="absolute inset-0 pointer-events-none"
       />
 
-      {/* 🔥 DEPTH OVERLAY */}
-      <div className="absolute inset-0 bg-black/10 opacity-0 hover:opacity-100 transition" />
+      {/* 🔥 DEPTH */}
+      <div className="absolute inset-0 bg-black/10 opacity-0 hover:opacity-80 transition duration-300" />
 
-      {/* 🔥 CONTENT */}
-      <span className="relative z-10 tracking-wide">
+      {/* 🔥 CONTENT (BREATHABLE) */}
+      <span className="relative z-10 text-sm tracking-wide px-1">
         {children}
       </span>
     </motion.button>

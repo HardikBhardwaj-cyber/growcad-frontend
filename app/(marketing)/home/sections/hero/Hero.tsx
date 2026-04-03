@@ -1,65 +1,72 @@
 "use client";
 
-import { motion, useTransform } from "framer-motion";
-import HeroLeft from "./HeroLeft";
-import HeroRight from "./HeroRight";
-import { useMotion } from "../../systems/MotionProvider";
+import { motion } from "framer-motion";
+import { fadeUp, staggerContainer } from "../../systems/variants";
+import MagneticButton from "../../components/ui/MagneticButton";
+import { Sparkles } from "lucide-react";
 
-export default function Hero() {
-  const { scrollProgress } = useMotion();
-
-  const opacity = useTransform(scrollProgress, [0, 0.4], [1, 0.8]);
-  const scale = useTransform(scrollProgress, [0, 0.4], [1, 0.985]);
-  const y = useTransform(scrollProgress, [0, 0.4], [0, -30]);
-
+export default function HeroLeft() {
   return (
-    <motion.section
-      style={{ opacity, scale, y }}
-      className="relative min-h-screen flex items-center overflow-hidden bg-[#0a0a0f]"
+    <motion.div
+      variants={staggerContainer}
+      initial="hidden"
+      animate="show"
+      className="flex flex-col max-w-[560px] text-left"
     >
-      {/* ================= BACKGROUND ================= */}
-
-      <div className="absolute inset-0 bg-grid opacity-[0.02]" />
-
-      <div className="absolute inset-0 
-      bg-[radial-gradient(circle_at_65%_40%,rgba(124,58,237,0.18),transparent_60%)]" />
-
-      <div className="absolute inset-0 
-      bg-[radial-gradient(circle_at_25%_30%,rgba(59,130,246,0.08),transparent_50%)]" />
-
-      <div className="absolute inset-0 opacity-[0.015] mix-blend-overlay bg-[url('/noise.png')]" />
-
-      {/* FLOATING ORB */}
-      <motion.div
-        animate={{ y: [0, -20, 0], x: [0, 15, 0] }}
-        transition={{ duration: 14, repeat: Infinity }}
-        className="absolute left-[12%] top-[30%] w-2.5 h-2.5 bg-purple-400 rounded-full blur-sm opacity-50"
-      />
-
-      {/* ================= CONTENT ================= */}
-
-      <div className="relative w-full max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20">
-
-        <div className="grid lg:grid-cols-[1.15fr_0.85fr] items-center min-h-[85vh] gap-12">
-
-          {/* LEFT */}
-          <div className="flex justify-start">
-            <div className="max-w-[620px] w-full">
-              <HeroLeft />
-            </div>
-          </div>
-
-          {/* RIGHT */}
-          <div className="flex justify-center lg:justify-end lg:pr-4 mt-12 lg:mt-0">
-            <HeroRight />
-          </div>
-
+      {/* 🔥 BLOCK 1: BADGE */}
+      <motion.div variants={fadeUp} className="mb-10">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full 
+        bg-white/5 border border-white/10 text-xs text-gray-300 backdrop-blur-md">
+          <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+          Growth OS for Coaching Institutes
         </div>
-      </div>
+      </motion.div>
 
-      {/* ================= BOTTOM FADE ================= */}
-      <div className="absolute bottom-0 left-0 w-full h-40 
-      bg-gradient-to-b from-transparent to-[#0a0a0f]" />
-    </motion.section>
+      {/* 🔥 BLOCK 2: HEADLINE */}
+      <motion.h1
+        variants={fadeUp}
+        className="leading-[1.08] tracking-tight space-y-2"
+      >
+        <span className="block text-4xl sm:text-5xl md:text-6xl font-semibold text-white">
+          Become a top
+        </span>
+
+        <span className="block text-4xl sm:text-5xl md:text-6xl font-semibold text-white">
+          coaching institute
+        </span>
+
+        <span className="block text-4xl sm:text-5xl md:text-6xl font-semibold text-white">
+          with
+        </span>
+
+        <span className="block mt-4 text-5xl sm:text-6xl md:text-7xl lg:text-[82px] font-extrabold 
+        bg-gradient-to-r from-purple-400 via-blue-400 to-indigo-500 
+        bg-clip-text text-transparent leading-[0.95]">
+          GROWCAD
+        </span>
+      </motion.h1>
+
+      {/* 🔥 BLOCK 3: SUBTEXT */}
+      <motion.p
+        variants={fadeUp}
+        className="text-gray-400 mt-6 text-base leading-relaxed max-w-[420px]"
+      >
+        Run your entire institute from one powerful system.
+      </motion.p>
+
+      {/* 🔥 BLOCK 4: CTA */}
+      <motion.div
+        variants={fadeUp}
+        className="flex items-center gap-5 mt-10"
+      >
+        <MagneticButton className="px-8 py-3 text-sm font-semibold shadow-[0_0_30px_rgba(124,58,237,0.6)]">
+          Get Early Access
+        </MagneticButton>
+
+        <button className="text-sm text-gray-400 hover:text-white transition">
+          See Live Demo →
+        </button>
+      </motion.div>
+    </motion.div>
   );
 }
