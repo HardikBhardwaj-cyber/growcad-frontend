@@ -5,12 +5,13 @@ import Value from "./components/sections/Value";
 import Trust from "./components/sections/Trust";
 import Pricing from "./components/sections/Pricing";
 import CTA from "./components/sections/CTA";
+import Splash from "./components/sections/Splash";
 
 // 🔥 CORE SYSTEMS
 import SmoothScroll from "./components/core/SmoothScroll";
 import PageTransition from "./components/core/PageTransition";
 import TransitionOverlay from "./components/core/TransitionOverlay";
-import Splash from "./components/core/Splash";
+
 
 export default function Page() {
   return (
