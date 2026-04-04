@@ -97,7 +97,7 @@ export default function LoginPage() {
             transition={{ duration: 4, repeat: Infinity }}
           >
             <Image
-              src="/signup-illustration.png"
+              src="/dashboard-illustration.png"
               alt="dashboard"
               width={420}
               height={320}
