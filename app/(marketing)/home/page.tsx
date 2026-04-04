@@ -18,7 +18,7 @@ export default function Page() {
     <SmoothScroll>
 
       {/* 🔥 SPLASH (FIRST IMPRESSION) */}
-      <Splash />
+      <Splash>
 
         {/* 🔥 PAGE TRANSITION OVERLAY */}
         <TransitionOverlay />
@@ -65,7 +65,7 @@ export default function Page() {
 
         </PageTransition>
 
-      
+      </Splash>
 
     </SmoothScroll>
   );
