@@ -1,10 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useRef } from "react";
 
 export function useTilt(maxTilt = 15) {
-  const [rotateX, setRotateX] = useState(0);
-  const [rotateY, setRotateY] = useState(0);
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  const state = useRef({
+    x: 0,
+    y: 0,
+    targetX: 0,
+    targetY: 0,
+    raf: 0 as number | 0,
+  });
+
+  const lerp = (start: number, end: number, factor: number) =>
+    start + (end - start) * factor;
+
+  const animate = () => {
+    const s = state.current;
+
+    s.x = lerp(s.x, s.targetX, 0.12);
+    s.y = lerp(s.y, s.targetY, 0.12);
+
+    if (ref.current) {
+      ref.current.style.transform = `
+        perspective(1000px)
+        rotateX(${s.x}deg)
+        rotateY(${s.y}deg)
+        scale3d(1.02, 1.02, 1.02)
+      `;
+    }
+
+    s.raf = requestAnimationFrame(animate);
+  };
 
   const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -15,17 +43,22 @@ export function useTilt(maxTilt = 15) {
     const midX = rect.width / 2;
     const midY = rect.height / 2;
 
-    const rotX = ((y - midY) / midY) * maxTilt;
-    const rotY = ((x - midX) / midX) * -maxTilt;
+    state.current.targetX = ((y - midY) / midY) * maxTilt;
+    state.current.targetY = ((x - midX) / midX) * -maxTilt;
 
-    setRotateX(rotX);
-    setRotateY(rotY);
+    if (!state.current.raf) {
+      state.current.raf = requestAnimationFrame(animate);
+    }
   };
 
   const handleLeave = () => {
-    setRotateX(0);
-    setRotateY(0);
+    state.current.targetX = 0;
+    state.current.targetY = 0;
   };
 
-  return { rotateX, rotateY, handleMove, handleLeave };
+  return {
+    ref,
+    handleMove,
+    handleLeave,
+  };
 }

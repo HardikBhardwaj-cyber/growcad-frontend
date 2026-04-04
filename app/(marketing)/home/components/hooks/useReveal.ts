@@ -9,7 +9,11 @@ type RevealOptions = {
   scale?: number;
   delay?: number;
   duration?: number;
+  stagger?: number;
+  ease?: string;
   triggerStart?: string;
+  once?: boolean;
+  scrub?: boolean;
 };
 
 export function useReveal(options: RevealOptions = {}) {
@@ -19,18 +23,25 @@ export function useReveal(options: RevealOptions = {}) {
     const el = ref.current;
     if (!el) return;
 
+    // 🔥 destructure once (prevents re-trigger spam)
     const {
       y = 60,
       x = 0,
       scale = 1,
       delay = 0,
-      duration = 1,
+      duration = 0.9,
+      stagger = 0,
+      ease = "power3.out",
       triggerStart = "top 85%",
+      once = true,
+      scrub = false,
     } = options;
 
     const ctx = gsap.context(() => {
+      const targets = el.children.length > 0 ? el.children : el;
+
       gsap.fromTo(
-        el,
+        targets,
         {
           opacity: 0,
           y,
@@ -44,18 +55,20 @@ export function useReveal(options: RevealOptions = {}) {
           scale: 1,
           duration,
           delay,
-          ease: "power3.out",
+          ease,
+          stagger,
           scrollTrigger: {
             trigger: el,
             start: triggerStart,
-            once: true, // 🔥 important (no repeat flicker)
+            once,
+            scrub: scrub || false,
           },
         }
       );
-    });
+    }, ref);
 
     return () => ctx.revert();
-  }, [options]);
+  }, []); // 🔥 run only once
 
   return ref;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect, useRef } from "react";
-import Lenis from "@studio-freight/lenis";
+import Lenis from "lenis";
 import { ScrollTrigger } from "@/lib/gsap";
 
 export default function SmoothScroll({
@@ -10,39 +10,40 @@ export default function SmoothScroll({
   children: ReactNode;
 }) {
   const lenisRef = useRef<Lenis | null>(null);
+  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // 🔥 INIT LENIS
+    // 🔥 prevent double init (strict mode safe)
+    if (lenisRef.current) return;
+
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 1.1,
       smoothWheel: true,
       wheelMultiplier: 1,
       touchMultiplier: 1,
+      lerp: 0.08,
     });
 
     lenisRef.current = lenis;
 
-    // 🔥 RAF LOOP
-    let rafId: number;
-
+    // 🔥 RAF LOOP (SINGLE SOURCE OF TRUTH)
     const raf = (time: number) => {
       lenis.raf(time);
-      ScrollTrigger.update(); // 🔥 sync GSAP
-      rafId = requestAnimationFrame(raf);
+      rafRef.current = requestAnimationFrame(raf);
     };
 
-    rafId = requestAnimationFrame(raf);
+    rafRef.current = requestAnimationFrame(raf);
 
-    // 🔥 SCROLLTRIGGER SYNC (VERY IMPORTANT)
+    // 🔥 SYNC GSAP (ONLY ONE METHOD)
     lenis.on("scroll", ScrollTrigger.update);
 
-    // 🔥 FIX SCROLLTRIGGER + LENIS CONFLICT
-    ScrollTrigger.scrollerProxy(document.body, {
+    // 🔥 PROPER SCROLLER PROXY
+    ScrollTrigger.scrollerProxy(document.documentElement, {
       scrollTop(value) {
-        if (arguments.length && lenis) {
-          lenis.scrollTo(value as number);
+        if (arguments.length) {
+          lenis.scrollTo(value as number, { immediate: true });
         }
-        return window.scrollY;
+        return lenis.scroll;
       },
       getBoundingClientRect() {
         return {
@@ -54,12 +55,24 @@ export default function SmoothScroll({
       },
     });
 
+    // 🔥 REFRESH HANDLING
+    const handleResize = () => {
+      ScrollTrigger.refresh();
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    ScrollTrigger.addEventListener("refresh", () => lenis.resize());
     ScrollTrigger.refresh();
 
     // 🔥 CLEANUP
     return () => {
-      cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", handleResize);
+
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+
       lenis.destroy();
+      lenisRef.current = null;
     };
   }, []);
 

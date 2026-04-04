@@ -1,159 +1,236 @@
 "use client";
 
 import { useState } from "react";
-import GlassCard from "../ui/GlassCard";
 import Magnetic from "../motion/Magnetic";
-import { useStagger } from "../hooks/useStagger";
+
+const studentTiers = [150, 250, 500, 750, 1000];
+
+const plans = [
+  {
+    name: "Basic",
+    price: 9,
+    highlight: false,
+  },
+  {
+    name: "Academic",
+    price: 15,
+    highlight: true,
+  },
+  {
+    name: "Advanced",
+    price: 25,
+    highlight: false,
+  },
+];
+
+// 🔥 FEATURE MATRIX (FROM YOUR NOTEBOOK)
+const features = [
+  {
+    title: "Student & Batch Management",
+    basic: true,
+    academic: true,
+    advanced: true,
+  },
+  {
+    title: "Smart Attendance",
+    basic: true,
+    academic: true,
+    advanced: true,
+  },
+  {
+    title: "SMS Alerts",
+    basic: true,
+    academic: true,
+    advanced: true,
+  },
+  {
+    title: "WhatsApp Notifications",
+    basic: false,
+    academic: true,
+    advanced: true,
+  },
+  {
+    title: "Fee Management",
+    basic: true,
+    academic: true,
+    advanced: true,
+  },
+  {
+    title: "Auto Test Creation",
+    basic: false,
+    academic: true,
+    advanced: true,
+  },
+  {
+    title: "Live Classes",
+    basic: false,
+    academic: true,
+    advanced: true,
+  },
+  {
+    title: "Study Material",
+    basic: true,
+    academic: true,
+    advanced: true,
+  },
+  {
+    title: "Recorded Lectures",
+    basic: false,
+    academic: false,
+    advanced: true,
+  },
+  {
+    title: "AI Doubt Solving",
+    basic: false,
+    academic: false,
+    advanced: true,
+  },
+  {
+    title: "Custom Email + Domain",
+    basic: false,
+    academic: "Email",
+    advanced: "Email + Domain",
+  },
+  {
+    title: "Performance Reports",
+    basic: "Basic",
+    academic: "Standard",
+    advanced: "Advanced",
+  },
+];
 
 export default function Pricing() {
-  const [yearly, setYearly] = useState(true);
-  const ref = useStagger({ stagger: 0.15 });
-
-  const plans = [
-    {
-      name: "Basic",
-      monthly: 15,
-      yearly: 159,
-      highlight: false,
-    },
-    {
-      name: "Academic",
-      monthly: 25,
-      yearly: 269,
-      highlight: true,
-    },
-    {
-      name: "Advanced",
-      monthly: 99,
-      yearly: 899,
-      highlight: false,
-    },
-  ];
+  const [students, setStudents] = useState(250);
+  const [showTable, setShowTable] = useState(false);
 
   return (
-    <section className="py-32 relative overflow-hidden">
+    <section className="py-32 relative">
 
-      {/* 🔥 BACKGROUND LIGHT */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_0%,rgba(124,58,237,0.2),transparent_60%)]" />
-
-      <div className="max-w-7xl mx-auto px-8 space-y-20 text-center">
+      <div className="max-w-7xl mx-auto px-6 space-y-20">
 
         {/* 🔥 HEADER */}
-        <div className="space-y-6">
-          <h2 className="text-4xl md:text-5xl font-bold">
-            Simple, Scalable Pricing
+        <div className="text-center space-y-4">
+          <h2 className="text-5xl font-bold">
+            Pricing that scales with you
           </h2>
-
-          <p className="text-white/60 text-lg">
-            Pay per student. Scale as your institute grows.
+          <p className="text-white/60">
+            Pay per student. Grow without limits.
           </p>
         </div>
 
-        {/* 🔥 TOGGLE */}
-        <div className="flex justify-center items-center gap-4">
-
-          <span className={!yearly ? "text-white" : "text-white/40"}>
-            Monthly
-          </span>
-
-          <button
-            onClick={() => setYearly(!yearly)}
-            className="relative w-16 h-9 bg-white/10 rounded-full border border-white/10"
+        {/* 🔥 STUDENT SELECTOR */}
+        <div className="flex justify-center">
+          <select
+            value={students}
+            onChange={(e) => setStudents(Number(e.target.value))}
+            className="px-6 py-3 bg-black border border-white/20 rounded-xl"
           >
-            <div
-              className={`
-                absolute top-1 left-1 w-7 h-7 rounded-full bg-white
-                transition-transform duration-300
-                ${yearly ? "translate-x-7" : ""}
-              `}
-            />
-          </button>
-
-          <span className={yearly ? "text-white" : "text-white/40"}>
-            Yearly
-          </span>
-
-          <span className="text-xs text-purple-400 ml-2">
-            Save ~20%
-          </span>
+            {studentTiers.map((s) => (
+              <option key={s} value={s}>
+                {s} Students
+              </option>
+            ))}
+          </select>
         </div>
 
-        {/* 🔥 PRICING CARDS */}
-        <div ref={ref} className="grid md:grid-cols-3 gap-10">
+        {/* 🔥 CARDS */}
+        <div className="grid md:grid-cols-3 gap-10">
 
           {plans.map((plan, i) => {
-            const price = yearly ? plan.yearly : plan.monthly;
+            const total = plan.price * students;
 
             return (
-              <GlassCard
+              <div
                 key={i}
                 className={`
-                  p-8 space-y-6 relative overflow-hidden
-                  transition-all duration-500
-                  hover:scale-[1.04]
-                  ${plan.highlight ? "scale-105 border-purple-500" : ""}
+                  p-8 rounded-2xl border relative
+                  ${plan.highlight
+                    ? "border-purple-500 scale-105 bg-white/10"
+                    : "border-white/10 bg-white/5"}
                 `}
               >
-                {/* 🔥 POPULAR BADGE */}
                 {plan.highlight && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-purple-500 text-xs px-3 py-1 rounded-full">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 px-3 py-1 text-xs rounded-full">
                     Most Popular
                   </div>
                 )}
 
-                {/* 🔥 PLAN NAME */}
                 <h3 className="text-xl font-semibold">{plan.name}</h3>
 
-                {/* 🔥 PRICE */}
-                <div className="text-5xl font-bold">
-                  ₹{price}
+                <div className="text-5xl font-bold my-6">
+                  ₹{total}
                   <span className="text-sm text-white/50">
-                    {" "}
-                    /student
+                    {" "} /month
                   </span>
                 </div>
 
-                {/* 🔥 BUFFER USP */}
-                {yearly && (
-                  <p className="text-green-400 text-sm">
-                    Includes 10% FREE student buffer
-                  </p>
-                )}
-
-                {/* 🔥 DESCRIPTION */}
-                <p className="text-white/60 text-sm">
-                  Built for modern coaching institutes
+                <p className="text-white/60 text-sm mb-6">
+                  ₹{plan.price} per student
                 </p>
 
-                {/* 🔥 CTA */}
                 <Magnetic>
-                  <button className="w-full py-3 btn-primary text-lg">
+                  <button className="w-full py-3 btn-primary">
                     Get Started
                   </button>
                 </Magnetic>
-
-                {/* 🔥 HOVER LIGHT */}
-                <div className="absolute inset-0 opacity-0 hover:opacity-100 transition duration-500 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_70%)]" />
-              </GlassCard>
+              </div>
             );
           })}
-
         </div>
 
-        {/* 🔥 IMPLEMENTATION */}
-        <div className="text-white/50 text-sm space-y-2">
-          <p>
-            One-time onboarding & setup based on institute size
-          </p>
-          <p className="text-white/40">
-            Starts from ₹4,999 (up to 250 students)
-          </p>
+        {/* 🔥 TOGGLE FEATURE TABLE */}
+        <div className="text-center">
+          <button
+            onClick={() => setShowTable(!showTable)}
+            className="text-purple-400"
+          >
+            {showTable ? "Hide Full Comparison" : "Compare All Features"}
+          </button>
         </div>
 
-        {/* 🔥 OFFER */}
-        <div className="text-purple-400 text-sm">
-          🎉 50% OFF for additional institutes
-        </div>
+        {/* 🔥 FEATURE TABLE */}
+        {showTable && (
+          <div className="overflow-x-auto mt-10">
+            <table className="w-full text-left border border-white/10 rounded-xl overflow-hidden">
+
+              <thead className="bg-white/5">
+                <tr>
+                  <th className="p-4">Features</th>
+                  <th className="p-4">Basic</th>
+                  <th className="p-4">Academic</th>
+                  <th className="p-4">Advanced</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {features.map((f, i) => (
+                  <tr key={i} className="border-t border-white/10">
+                    <td className="p-4 text-white/80">{f.title}</td>
+
+                    <td className="p-4">
+                      {typeof f.basic === "boolean"
+                        ? f.basic ? "✔" : "—"
+                        : f.basic}
+                    </td>
+
+                    <td className="p-4">
+                      {typeof f.academic === "boolean"
+                        ? f.academic ? "✔" : "—"
+                        : f.academic}
+                    </td>
+
+                    <td className="p-4">
+                      {typeof f.advanced === "boolean"
+                        ? f.advanced ? "✔" : "—"
+                        : f.advanced}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+
+            </table>
+          </div>
+        )}
 
       </div>
     </section>
