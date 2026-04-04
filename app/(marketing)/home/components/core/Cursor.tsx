@@ -3,11 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 
 export default function Cursor() {
-  const dotRef = useRef<HTMLDivElement | null>(null);
   const glowRef = useRef<HTMLDivElement | null>(null);
 
   const mouse = useRef({ x: 0, y: 0 });
-  const dot = useRef({ x: 0, y: 0 });
   const glow = useRef({ x: 0, y: 0 });
 
   const rafRef = useRef<number | null>(null);
@@ -18,7 +16,6 @@ export default function Cursor() {
   /* 🔥 DISABLE ON TOUCH DEVICES */
   useEffect(() => {
     if ("ontouchstart" in window) {
-      if (dotRef.current) dotRef.current.style.display = "none";
       if (glowRef.current) glowRef.current.style.display = "none";
     }
   }, []);
@@ -44,16 +41,12 @@ export default function Cursor() {
     const animate = () => {
       if (!mounted.current) return;
 
-      // fast dot
-      dot.current.x += (mouse.current.x - dot.current.x) * 0.25;
-      dot.current.y += (mouse.current.y - dot.current.y) * 0.25;
 
       // slow glow
       glow.current.x += (mouse.current.x - glow.current.x) * 0.12;
       glow.current.y += (mouse.current.y - glow.current.y) * 0.12;
 
-      if (dotRef.current && glowRef.current) {
-        dotRef.current.style.transform = `translate3d(${dot.current.x}px, ${dot.current.y}px, 0) translate(-50%, -50%)`;
+      if (glowRef.current) {
         glowRef.current.style.transform = `translate3d(${glow.current.x}px, ${glow.current.y}px, 0) translate(-50%, -50%)`;
       }
 
@@ -99,18 +92,7 @@ export default function Cursor() {
         `}
       />
 
-      {/* 🔥 DOT */}
-      <div
-        ref={dotRef}
-        className={`
-          pointer-events-none fixed top-0 left-0 z-[9999]
-          w-3 h-3 rounded-full bg-white
-          mix-blend-difference
-          will-change-transform
-          transition-transform duration-200 ease-out
-          ${hovering ? "scale-150" : "scale-100"}
-        `}
-      />
+      
     </>
   );
 }
