@@ -1,45 +1,89 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Eye, EyeOff } from "lucide-react";
-import { motion } from "framer-motion";
+import { Eye, EyeOff, ArrowRight } from "lucide-react";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  useSpring,
+} from "framer-motion";
 
 import { useAuth } from "@/hooks/useAuth";
 
-// UI SYSTEM
-import CursorGlow from "@/components/ui/cursor-glow";
-import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
-import { MotionCard } from "@/components/ui/motion-card";
-import Reveal from "@/components/ui/Reveal";
+/* ================= TYPES ================= */
+
+type InputFieldProps = {
+  label: string;
+  type?: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  suffix?: React.ReactNode;
+};
+
+/* ================= PAGE ================= */
 
 export default function LoginPage() {
   const router = useRouter();
   const { login, user } = useAuth();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPw, setShowPw] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [showPw, setShowPw] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+
+  const cardRef = useRef<HTMLDivElement | null>(null);
+
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const rotateX = useSpring(
+    useTransform(mouseY, [-0.5, 0.5], [4, -4]),
+    { stiffness: 150, damping: 25 }
+  );
+
+  const rotateY = useSpring(
+    useTransform(mouseX, [-0.5, 0.5], [-4, 4]),
+    { stiffness: 150, damping: 25 }
+  );
 
   // ✅ Redirect if logged in
   useEffect(() => {
     if (user) router.replace("/dashboard");
   }, [user, router]);
 
-  // ✅ Login handler
+  // ✅ Mouse tilt
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+
+    const rect = cardRef.current.getBoundingClientRect();
+
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+    mouseX.set(x);
+    mouseY.set(y);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
+
+  // ✅ Login
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     setLoading(true);
     setError("");
 
     try {
       await login(email, password);
       router.push("/dashboard");
-    } catch (err) {
+    } catch {
       setError("Invalid email or password");
     } finally {
       setLoading(false);
@@ -47,154 +91,200 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-[#0a0a0f] overflow-hidden">
-      
-      {/* 🔥 Cursor Glow */}
-      <CursorGlow />
+    <div className="relative min-h-screen flex items-center justify-center bg-[#070709] overflow-hidden">
 
-      {/* 🔥 Background Gradient */}
+      {/* 🔥 BACKGROUND LIGHT */}
       <div className="absolute inset-0 -z-10">
-        <Image
-          src="/bg-gradient.png"
-          alt="bg"
-          fill
-          priority
-          className="object-cover opacity-80"
-        />
-        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute w-[500px] h-[500px] bg-purple-600/20 blur-[120px] top-[-100px] left-[-100px]" />
+        <div className="absolute w-[400px] h-[400px] bg-blue-600/20 blur-[120px] bottom-[-100px] right-[-100px]" />
       </div>
 
-      {/* ================== MAIN CONTAINER ================== */}
-      <div className="w-full max-w-7xl px-6 lg:px-12 grid lg:grid-cols-2 gap-12 items-center">
+      {/* ================= GRID ================= */}
+      <div className="w-full max-w-7xl px-6 lg:px-12 grid lg:grid-cols-[1fr_420px] gap-20 items-center">
 
-        {/* ================== LEFT PANEL ================== */}
-        <Reveal>
-          <div className="relative">
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-10 lg:p-12 shadow-xl">
-              
-              {/* Logo */}
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center font-bold">
-                  G
-                </div>
-                <span className="text-lg font-semibold tracking-wide">
-                  GROWCAD
-                </span>
-              </div>
+        {/* ================= LEFT ================= */}
+        <div className="hidden lg:flex flex-col gap-10">
 
-              {/* Heading */}
-              <h1 className="text-4xl lg:text-5xl font-bold leading-tight mb-6">
-                Run your institute <br />
-                smarter & faster
-              </h1>
-
-              {/* Subtext */}
-              <p className="text-white/70 mb-6">
-                Manage students, fees, attendance & analytics — all in one platform.
-              </p>
-
-              {/* Features */}
-              <ul className="space-y-3 text-white/60 text-sm">
-                <li>• Student & Teacher Management</li>
-                <li>• Attendance Tracking</li>
-                <li>• Automated Fee Collection</li>
-                <li>• Reports & Insights</li>
-              </ul>
-
-              {/* Illustration */}
-              <div className="mt-10 relative h-[260px]">
-                <Image
-                  src="/signup-illustration.png"
-                  alt="illustration"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center font-bold">
+              G
             </div>
+            <span className="text-white font-semibold">GROWCAD</span>
           </div>
-        </Reveal>
 
-        {/* ================== RIGHT PANEL ================== */}
-        <Reveal delay={0.2}>
-          <div className="flex justify-center lg:justify-end">
+          <div>
+            <h1 className="text-[52px] font-semibold leading-tight text-white">
+              Run your institute <br />
+              <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                smarter & faster
+              </span>
+            </h1>
 
-            <MotionCard className="w-full max-w-md">
+            <p className="mt-4 text-white/60 max-w-md">
+              Manage students, fees, attendance and analytics — all in one platform.
+            </p>
+          </div>
 
-              <form onSubmit={handleLogin} className="space-y-5">
+          <div className="relative w-[420px] h-[280px]">
+            <Image
+              src="/signup-illustration.png"
+              alt="illustration"
+              fill
+              className="object-contain"
+            />
+          </div>
+        </div>
 
-                {/* Heading */}
-                <div>
-                  <h2 className="text-2xl font-semibold">Welcome Back</h2>
-                  <p className="text-sm text-white/60">
-                    Login to your dashboard
-                  </p>
-                </div>
+        {/* ================= RIGHT ================= */}
+        <motion.div
+          ref={cardRef}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={{ rotateX, rotateY, transformPerspective: 1000 }}
+          className="relative"
+        >
+          {/* 🔥 SPOTLIGHT EFFECT */}
+          <motion.div
+            className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 hover:opacity-100 transition"
+            style={{
+              background:
+                "radial-gradient(600px circle at var(--x) var(--y), rgba(168,85,247,0.15), transparent 40%)",
+            }}
+          />
 
-                {/* Email */}
-                <div className="space-y-1">
-                  <label className="text-xs text-white/60">Email</label>
-                  <Input
-                    type="email"
-                    placeholder="admin@growcad.in"
-                    value={email}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setEmail(e.target.value)
-                    }
-                  />
-                </div>
+          {/* CARD */}
+          <div className="relative rounded-2xl p-8 backdrop-blur-xl border border-white/10 bg-white/5 shadow-[0_30px_80px_rgba(0,0,0,0.6)] w-full max-w-md mx-auto">
 
-                {/* Password */}
-                <div className="space-y-1 relative">
-                  <label className="text-xs text-white/60">Password</label>
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold text-white">
+                Welcome back
+              </h2>
+              <p className="text-white/50 text-sm">
+                Login to your dashboard
+              </p>
+            </div>
 
-                  <Input
-                    type={showPw ? "text" : "password"}
-                    placeholder="Enter password"
-                    value={password}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setPassword(e.target.value)
-                    }
-                  />
+            {/* FORM */}
+            <form onSubmit={handleLogin} className="space-y-4">
 
+              <InputField
+                label="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+
+              <InputField
+                label="Password"
+                type={showPw ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                suffix={
                   <button
                     type="button"
                     onClick={() => setShowPw(!showPw)}
-                    className="absolute right-3 top-[34px] text-white/40 hover:text-white"
                   >
-                    {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
-                </div>
+                }
+              />
 
-                {/* Error */}
-                {error && (
-                  <p className="text-red-400 text-sm">{error}</p>
-                )}
+              {error && (
+                <p className="text-red-400 text-sm">{error}</p>
+              )}
 
-                {/* Button */}
-                <Button type="submit" disabled={loading} className="w-full">
-                  {loading ? "Signing in..." : "Sign In"}
-                </Button>
+              {/* 🔥 MAGNETIC BUTTON */}
+              <MagneticButton loading={loading} />
 
-                {/* Footer */}
-                <p className="text-xs text-center text-white/50">
-                  New to Growcad?{" "}
-                  <span
-                    className="text-purple-400 cursor-pointer"
-                    onClick={() => router.push("/signup")}
-                  >
-                    Create account
-                  </span>
-                </p>
+            </form>
 
-              </form>
-
-            </MotionCard>
+            <p className="text-xs text-center text-white/40 mt-6">
+              New to Growcad?{" "}
+              <span
+                className="text-purple-400 cursor-pointer"
+                onClick={() => router.push("/signup")}
+              >
+                Create account
+              </span>
+            </p>
 
           </div>
-        </Reveal>
+        </motion.div>
 
       </div>
     </div>
+  );
+}
+
+/* ================= INPUT ================= */
+
+function InputField({
+  label,
+  value,
+  onChange,
+  type = "text",
+  suffix,
+}: InputFieldProps) {
+  const [focus, setFocus] = useState<boolean>(false);
+
+  return (
+    <div className="relative">
+      <label
+        className={`absolute left-3 text-xs transition-all ${
+          focus || value
+            ? "top-1 text-purple-400"
+            : "top-3 text-white/40"
+        }`}
+      >
+        {label}
+      </label>
+
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        onFocus={() => setFocus(true)}
+        onBlur={() => setFocus(false)}
+        className="w-full h-12 px-3 pt-4 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-purple-500"
+      />
+
+      {suffix && (
+        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+          {suffix}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ================= MAGNETIC BUTTON ================= */
+
+function MagneticButton({ loading }: { loading: boolean }) {
+  const ref = useRef<HTMLButtonElement | null>(null);
+
+  const handleMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = ref.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+
+    ref.current!.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+  };
+
+  const reset = () => {
+    if (ref.current) ref.current.style.transform = "translate(0,0)";
+  };
+
+  return (
+    <button
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseLeave={reset}
+      type="submit"
+      disabled={loading}
+      className="w-full py-3 rounded-xl text-white font-medium bg-gradient-to-r from-purple-600 to-blue-500 transition-all"
+    >
+      {loading ? "Signing in..." : "Sign In"}
+    </button>
   );
 }
