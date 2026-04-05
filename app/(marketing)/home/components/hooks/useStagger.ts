@@ -1,91 +1,68 @@
-"use client";
+import { useMemo } from 'react';
+import { Variants } from 'framer-motion';
+import { EASE_SOFT } from '../../systems/design';
 
-import { useEffect, useRef } from "react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
+interface StaggerOptions {
+  staggerChildren?: number;
+  delayChildren?:   number;
+  duration?:        number;
+  y?:               number;
+  blur?:            boolean;
+}
 
-type StaggerOptions = {
-  y?: number;
-  x?: number;
-  scale?: number;
-  duration?: number;
-  stagger?: number;
-  delay?: number;
-  ease?: string;
-  start?: string;
-  once?: boolean;
-  from?: "start" | "center" | "end" | "edges" | "random";
-  immediate?: boolean; // 🔥 for hero (no scroll trigger)
-};
+interface StaggerResult {
+  container: Variants;
+  item:      Variants;
+}
 
-export function useStagger(options: StaggerOptions = {}) {
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const {
-      y = 50,
-      x = 0,
-      scale = 1,
-      duration = 0.8,
-      stagger = 0.1,
-      delay = 0,
-      ease = "power3.out",
-      start = "top 85%",
-      once = true,
-      from = "start",
-      immediate = false,
-    } = options;
-
-    const ctx = gsap.context(() => {
-      // 🔥 safer selector (supports nested elements)
-      const targets = gsap.utils.toArray<HTMLElement>(
-        el.querySelectorAll("[data-stagger]")
-      );
-
-      if (!targets.length) return;
-
-      const animation = {
-        opacity: 1,
-        y: 0,
-        x: 0,
-        scale: 1,
-        duration,
-        delay,
-        ease,
-        stagger: {
-          each: stagger,
-          from,
-        },
-      };
-
-      // 🔥 initial state
-      gsap.set(targets, {
-        opacity: 0,
-        y,
-        x,
-        scale: scale < 1 ? scale : 1,
-      });
-
-      if (immediate) {
-        // 🔥 hero / instant animation
-        gsap.to(targets, animation);
-      } else {
-        // 🔥 scroll-based animation
-        gsap.to(targets, {
-          ...animation,
-          scrollTrigger: {
-            trigger: el,
-            start,
-            once,
+/**
+ * Returns Framer Motion variant objects for staggered list reveals.
+ * Uses memoisation — safe to call every render.
+ *
+ * The container stagger uses a natural exponential falloff so earlier
+ * items animate faster and later items settle in behind them.
+ *
+ * @example
+ * const { container, item } = useStagger({ staggerChildren: 0.09 });
+ * <motion.div variants={container} initial="hidden" animate="visible">
+ *   {items.map(i => <motion.div variants={item}>{i}</motion.div>)}
+ * </motion.div>
+ */
+export function useStagger({
+  staggerChildren = 0.075,
+  delayChildren   = 0.12,
+  duration        = 0.65,
+  y               = 24,
+  blur            = true,
+}: StaggerOptions = {}): StaggerResult {
+  return useMemo<StaggerResult>(
+    () => ({
+      container: {
+        hidden:  {},
+        visible: {
+          transition: {
+            staggerChildren,
+            delayChildren,
           },
-        });
-      }
-    }, ref);
-
-    return () => ctx.revert();
-  }, []); // 🔥 run once
-
-  return ref;
+        },
+      },
+      item: {
+        hidden: {
+          opacity: 0,
+          y,
+          ...(blur && { filter: 'blur(5px)' }),
+        },
+        visible: {
+          opacity: 1,
+          y: 0,
+          ...(blur && { filter: 'blur(0px)' }),
+          transition: {
+            duration,
+            ease: EASE_SOFT,
+          },
+        },
+      },
+    }),
+    [staggerChildren, delayChildren, duration, y, blur]
+  );
 }

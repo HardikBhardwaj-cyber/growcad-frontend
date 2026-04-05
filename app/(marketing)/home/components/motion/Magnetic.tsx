@@ -1,95 +1,58 @@
-"use client";
+'use client';
 
-import { useRef, useEffect } from "react";
-import { gsap } from "@/lib/gsap";
+import { useRef, ReactNode, MouseEvent, useEffect, useState } from 'react';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { cn } from '@/lib/utils';
+
+interface MagneticProps {
+  children: ReactNode;
+  strength?: number;
+  scaleOnHover?: number;
+  className?: string;
+  as?: 'div' | 'span' | 'li';
+}
 
 export default function Magnetic({
   children,
-  strength = 0.35,
-}: {
-  children: React.ReactNode;
-  strength?: number;
-}) {
-  const ref = useRef<HTMLDivElement | null>(null);
+  strength    = 0.38,
+  scaleOnHover = 1.0,
+  className,
+}: MagneticProps) {
+  const ref    = useRef<HTMLDivElement>(null);
+  const canHover =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(hover: hover)').matches;
 
-  const state = useRef({
-    x: 0,
-    y: 0,
-    targetX: 0,
-    targetY: 0,
-    raf: 0 as number | 0,
-  });
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const x = useSpring(rawX, { damping: 20, stiffness: 220, mass: 0.4 });
+  const y = useSpring(rawY, { damping: 20, stiffness: 220, mass: 0.4 });
 
-  const lerp = (start: number, end: number, factor: number) =>
-    start + (end - start) * factor;
-
-  const animate = () => {
-    const s = state.current;
-
-    s.x = lerp(s.x, s.targetX, 0.18);
-    s.y = lerp(s.y, s.targetY, 0.18);
-
-    if (ref.current) {
-      gsap.set(ref.current, {
-        x: s.x,
-        y: s.y,
-      });
-    }
-
-    s.raf = requestAnimationFrame(animate);
-  };
-
-  const handleMove = (e: React.MouseEvent) => {
+  const onMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (!canHover) return;
     const el = ref.current;
     if (!el) return;
-
     const rect = el.getBoundingClientRect();
-
-    const x = e.clientX - (rect.left + rect.width / 2);
-    const y = e.clientY - (rect.top + rect.height / 2);
-
-    state.current.targetX = x * strength;
-    state.current.targetY = y * strength;
-
-    if (!state.current.raf) {
-      state.current.raf = requestAnimationFrame(animate);
-    }
+    rawX.set((e.clientX - (rect.left + rect.width  / 2)) * strength);
+    rawY.set((e.clientY - (rect.top  + rect.height / 2)) * strength);
   };
 
-  const handleLeave = () => {
-    state.current.targetX = 0;
-    state.current.targetY = 0;
-
-    gsap.to(state.current, {
-      x: 0,
-      y: 0,
-      duration: 0.8,
-      ease: "elastic.out(1, 0.35)",
-      onUpdate: () => {
-        if (ref.current) {
-          gsap.set(ref.current, {
-            x: state.current.x,
-            y: state.current.y,
-          });
-        }
-      },
-    });
+  const onMouseLeave = () => {
+    rawX.set(0);
+    rawY.set(0);
   };
-
-  useEffect(() => {
-    return () => {
-      if (state.current.raf) cancelAnimationFrame(state.current.raf);
-    };
-  }, []);
 
   return (
-    <div
+    <motion.div
       ref={ref}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
-      className="inline-block will-change-transform"
+      className={cn('inline-block', className)}
+      style={{ x, y }}
+      whileHover={scaleOnHover !== 1.0 ? { scale: scaleOnHover } : undefined}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      transition={{ duration: 0.22 }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }

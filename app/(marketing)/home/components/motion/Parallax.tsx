@@ -1,51 +1,62 @@
-"use client";
+'use client';
 
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-import { useRef } from "react";
+import { useRef, ReactNode } from 'react';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import { cn } from '@/lib/utils';
+
+type OffsetType =
+  | 'start start'
+  | 'start end'
+  | 'end start'
+  | 'end end';
+
+interface ParallaxProps {
+  children: ReactNode;
+  speed?: number;
+  axis?: 'y' | 'x';
+  spring?: boolean;
+  className?: string;
+  offset?: [OffsetType, OffsetType];
+}
 
 export default function Parallax({
   children,
   speed = 0.25,
-  direction = "vertical", // 🔥 "vertical" | "horizontal"
-  reverse = false,
-}: {
-  children: React.ReactNode;
-  speed?: number;
-  direction?: "vertical" | "horizontal";
-  reverse?: boolean;
-}) {
+  axis = 'y',
+  spring = true,
+  className,
+  offset = ['start end', 'end start'],
+}: ParallaxProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start end", "end start"],
+    offset,
   });
 
-  // 🔥 dynamic range (responsive)
-  const distance = 300 * speed;
-  const start = reverse ? distance : -distance;
-  const end = reverse ? -distance : distance;
+  const px = `${speed * 100}px`;
 
-  const transformValue = useTransform(scrollYProgress, [0, 1], [start, end]);
+  const raw = useTransform(
+    scrollYProgress,
+    [0, 1],
+    axis === 'y'
+      ? [`-${px}`, px]
+      : [`-${px}`, px]
+  );
 
-  // 🔥 smooth spring (premium feel)
-  const smooth = useSpring(transformValue, {
-    stiffness: 120,
-    damping: 20,
-    mass: 0.3,
+  const smoothed = useSpring(raw, {
+    damping: 22,
+    stiffness: 100,
+    mass: 0.6,
   });
+
+  const motionVal = spring ? smoothed : raw;
 
   return (
-    <motion.div
-      ref={ref}
-      style={
-        direction === "vertical"
-          ? { y: smooth }
-          : { x: smooth }
-      }
-      className="will-change-transform"
-    >
-      {children}
-    </motion.div>
+    <div ref={ref} className={cn('overflow-hidden', className)}>
+      <motion.div style={axis === 'y' ? { y: motionVal } : { x: motionVal }}>
+        {children}
+      </motion.div>
+    </div>
   );
 }

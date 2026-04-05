@@ -1,56 +1,48 @@
-"use client";
+import Hero from './components/sections/Hero';
+import Value from './components/sections/Value';
+import Trust from './components/sections/Trust';
+import DashboardPreview from './components/sections/DashboardPreview';
+import Testimonials from './components/sections/Testimonials';
+import Pricing from './components/sections/Pricing';
+import CTA from './components/sections/CTA';
 
-import Hero from "./components/sections/Hero";
-import Value from "./components/sections/Value";
-import Trust from "./components/sections/Trust";
-import Pricing from "./components/sections/Pricing";
-import CTA from "./components/sections/CTA";
-import Splash from "./components/sections/Splash";
-
-export default function Page() {
+/**
+ * Growcad landing page — scroll narrative structure
+ *
+ * Scene 1 → Hero        "Hook" — first 3 seconds = "this is different"
+ * Scene 2 → Value       "Problem/Solution" — here's what you've been missing
+ * Scene 3 → Trust       "Proof" — others already switched
+ * Scene 4 → Product     "System" — see it work
+ * Scene 5 → Proof       "Validation" — hear from real users
+ * Scene 6 → Pricing     "Decision" — simple choice
+ * Scene 7 → CTA         "Conversion" — "I want this"
+ *
+ * Each section has data-scene for scroll-story orchestration.
+ * Scene-to-scene transitions are handled by CSS section connectors in globals.css.
+ */
+export default function HomePage() {
   return (
-    <Splash>
-      <main className="relative bg-[#0a0a0f] text-white overflow-hidden">
+    <div className="relative overflow-hidden">
+      {/* Scene 1: Hook */}
+      <Hero />
 
-        {/* 🔥 GLOBAL DEPTH */}
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(124,58,237,0.1),transparent_50%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(59,130,246,0.1),transparent_50%)]" />
-        </div>
+      {/* Scene 2: Problem/Value */}
+      <Value />
 
-        {/* 🔥 HERO */}
-        <Hero />
+      {/* Scene 3: Social proof numbers + logos */}
+      <Trust />
 
-        {/* 🔥 TRANSITION */}
-        <SectionDivider />
+      {/* Scene 4: Product demonstration */}
+      <DashboardPreview />
 
-        {/* 🚀 VALUE */}
-        <Value />
+      {/* Scene 5: Testimonials */}
+      <Testimonials />
 
-        <SectionDivider />
+      {/* Scene 6: Pricing decision */}
+      <Pricing />
 
-        {/* 🤝 TRUST */}
-        <Trust />
-
-        <SectionDivider />
-
-        {/* 💰 PRICING */}
-        <Pricing />
-
-        <SectionDivider />
-
-        {/* 🎯 CTA */}
-        <CTA />
-
-      </main>
-    </Splash>
-  );
-}
-
-/* ================= DIVIDER COMPONENT ================= */
-
-function SectionDivider() {
-  return (
-    <div className="h-24 md:h-32 bg-gradient-to-b from-transparent to-white/[0.02]" />
+      {/* Scene 7: Final conversion */}
+      <CTA />
+    </div>
   );
 }

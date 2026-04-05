@@ -1,70 +1,90 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { motion, Variants } from 'framer-motion';
+import { ReactNode, useMemo } from 'react';
+import { useReveal } from '../hooks/useReveal';
+import { cn } from '@/lib/utils';
+import { EASE_OUT } from '../../systems/design';
 
-type RevealProps = {
-  children: React.ReactNode;
-  y?: number;
-  x?: number;
-  duration?: number;
-  stagger?: number;
-  delay?: number;
-  ease?: string;
-  start?: string;
-  once?: boolean;
+type Direction = 'up' | 'down' | 'left' | 'right' | 'none';
+
+interface RevealProps {
+  children:   ReactNode;
+  /** Stagger delay in seconds */
+  delay?:     number;
+  /** Travel distance in px */
+  distance?:  number;
+  /** Entry direction */
+  direction?: Direction;
+  /** Gaussian blur on enter */
+  blur?:      boolean;
+  /** Slight scale on enter */
+  scale?:     boolean;
+  /** Class applied to wrapper div */
+  className?: string;
+  /** Only animate once (default: true) */
+  once?:      boolean;
+  /** Viewport intersection threshold */
+  amount?:    number;
+  /** Animation duration in seconds */
+  duration?:  number;
+}
+
+const OFFSET: Record<Direction, { x: number; y: number }> = {
+  up:    { x: 0,   y: 1 },
+  down:  { x: 0,   y: -1 },
+  left:  { x: 1,   y: 0 },
+  right: { x: -1,  y: 0 },
+  none:  { x: 0,   y: 0 },
 };
 
 export default function Reveal({
   children,
-  y = 50,
-  x = 0,
-  duration = 0.8,
-  stagger = 0.1,
-  delay = 0,
-  ease = "power3.out",
-  start = "top 85%",
-  once = true,
+  delay     = 0,
+  distance  = 24,
+  direction = 'up',
+  blur      = true,
+  scale     = false,
+  className,
+  once      = true,
+  amount    = 0.1,
+  duration  = 0.68,
 }: RevealProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const [ref, inView] = useReveal<HTMLDivElement>({ once, amount });
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+  const { sx, sy } = useMemo(() => ({
+    sx: OFFSET[direction].x * distance,
+    sy: OFFSET[direction].y * distance,
+  }), [direction, distance]);
 
-    const ctx = gsap.context(() => {
-      // 🔥 flexible targeting
-      const targets = gsap.utils.toArray<HTMLElement>(
-        el.querySelectorAll("[data-reveal]")
-      );
+  const variants = useMemo<Variants>(() => ({
+    hidden: {
+      opacity: 0,
+      x: sx,
+      y: sy,
+      ...(scale && { scale: 0.96 }),
+      ...(blur  && { filter: 'blur(7px)' }),
+    },
+    visible: {
+      opacity: 1,
+      x: 0,
+      y: 0,
+      ...(scale && { scale: 1 }),
+      ...(blur  && { filter: 'blur(0px)' }),
+      transition: { duration, delay, ease: EASE_OUT },
+    },
+  }), [sx, sy, scale, blur, duration, delay]);
 
-      // fallback (single element)
-      const elements = targets.length ? targets : [el];
-
-      gsap.set(elements, {
-        opacity: 0,
-        y,
-        x,
-      });
-
-      gsap.to(elements, {
-        opacity: 1,
-        y: 0,
-        x: 0,
-        duration,
-        delay,
-        ease,
-        stagger: elements.length > 1 ? stagger : 0,
-        scrollTrigger: {
-          trigger: el,
-          start,
-          once,
-        },
-      });
-    }, ref);
-
-    return () => ctx.revert();
-  }, []);
-
-  return <div ref={ref}>{children}</div>;
+  return (
+    <motion.div
+      ref={ref as React.RefObject<HTMLDivElement>}
+      className={cn(className)}
+      style={{ willChange: 'transform, opacity' }}
+      variants={variants}
+      initial="hidden"
+      animate={inView ? 'visible' : 'hidden'}
+    >
+      {children}
+    </motion.div>
+  );
 }

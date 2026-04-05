@@ -1,57 +1,72 @@
-"use client";
+import { useEffect, useRef, useState } from 'react';
 
-import { useEffect, useRef, useState } from "react";
+type EasingFn = (t: number) => number;
 
-type Options = {
-  duration?: number;
-  decimals?: number;
-  easing?: (t: number) => number;
-};
+interface CountUpOptions {
+  duration?:  number;
+  decimals?:  number;
+  easing?:    EasingFn;
+  prefix?:    string;
+  suffix?:    string;
+  separator?: string;
+}
 
+const easeOutQuart: EasingFn = (t) => 1 - Math.pow(1 - t, 4);
+const easeOutExpo:  EasingFn = (t) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+
+export const EASINGS = { easeOutQuart, easeOutExpo } as const;
+
+/**
+ * Animates a number from 0 to `target` when `start` becomes true.
+ * Returns a formatted string with optional prefix/suffix/separator.
+ */
 export function useCountUp(
-  target: number,
-  { duration = 1.5, decimals = 0, easing }: Options = {}
-) {
+  target:  number,
+  start:   boolean,
+  options: CountUpOptions = {}
+): string {
+  const {
+    duration  = 2.2,
+    decimals  = 0,
+    easing    = easeOutQuart,
+    prefix    = '',
+    suffix    = '',
+    separator = ',',
+  } = options;
+
   const [value, setValue] = useState(0);
-
-  const raf = useRef<number | null>(null);
-  const startTime = useRef<number | null>(null);
-
-  // 🔥 DEFAULT EASING (easeOutCubic = premium feel)
-  const ease =
-    easing ||
-    ((t: number) => 1 - Math.pow(1 - t, 3));
+  const rafRef  = useRef<number>(0);
+  const startTs = useRef<number | null>(null);
 
   useEffect(() => {
-    if (raf.current) cancelAnimationFrame(raf.current);
+    if (!start) return;
 
-    startTime.current = null;
+    startTs.current = null;
 
-    const animate = (time: number) => {
-      if (!startTime.current) startTime.current = time;
-
-      const elapsed = (time - startTime.current) / 1000;
+    const animate = (ts: number) => {
+      if (!startTs.current) startTs.current = ts;
+      const elapsed  = (ts - startTs.current) / 1000;
       const progress = Math.min(elapsed / duration, 1);
+      const eased    = easing(progress);
 
-      const eased = ease(progress);
-      const current = target * eased;
-
-      const factor = Math.pow(10, decimals);
-      setValue(Math.floor(current * factor) / factor);
+      setValue(parseFloat((eased * target).toFixed(decimals)));
 
       if (progress < 1) {
-        raf.current = requestAnimationFrame(animate);
+        rafRef.current = requestAnimationFrame(animate);
       } else {
         setValue(target);
       }
     };
 
-    raf.current = requestAnimationFrame(animate);
+    rafRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [target, start, duration, decimals, easing]);
 
-    return () => {
-      if (raf.current) cancelAnimationFrame(raf.current);
-    };
-  }, [target, duration, decimals, ease]);
+  // Format number with separator
+  const formatted = value.toFixed(decimals).replace(
+    /\B(?=(\d{3})+(?!\d))/g,
+    separator
+  );
 
-  return value;
+  return `${prefix}${formatted}${suffix}`;
 }

@@ -1,119 +1,217 @@
-"use client";
+'use client';
 
-import { useStagger } from "../hooks/useStagger";
-import GlassCard from "../ui/GlassCard";
-import { motion } from "framer-motion";
+import { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import Reveal from '../motion/Reveal';
+import { useReveal } from '../hooks/useReveal';
+import { useCountUp } from '../../hooks/useCountUp';
+import {
+  CONTAINER, SECTION_PY, SCENES,
+  staggerDelay, DUR, EASE_OUT,
+  HIERARCHY, SHADOW,
+} from '../../systems/design';
 
-const testimonials = [
-  {
-    name: "Rahul Sharma",
-    role: "Director, Bright Academy",
-    text: "Growcad completely transformed how we manage students. Admissions, fees, and reports — everything is automated.",
-  },
-  {
-    name: "Neha Verma",
-    role: "Owner, Alpha Coaching",
-    text: "The AI insights and WhatsApp automation boosted our conversions by 2x. This is not just software, it's a growth engine.",
-  },
-  {
-    name: "Amit Singh",
-    role: "Founder, Success Point",
-    text: "We replaced 4 different tools with Growcad. Everything is now in one place — smooth and powerful.",
-  },
+// ─── Data ─────────────────────────────────────────────────────────────────────
+const STATS = [
+  { target: 4200, opts: { suffix: '+',   separator: ',' }, label: 'Teams onboarded',       sub: 'and growing 18% MoM'   },
+  { target: 99,   opts: { suffix: '.9%'                }, label: 'Uptime SLA',             sub: '→ zero downtime promise' },
+  { target: 2,    opts: { suffix: 'B+'                 }, label: 'Events processed / mo',  sub: 'across all customers'   },
+  { target: 12,   opts: { suffix: 'ms', prefix: 'p99 ' }, label: 'Query latency',          sub: 'across 40+ regions'     },
 ];
 
-const stats = [
-  { value: "500+", label: "Institutes" },
-  { value: "1L+", label: "Students Managed" },
-  { value: "99.9%", label: "Uptime" },
+const LOGOS = [
+  'Vercel', 'Stripe', 'Linear', 'Notion', 'Figma',
+  'Resend', 'Supabase', 'Planetscale', 'Turso', 'Neon',
 ];
 
-export default function Trust() {
-  const ref = useStagger({ stagger: 0.15 });
+// ─── Stat card ────────────────────────────────────────────────────────────────
+function StatCard({ target, opts, label, sub, delay = 0 }: {
+  target: number;
+  opts:   { suffix?: string; prefix?: string; separator?: string };
+  label:  string;
+  sub:    string;
+  delay?: number;
+}) {
+  const [ref, inView] = useReveal<HTMLDivElement>({ once: true, amount: 0.3 });
+
+  const formatted = useCountUp(target, inView, {
+    duration:  2.6,
+    suffix:    opts.suffix    ?? '',
+    prefix:    opts.prefix    ?? '',
+    separator: opts.separator ?? ',',
+  });
 
   return (
-    <section className="py-32 relative overflow-hidden">
+    <motion.div
+      ref={ref as React.RefObject<HTMLDivElement>}
+      className="flex flex-col items-center gap-2 text-center"
+      initial={{ opacity: 0, y: 28, filter: 'blur(8px)' }}
+      animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+      transition={{ duration: DUR.SLOW, delay, ease: EASE_OUT }}
+    >
+      {/* Number — primary (gradient = maximum visual weight) */}
+      <div
+        className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text font-bold leading-none tracking-tight text-transparent tabular-nums"
+        style={{ fontSize: 'clamp(2.4rem, 4vw, 3.4rem)' }}
+      >
+        {formatted}
+      </div>
+      {/* Label — secondary */}
+      <p className={`text-[13.5px] font-medium ${HIERARCHY.secondary}`}>{label}</p>
+      {/* Sub — tertiary (lowest, but provides context) */}
+      <p className={`text-[11px] ${HIERARCHY.muted}`}>{sub}</p>
+    </motion.div>
+  );
+}
 
-      {/* 🔥 BACKGROUND */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_20%,rgba(59,130,246,0.15),transparent_60%)]" />
+// ─── Marquee row ──────────────────────────────────────────────────────────────
+function Marquee({ logos, dir = 'left', dur = 30 }: {
+  logos: string[]; dir?: 'left' | 'right'; dur?: number;
+}) {
+  const doubled = [...logos, ...logos];
+  return (
+    <div className="relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-36 bg-gradient-to-r from-[#070709] to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-36 bg-gradient-to-l from-[#070709] to-transparent" />
+      <motion.div
+        className="flex whitespace-nowrap"
+        animate={{ x: dir === 'left' ? ['0%', '-50%'] : ['-50%', '0%'] }}
+        transition={{ duration: dur, repeat: Infinity, ease: 'linear' }}
+      >
+        {doubled.map((logo, i) => (
+          <span
+            key={`${logo}-${i}`}
+            className={`inline-flex items-center gap-2 px-7 py-3 text-[13px] font-semibold tracking-tight transition-colors duration-200 ${HIERARCHY.muted} hover:text-white/42`}
+          >
+            <span className="h-[3px] w-[3px] rounded-full bg-white/12" />
+            {logo}
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
 
-      <div className="max-w-7xl mx-auto px-6 space-y-24">
+// ─── Section ──────────────────────────────────────────────────────────────────
+export default function Trust() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  });
+  // Parallax the quote card slightly with scroll — adds depth
+  const quoteY = useTransform(scrollYProgress, [0, 1], [30, -30]);
 
-        {/* 🔥 HEADER */}
-        <div className="text-center space-y-6 max-w-2xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold">
-            Trusted by Growing Institutes
+  return (
+    <section
+      ref={sectionRef}
+      data-scene={SCENES.trust}
+      className={`relative ${SECTION_PY.md}`}
+    >
+      <div className="section-divider" />
+
+      {/* Ambient */}
+      <div
+        className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2"
+        style={{
+          width: 500, height: 500,
+          background: 'radial-gradient(circle, rgba(109,40,217,0.04) 0%, transparent 70%)',
+          filter: 'blur(90px)',
+        }}
+      />
+
+      <div className={CONTAINER.page}>
+        {/* Scene narrative label */}
+        <Reveal className="mb-14 text-center">
+          <p className="scene-label mb-3">By the numbers</p>
+          <h2
+            className="font-bold leading-[1.1] tracking-[-0.028em]"
+            style={{ fontSize: 'clamp(2.1rem, 4.2vw, 3.2rem)' }}
+          >
+            <span className={HIERARCHY.primary}>The proof is in</span>
+            <br />
+            <span className="text-white/26">the data.</span>
           </h2>
+        </Reveal>
 
-          <p className="text-white/60 text-lg">
-            Join hundreds of coaching institutes scaling faster with Growcad.
+        {/* Stats — individually timed reveals */}
+        <div className="mb-20 grid grid-cols-2 gap-x-8 gap-y-14 md:grid-cols-4">
+          {STATS.map((s, i) => (
+            <StatCard key={s.label} {...s} delay={staggerDelay(i, 0.06)} />
+          ))}
+        </div>
+
+        {/* Trusted by header */}
+        <Reveal delay={0.05} className="mb-10 text-center">
+          <p className={`text-[11px] font-medium uppercase tracking-[0.26em] ${HIERARCHY.muted}`}>
+            Trusted by teams at
           </p>
+        </Reveal>
+
+        {/* Dual marquee — offset for depth */}
+        <div className="flex flex-col gap-3">
+          <Marquee logos={LOGOS}                     dir="left"  dur={30} />
+          <Marquee logos={[...LOGOS].reverse()}      dir="right" dur={38} />
         </div>
 
-        {/* 🔥 LOGO STRIP (NEW - HUGE TRUST BOOST) */}
-        <div className="flex flex-wrap justify-center gap-10 text-white/30 text-sm">
-          <span>Bright Academy</span>
-          <span>Alpha Coaching</span>
-          <span>Success Point</span>
-          <span>Future Classes</span>
-          <span>Excel Institute</span>
-        </div>
-
-        {/* 🔥 STATS (ANIMATED) */}
-        <div className="grid md:grid-cols-3 gap-10 text-center">
-          {stats.map((s, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.15 }}
+        {/* Featured quote — parallax depth */}
+        <Reveal delay={0.12} className="mt-20">
+          <motion.div
+            style={{ y: quoteY }}
+            className="relative mx-auto max-w-[720px]"
+          >
+            {/* Outer glow */}
+            <div
+              className="pointer-events-none absolute -inset-4 rounded-3xl blur-2xl"
+              style={{
+                background: 'radial-gradient(ellipse, rgba(109,40,217,0.08) 0%, transparent 70%)',
+              }}
+            />
+            <div
+              className="relative overflow-hidden rounded-2xl border border-white/[0.07] p-10 text-center backdrop-blur-sm"
+              style={{
+                background: 'rgba(255,255,255,0.025)',
+                boxShadow: SHADOW.card,
+              }}
             >
-              <h3 className="text-3xl font-bold text-purple-400">
-                {s.value}
-              </h3>
-              <p className="text-white/60">{s.label}</p>
-            </motion.div>
-          ))}
-        </div>
+              {/* Inner decorations */}
+              <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-500/[0.055] via-transparent to-transparent" />
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.14] to-transparent" />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
 
-        {/* 🔥 TESTIMONIALS */}
-        <div ref={ref} className="grid md:grid-cols-3 gap-10">
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={i}
-              whileHover={{ y: -10, scale: 1.03 }}
-              transition={{ duration: 0.3 }}
-            >
-              <GlassCard className="p-8 space-y-5 relative overflow-hidden">
+              {/* Quote mark — tertiary */}
+              <div className="relative mb-6 font-serif text-5xl leading-none text-violet-500/20">
+                &ldquo;
+              </div>
 
-                {/* 🔥 RATING */}
-                <div className="text-yellow-400 text-sm">
-                  ★ ★ ★ ★ ★
+              {/* Quote — secondary (this is the key message, but body-weight) */}
+              <p className="relative mb-8 text-[17px] font-medium leading-[1.75] text-white/55">
+                Growcad cut our time-to-insight from days to minutes.
+                It is the first growth tool that actually grows with us.
+              </p>
+
+              {/* Author */}
+              <div className="relative flex items-center justify-center gap-4">
+                <div className="relative h-11 w-11 flex-shrink-0">
+                  <div className="absolute -inset-[2px] rounded-full bg-gradient-to-br from-violet-500 to-blue-500 opacity-55" />
+                  <div className="relative flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-blue-600 text-[14px] font-bold text-white">
+                    S
+                  </div>
                 </div>
-
-                {/* 🔥 TEXT */}
-                <p className="text-white/70 leading-relaxed">
-                  “{t.text}”
-                </p>
-
-                {/* 🔥 USER */}
-                <div className="pt-4 border-t border-white/10">
-                  <p className="font-semibold">{t.name}</p>
-                  <p className="text-white/50 text-sm">{t.role}</p>
+                <div className="text-left">
+                  <p className={`text-[14px] font-semibold ${HIERARCHY.secondary}`}>Sarah Chen</p>
+                  <p className={`text-[12px] ${HIERARCHY.tertiary}`}>Head of Growth · Loom</p>
                 </div>
-
-                {/* 🔥 HOVER LIGHT */}
-                <div className="absolute inset-0 opacity-0 hover:opacity-100 transition duration-500 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_70%)]" />
-              </GlassCard>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* 🔥 TRUST FOOTER LINE */}
-        <div className="text-center text-white/40 text-sm">
-          Rated 4.9/5 by 500+ institutes across India
-        </div>
-
+                {/* Stars */}
+                <div className="ml-6 flex gap-0.5">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <span key={s} className="text-amber-400/62 text-[13px]">★</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </Reveal>
       </div>
     </section>
   );

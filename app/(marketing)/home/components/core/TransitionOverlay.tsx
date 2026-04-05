@@ -1,62 +1,14 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
-import { gsap } from "@/lib/gsap";
+import { motion } from 'framer-motion';
 
 export default function TransitionOverlay() {
-  const overlay = useRef<HTMLDivElement>(null);
-  const tlRef = useRef<gsap.core.Timeline | null>(null);
-  const pathname = usePathname();
-
-  useEffect(() => {
-    if (!overlay.current) return;
-
-    // 🔥 kill previous timeline (prevents stacking)
-    tlRef.current?.kill();
-
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        defaults: { ease: "power4.inOut" },
-      });
-
-      tlRef.current = tl;
-
-      // 🔥 start from bottom
-      tl.set(overlay.current, { y: "100%" });
-
-      // 🔥 cover screen
-      tl.to(overlay.current, {
-        y: "0%",
-        duration: 0.6,
-      });
-
-      // 🔥 slight hold for premium feel
-      tl.to(overlay.current, {
-        y: "0%",
-        duration: 0.15,
-      });
-
-      // 🔥 reveal next page
-      tl.to(overlay.current, {
-        y: "-100%",
-        duration: 0.7,
-      });
-    }, overlay);
-
-    return () => {
-      ctx.revert();
-    };
-  }, [pathname]);
-
   return (
-    <div
-      ref={overlay}
-      className="
-        fixed inset-0 z-[9999] pointer-events-none
-        bg-gradient-to-b from-black via-neutral-900 to-black
-        will-change-transform
-      "
+    <motion.div
+      className="pointer-events-none fixed inset-0 z-[9998] bg-[#070709]"
+      initial={{ scaleY: 1, originY: 'bottom' }}
+      animate={{ scaleY: 0, originY: 'top' }}
+      transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.1 }}
     />
   );
 }

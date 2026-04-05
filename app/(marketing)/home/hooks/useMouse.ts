@@ -1,39 +1,44 @@
-"use client";
+import { useEffect, useRef, useState } from 'react';
 
-import { useEffect, useRef } from "react";
+interface MousePosition {
+  x: number;
+  y: number;
+  /** Normalised -1..1 relative to viewport center */
+  nx: number;
+  ny: number;
+}
 
-export function useMouse(smoothness: number = 0.1) {
-  const mouse = useRef({ x: 0, y: 0 });     // real mouse
-  const current = useRef({ x: 0, y: 0 });   // smooth position
+/**
+ * Returns raw mouse position (x, y) and viewport-normalised position (nx, ny).
+ * Uses requestAnimationFrame throttling — safe to call every render.
+ */
+export function useMouse(): MousePosition {
+  const [pos, setPos] = useState<MousePosition>({ x: 0, y: 0, nx: 0, ny: 0 });
+  const frameRef = useRef<number>(0);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      mouse.current.x = e.clientX;
-      mouse.current.y = e.clientY;
+    let pending = false;
+
+    const handler = (e: MouseEvent) => {
+      if (pending) return;
+      pending = true;
+      frameRef.current = requestAnimationFrame(() => {
+        setPos({
+          x:  e.clientX,
+          y:  e.clientY,
+          nx: (e.clientX / window.innerWidth)  * 2 - 1,
+          ny: (e.clientY / window.innerHeight) * 2 - 1,
+        });
+        pending = false;
+      });
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-
-    const lerp = (start: number, end: number, factor: number) => {
-      return start + (end - start) * factor;
-    };
-
-    const animate = () => {
-      current.current.x = lerp(current.current.x, mouse.current.x, smoothness);
-      current.current.y = lerp(current.current.y, mouse.current.y, smoothness);
-
-      requestAnimationFrame(animate);
-    };
-
-    animate();
-
+    window.addEventListener('mousemove', handler, { passive: true });
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener('mousemove', handler);
+      cancelAnimationFrame(frameRef.current);
     };
-  }, [smoothness]);
+  }, []);
 
-  return {
-    mouse,
-    current,
-  };
+  return pos;
 }

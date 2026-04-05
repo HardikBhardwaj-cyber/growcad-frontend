@@ -1,98 +1,77 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from 'react';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 export default function Cursor() {
-  const glowRef = useRef<HTMLDivElement | null>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
 
-  const mouse = useRef({ x: 0, y: 0 });
-  const glow = useRef({ x: 0, y: 0 });
+  const mouseX = useMotionValue(-100);
+  const mouseY = useMotionValue(-100);
 
-  const rafRef = useRef<number | null>(null);
-  const mounted = useRef(true);
+  // Ring — slow spring
+  const ringX = useSpring(mouseX, { damping: 26, stiffness: 200, mass: 0.4 });
+  const ringY = useSpring(mouseY, { damping: 26, stiffness: 200, mass: 0.4 });
 
-  const [hovering, setHovering] = useState(false);
+  // Dot — snappy spring
+  const dotX = useSpring(mouseX, { damping: 50, stiffness: 900 });
+  const dotY = useSpring(mouseY, { damping: 50, stiffness: 900 });
 
-  /* 🔥 DISABLE ON TOUCH DEVICES */
   useEffect(() => {
-    if ("ontouchstart" in window) {
-      if (glowRef.current) glowRef.current.style.display = "none";
-    }
-  }, []);
-
-  /* 🔥 TRACK MOUSE */
-  useEffect(() => {
-    const move = (e: MouseEvent) => {
-      mouse.current.x = e.clientX;
-      mouse.current.y = e.clientY;
+    const onMove = (e: MouseEvent) => {
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
     };
 
-    window.addEventListener("mousemove", move, { passive: true });
+    const onEnter = () => ringRef.current?.setAttribute('data-hover', 'true');
+    const onLeave = () => ringRef.current?.removeAttribute('data-hover');
+
+    window.addEventListener('mousemove', onMove, { passive: true });
+
+    const targets = document.querySelectorAll('a, button, [data-cursor]');
+    targets.forEach((el) => {
+      el.addEventListener('mouseenter', onEnter);
+      el.addEventListener('mouseleave', onLeave);
+    });
 
     return () => {
-      window.removeEventListener("mousemove", move);
+      window.removeEventListener('mousemove', onMove);
     };
-  }, []);
-
-  /* 🔥 ULTRA SMOOTH ANIMATION LOOP */
-  useEffect(() => {
-    mounted.current = true;
-
-    const animate = () => {
-      if (!mounted.current) return;
-
-
-      // slow glow
-      glow.current.x += (mouse.current.x - glow.current.x) * 0.12;
-      glow.current.y += (mouse.current.y - glow.current.y) * 0.12;
-
-      if (glowRef.current) {
-        glowRef.current.style.transform = `translate3d(${glow.current.x}px, ${glow.current.y}px, 0) translate(-50%, -50%)`;
-      }
-
-      rafRef.current = requestAnimationFrame(animate);
-    };
-
-    rafRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      mounted.current = false;
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, []);
-
-  /* 🔥 STABLE HOVER DETECTION (NO FLICKER, NO LEAK) */
-  useEffect(() => {
-    const handlePointerOver = (e: Event) => {
-      const target = (e.target as HTMLElement)?.closest(
-        "button, a, .magnetic"
-      );
-      setHovering(!!target);
-    };
-
-    document.addEventListener("pointerover", handlePointerOver);
-
-    return () => {
-      document.removeEventListener("pointerover", handlePointerOver);
-    };
-  }, []);
+  }, [mouseX, mouseY]);
 
   return (
     <>
-      {/* 🔥 GLOW */}
-      <div
-        ref={glowRef}
-        className={`
-          pointer-events-none fixed top-0 left-0 z-[9998]
-          w-56 h-56 rounded-full
-          bg-purple-500/20 blur-[80px]
-          will-change-transform
-          transition-all duration-300 ease-out
-          ${hovering ? "scale-150 bg-blue-500/30" : "scale-100"}
-        `}
+      {/* Ring */}
+      <motion.div
+        ref={ringRef}
+        className="pointer-events-none fixed z-[9999] hidden lg:block"
+        style={{
+          x: ringX,
+          y: ringY,
+          translateX: '-50%',
+          translateY: '-50%',
+          width: 36,
+          height: 36,
+          borderRadius: '50%',
+          border: '1.5px solid rgba(255,255,255,0.22)',
+          mixBlendMode: 'difference',
+        }}
       />
-
-      
+      {/* Dot */}
+      <motion.div
+        className="pointer-events-none fixed z-[9999] hidden lg:block"
+        style={{
+          x: dotX,
+          y: dotY,
+          translateX: '-50%',
+          translateY: '-50%',
+          width: 5,
+          height: 5,
+          borderRadius: '50%',
+          backgroundColor: 'rgba(255,255,255,0.85)',
+          mixBlendMode: 'difference',
+        }}
+      />
     </>
   );
 }

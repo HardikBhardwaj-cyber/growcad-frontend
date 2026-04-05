@@ -1,48 +1,59 @@
-"use client";
+import type { Metadata } from 'next';
+import SmoothScroll from './components/core/SmoothScroll';
+import Cursor from './components/core/Cursor';
+import CursorGlow from './components/effects/CursorGlow';
+import GridBackground from './components/effects/GridBackground';
+import NoiseLayer from './components/effects/NoiseLayer';
+import TransitionOverlay from './components/core/TransitionOverlay';
+import ScrollFix from './components/core/ScrollFix';
+import ReducedMotionConfig from './components/core/ReducedMotionConfig';
+import Navbar from './components/layout/Navbar';
+import Footer from './components/layout/Footer';
+import Splash from './components/core/Splash';
 
-import { useEffect } from "react";
-import SmoothScroll from "./components/core/SmoothScroll";
-import PageTransition from "./components/core/PageTransition";
-import TransitionOverlay from "./components/core/TransitionOverlay";
+export const metadata: Metadata = {
+  title: 'Growcad — The Growth Stack That Never Sleeps',
+  description:
+    'Growcad unifies analytics, experiments, and revenue data into one intelligent workspace for modern growth teams.',
+  openGraph: {
+    title: 'Growcad — The Growth Stack That Never Sleeps',
+    description: 'Analytics, experiments, and revenue data. One workspace.',
+    type: 'website',
+  },
+};
 
-export default function MarketingLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  /* ================= SCROLL CONTROL ================= */
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const prev = window.history.scrollRestoration;
-    window.history.scrollRestoration = "manual";
-
-    return () => {
-      window.history.scrollRestoration = prev;
-    };
-  }, []);
-
-  /* ================= LAYOUT ================= */
-
+export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <SmoothScroll>
-      {/* 🔥 ROOT LAYER */}
-      <div className="relative isolate">
+    <ReducedMotionConfig>
+      {/* Splash loader */}
+      <Splash />
 
-        {/* 🔥 TRANSITION OVERLAY (TOP MOST) */}
-        <div className="fixed inset-0 z-[9999] pointer-events-none">
-          <TransitionOverlay />
+      {/* Page wipe transition */}
+      <TransitionOverlay />
+
+      {/* Custom cursor (desktop only) */}
+      <Cursor />
+
+      {/* Cursor ambient glow */}
+      <CursorGlow />
+
+      {/* Persistent grid bg */}
+      <GridBackground />
+
+      {/* Film grain depth layer */}
+      <NoiseLayer />
+
+      {/* Route scroll reset */}
+      <ScrollFix />
+
+      {/* Smooth scrolling via Lenis */}
+      <SmoothScroll>
+        <div className="relative min-h-screen bg-[#070709] text-white selection:bg-violet-500/30">
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
         </div>
-
-        {/* 🔥 MAIN CONTENT */}
-        <main className="relative z-10">
-          <PageTransition>
-            {children}
-          </PageTransition>
-        </main>
-
-      </div>
-    </SmoothScroll>
+      </SmoothScroll>
+    </ReducedMotionConfig>
   );
 }

@@ -1,74 +1,27 @@
-"use client";
+import { useInView } from 'framer-motion';
+import { useRef, RefObject } from 'react';
 
-import { useEffect, useRef } from "react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
+type MarginType = `${number}px` | `${number}%`;
 
-type RevealOptions = {
-  y?: number;
-  x?: number;
-  scale?: number;
-  delay?: number;
-  duration?: number;
-  stagger?: number;
-  ease?: string;
-  triggerStart?: string;
+interface RevealOptions {
   once?: boolean;
-  scrub?: boolean;
-};
+  amount?: number;
+  margin?: MarginType;
+}
 
-export function useReveal(options: RevealOptions = {}) {
-  const ref = useRef<HTMLDivElement | null>(null);
+export function useReveal<T extends Element = HTMLDivElement>({
+  once = true,
+  amount = 0.15,
+  margin = '0px',
+}: RevealOptions = {}): [RefObject<T | null>, boolean] {
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+  const ref = useRef<T | null>(null);
 
-    // 🔥 destructure once (prevents re-trigger spam)
-    const {
-      y = 60,
-      x = 0,
-      scale = 1,
-      delay = 0,
-      duration = 0.9,
-      stagger = 0,
-      ease = "power3.out",
-      triggerStart = "top 85%",
-      once = true,
-      scrub = false,
-    } = options;
+  const isInView = useInView(ref, {
+    once,
+    amount,
+    margin,
+  });
 
-    const ctx = gsap.context(() => {
-      const targets = el.children.length > 0 ? el.children : el;
-
-      gsap.fromTo(
-        targets,
-        {
-          opacity: 0,
-          y,
-          x,
-          scale: scale < 1 ? scale : 1,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          x: 0,
-          scale: 1,
-          duration,
-          delay,
-          ease,
-          stagger,
-          scrollTrigger: {
-            trigger: el,
-            start: triggerStart,
-            once,
-            scrub: scrub || false,
-          },
-        }
-      );
-    }, ref);
-
-    return () => ctx.revert();
-  }, []); // 🔥 run only once
-
-  return ref;
+  return [ref, isInView];
 }

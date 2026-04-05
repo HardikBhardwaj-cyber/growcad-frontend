@@ -1,65 +1,60 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { ReactNode } from "react";
-import clsx from "clsx";
+import { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
-type BadgeProps = {
-  children: ReactNode;
+type BadgeColor = 'violet' | 'blue' | 'emerald' | 'amber' | 'rose' | 'cyan';
+
+interface BadgeProps {
+  children:  ReactNode;
   className?: string;
-  variant?: "default" | "glow" | "outline" | "success" | "danger";
-  animate?: boolean;
+  dot?:      boolean;
+  color?:    BadgeColor;
+  size?:     'sm' | 'md';
+}
+
+const COLOR_MAP: Record<BadgeColor, { wrap: string; dot: string }> = {
+  violet:  { wrap: 'border-violet-500/22  bg-violet-500/10  text-violet-300',  dot: 'bg-violet-400'  },
+  blue:    { wrap: 'border-blue-500/22    bg-blue-500/10    text-blue-300',    dot: 'bg-blue-400'    },
+  emerald: { wrap: 'border-emerald-500/22 bg-emerald-500/10 text-emerald-300', dot: 'bg-emerald-400' },
+  amber:   { wrap: 'border-amber-500/22   bg-amber-500/10   text-amber-300',   dot: 'bg-amber-400'   },
+  rose:    { wrap: 'border-rose-500/22    bg-rose-500/10    text-rose-300',    dot: 'bg-rose-400'    },
+  cyan:    { wrap: 'border-cyan-500/22    bg-cyan-500/10    text-cyan-300',    dot: 'bg-cyan-400'    },
+};
+
+const SIZE_MAP: Record<'sm' | 'md', string> = {
+  sm: 'px-2.5 py-[3px] text-[10px] gap-1.5',
+  md: 'px-3.5  py-[5px] text-[11px] gap-2',
 };
 
 export default function Badge({
   children,
   className,
-  variant = "default",
-  animate = true,
+  dot   = false,
+  color = 'violet',
+  size  = 'md',
 }: BadgeProps) {
-  const base =
-    "inline-flex items-center gap-2.5 px-4 py-2 rounded-full text-[12px] font-medium backdrop-blur-md will-change-transform";
-
-  const styles = {
-    default:
-      "bg-white/5 border border-white/10 text-gray-300",
-
-    glow:
-      "bg-white/5 border border-purple-400/30 text-white shadow-[0_0_25px_rgba(124,58,237,0.25)]",
-
-    outline:
-      "border border-white/20 text-gray-400 bg-transparent",
-
-    success:
-      "bg-green-500/10 border border-green-400/30 text-green-300",
-
-    danger:
-      "bg-red-500/10 border border-red-400/30 text-red-300",
-  };
+  const { wrap, dot: dotColor } = COLOR_MAP[color];
 
   return (
-    <motion.div
-      initial={animate ? { opacity: 0, y: 6 } : false}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{
-        scale: 1.05,
-        y: -2,
-      }}
-      className={clsx(base, styles[variant], className)}
+    <span
+      className={cn(
+        'inline-flex items-center rounded-full border font-medium tracking-wide',
+        wrap,
+        SIZE_MAP[size],
+        className
+      )}
     >
-      {/* 🔥 DOT (ANIMATED) */}
-      <span className="relative flex items-center justify-center">
-        <span className="w-1.5 h-1.5 rounded-full bg-purple-400 z-10" />
-
-        {/* pulse */}
-        <span className="absolute w-3 h-3 rounded-full bg-purple-400/40 animate-ping" />
-      </span>
-
-      {/* 🔥 TEXT */}
-      <span className="tracking-wide leading-none">
-        {children}
-      </span>
-    </motion.div>
+      {dot && (
+        <span className="relative flex h-1.5 w-1.5 flex-shrink-0">
+          {/* ping uses CSS keyframe from globals.css */}
+          <span
+            className={cn('absolute inline-flex h-full w-full animate-ping rounded-full opacity-65', dotColor)}
+          />
+          <span className={cn('relative inline-flex h-1.5 w-1.5 rounded-full', dotColor)} />
+        </span>
+      )}
+      {children}
+    </span>
   );
 }

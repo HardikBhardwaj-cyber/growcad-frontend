@@ -1,98 +1,65 @@
-"use client";
+import { useEffect } from 'react';
+import { useMotionValue, useSpring, MotionValue } from 'framer-motion';
 
-import {
-  useMotionValue,
-  useVelocity,
-  useTransform,
-  MotionValue,
-} from "framer-motion";
-import { useEffect, useRef } from "react";
+interface SpringConfig {
+  damping?:   number;
+  stiffness?: number;
+  mass?:      number;
+}
 
-type Position = {
-  x: number;
-  y: number;
+interface MouseSmooth {
+  x:  MotionValue<number>;
+  y:  MotionValue<number>;
+  /** Viewport-normalised −1..1 (useful for shader uniforms) */
+  nx: MotionValue<number>;
+  ny: MotionValue<number>;
+}
+
+const DEFAULTS: Required<SpringConfig> = {
+  damping:   28,
+  stiffness: 180,
+  mass:      0.5,
 };
 
-export function useMouseSmooth(speed: number = 0.08) {
-  /* ================= TARGET ================= */
+/**
+ * Spring-smoothed mouse position.
+ * Returns Framer Motion MotionValues — plug directly into `style` props.
+ */
+export function useMouseSmooth(config: SpringConfig = {}): MouseSmooth {
+  const cfg = { ...DEFAULTS, ...config };
 
-  const target = useRef<Position>({ x: 0, y: 0 });
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const rawNX = useMotionValue(0);
+  const rawNY = useMotionValue(0);
 
-  /* ================= MOTION VALUES ================= */
-
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  // 🔥 LAG LAYER (depth illusion)
-  const lagX = useMotionValue(0);
-  const lagY = useMotionValue(0);
-
-  /* ================= VELOCITY ================= */
-
-  const vx = useVelocity(x);
-  const vy = useVelocity(y);
-
-  // 🔥 SAFE SPEED CALCULATION
-  const speedValue = useTransform(
-    [vx, vy],
-    (latest) => {
-        const [vxVal, vyVal] = latest as [number, number];
-
-        const velocity = Math.sqrt(vxVal * vxVal + vyVal * vyVal);
-        return Math.min(velocity, 1000);
-    }
-  );
-
-  /* ================= RAF LOOP ================= */
-
-  const raf = useRef<number | null>(null);
+  const x  = useSpring(rawX,  cfg);
+  const y  = useSpring(rawY,  cfg);
+  const nx = useSpring(rawNX, cfg);
+  const ny = useSpring(rawNY, cfg);
 
   useEffect(() => {
-    // ✅ SAFE: only runs on client
-    const handleMove = (e: MouseEvent) => {
-      target.current.x = e.clientX;
-      target.current.y = e.clientY;
+    let pending = false;
+    let rafId: number;
+
+    const handler = (e: MouseEvent) => {
+      if (pending) return;
+      pending = true;
+      rafId = requestAnimationFrame(() => {
+        rawX.set(e.clientX);
+        rawY.set(e.clientY);
+        rawNX.set((e.clientX / window.innerWidth)  * 2 - 1);
+        rawNY.set((e.clientY / window.innerHeight) * 2 - 1);
+        pending = false;
+      });
     };
 
-    const loop = () => {
-      const tx = target.current.x;
-      const ty = target.current.y;
-
-      /* 🔥 MAIN SMOOTH (LERP) */
-      const cx = x.get() + (tx - x.get()) * speed;
-      const cy = y.get() + (ty - y.get()) * speed;
-
-      x.set(cx);
-      y.set(cy);
-
-      /* 🔥 LAG (SECOND LAYER DEPTH) */
-      const lx = lagX.get() + (cx - lagX.get()) * (speed * 0.5);
-      const ly = lagY.get() + (cy - lagY.get()) * (speed * 0.5);
-
-      lagX.set(lx);
-      lagY.set(ly);
-
-      raf.current = requestAnimationFrame(loop);
-    };
-
-    window.addEventListener("mousemove", handleMove);
-    raf.current = requestAnimationFrame(loop);
-
+    window.addEventListener('mousemove', handler, { passive: true });
     return () => {
-      window.removeEventListener("mousemove", handleMove);
-      if (raf.current) cancelAnimationFrame(raf.current);
+      window.removeEventListener('mousemove', handler);
+      cancelAnimationFrame(rafId);
     };
-  }, [speed, x, y, lagX, lagY]);
+  }, [rawX, rawY, rawNX, rawNY]);
 
-  /* ================= RETURN ================= */
-
-  return {
-    x,        // smooth cursor
-    y,
-    lagX,     // delayed cursor (depth)
-    lagY,
-    vx,       // velocity X
-    vy,       // velocity Y
-    speed: speedValue, // combined speed
-  };
+  return { x, y, nx, ny };
 }

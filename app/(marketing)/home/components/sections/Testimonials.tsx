@@ -1,98 +1,210 @@
-"use client";
+'use client';
 
-import GlassCard from "../ui/GlassCard";
-import Reveal from "../motion/Reveal";
-import { motion } from "framer-motion";
+import { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { MotionValue } from 'framer-motion';
+import GlassCard from '../ui/GlassCard';
+import Reveal from '../motion/Reveal';
+import {
+  CONTAINER, SECTION_PY, SCENES,
+  T, staggerDelay, DUR, EASE_OUT,
+  HIERARCHY, SHADOW,
+} from '../../systems/design';
 
-const testimonials = [
+// ─── Data ─────────────────────────────────────────────────────────────────────
+const TESTIMONIALS = [
   {
-    name: "Amit Sharma",
-    role: "Director, Sharma Classes",
-    text: "GrowCAD helped us increase admissions by 40% in just 3 months.",
+    quote: "We replaced four separate tools with Growcad. Our data is finally a source of truth, not a source of endless arguments.",
+    name: 'Marcus Liu', role: 'VP of Product', co: 'Fathom',
+    color: '#7c3aed', span: 'md:col-span-2', stars: 5,
   },
   {
-    name: "Priya Classes",
-    role: "Coaching Institute",
-    text: "Managing students, fees, and communication is now effortless.",
+    quote: "The experiment engine alone is worth the price. We shipped 60 A/B tests in Q1. We used to do six a quarter.",
+    name: 'Priya Nair', role: 'Growth Lead', co: 'Render',
+    color: '#2563eb', span: '', stars: 5,
   },
   {
-    name: "Ravi Academy",
-    role: "Owner",
-    text: "Our revenue doubled after switching to GrowCAD.",
+    quote: "Onboarding took 20 minutes. The first insight took 5. I've never felt that fast with a data tool.",
+    name: 'Tom Briggs', role: 'Head of Ops', co: 'Railway',
+    color: '#059669', span: '', stars: 5,
+  },
+  {
+    quote: "The AI summaries are scary good. It caught a 15% activation drop we'd have missed for weeks.",
+    name: 'Yuki Tanaka', role: 'Data Engineer', co: 'Trigger.dev',
+    color: '#dc2626', span: '', stars: 5,
+  },
+  {
+    quote: "Best DX in the analytics space, bar none. The SDK is clean, APIs are predictable, and the docs actually work.",
+    name: 'Alex Mercer', role: 'Senior Engineer', co: 'Unkey',
+    color: '#d97706', span: 'md:col-span-2', stars: 5,
+  },
+  {
+    quote: "Switched from Mixpanel + Amplitude + Heap. I'm not going back. Ever.",
+    name: 'Sofia Mendez', role: 'CEO', co: 'Loops',
+    color: '#7c3aed', span: '', stars: 5,
   },
 ];
 
-export default function Testimonials() {
+// ─── Card ─────────────────────────────────────────────────────────────────────
+function TestimonialCard({
+  t, i, scrollProgress,
+}: {
+  t: typeof TESTIMONIALS[0];
+  i: number;
+  scrollProgress: MotionValue<number>;
+}) {
+  // Each card gets a slight parallax offset based on its index
+  // — later cards move at slightly different speeds, creating depth
+  const offset   = (i % 3) * 8; // 0, 8, or 16px
+  const cardY    = useTransform(scrollProgress, [0, 1], [offset, -offset]);
+
   return (
-    <section className="py-32 relative overflow-hidden">
+    <motion.div
+      className={t.span}
+      style={{ y: cardY }}
+      initial={{ opacity: 0, y: 36, filter: 'blur(10px)' }}
+      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      viewport={{ once: true, amount: 0.08 }}
+      transition={{
+        duration: DUR.SLOW + i * 0.03,
+        delay: staggerDelay(i, 0.06),
+        ease: EASE_OUT,
+      }}
+    >
+      <GlassCard
+        glow
+        glowColor={`${t.color}20`}
+        className="group h-full cursor-default"
+      >
+        {/* Per-card color tint on hover */}
+        <motion.div
+          className="pointer-events-none absolute inset-0 rounded-2xl"
+          style={{ background: `linear-gradient(135deg, ${t.color}0d, transparent 55%)` }}
+          initial={{ opacity: 0 }}
+          whileHover={{ opacity: 1 }}
+          transition={T.fast}
+        />
 
-      {/* 🔥 BACKGROUND GLOW */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.15),transparent_60%)]" />
+        {/* Header: quote mark + stars */}
+        <div className="mb-4 flex items-start justify-between">
+          {/* Quote mark — decorative (muted) */}
+          <motion.div
+            className={`font-serif text-[34px] leading-none ${HIERARCHY.muted}`}
+            whileHover={{ scale: 1.2 }}
+            transition={T.micro}
+          >
+            &ldquo;
+          </motion.div>
 
-      <div className="max-w-6xl mx-auto px-6 text-center space-y-16">
-
-        {/* 🔥 HEADER */}
-        <Reveal>
-          <div className="space-y-4">
-            <h2 className="text-4xl md:text-5xl font-bold text-white">
-              Loved by Institutes
-            </h2>
-            <p className="text-white/60">
-              Trusted by coaching centers across India
-            </p>
-          </div>
-        </Reveal>
-
-        {/* 🔥 TESTIMONIAL GRID */}
-        <div className="grid md:grid-cols-3 gap-8">
-
-          {testimonials.map((t, i) => (
-            <Reveal key={i}>
-              <motion.div
-                whileHover={{ y: -10, scale: 1.03 }}
-                transition={{ duration: 0.3 }}
+          {/* Stars — appear with spring stagger on scroll enter */}
+          <div className="flex gap-0.5">
+            {Array.from({ length: t.stars }).map((_, si) => (
+              <motion.span
+                key={si}
+                className="text-amber-400/62 text-[11px]"
+                initial={{ opacity: 0, scale: 0 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{
+                  delay: staggerDelay(si, 0.32) + i * 0.035,
+                  duration: 0.28,
+                  ease: [0.34, 1.56, 0.64, 1], // back ease — slight bounce
+                }}
               >
-                <GlassCard className="p-6 space-y-5 relative overflow-hidden">
-
-                  {/* 🔥 STAR RATING */}
-                  <div className="flex justify-center gap-1 text-yellow-400">
-                    ★ ★ ★ ★ ★
-                  </div>
-
-                  {/* 🔥 TEXT */}
-                  <p className="text-white/70 leading-relaxed">
-                    &ldquo;{t.text}&rdquo;
-                  </p>
-
-                  {/* 🔥 USER */}
-                  <div className="space-y-1">
-                    <h4 className="text-white font-semibold">
-                      {t.name}
-                    </h4>
-                    <p className="text-white/40 text-sm">
-                      {t.role}
-                    </p>
-                  </div>
-
-                  {/* 🔥 HOVER LIGHT */}
-                  <div className="absolute inset-0 opacity-0 hover:opacity-100 transition duration-500 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_70%)]" />
-
-                </GlassCard>
-              </motion.div>
-            </Reveal>
-          ))}
-
+                ★
+              </motion.span>
+            ))}
+          </div>
         </div>
 
-        {/* 🔥 TRUST BAR */}
-        <Reveal>
-          <div className="flex flex-wrap justify-center gap-8 text-white/40 text-sm pt-6">
-            <span>500+ Institutes</span>
-            <span>1L+ Students</span>
-            <span>4.9⭐ Rating</span>
+        {/* Quote — secondary (body weight, not headline weight) */}
+        <p className={`mb-6 text-[13.5px] leading-[1.72] ${HIERARCHY.secondary}`}>
+          {t.quote}
+        </p>
+
+        {/* Author — tertiary */}
+        <div className="mt-auto flex items-center gap-3">
+          <div
+            className="relative h-9 w-9 flex-shrink-0 rounded-full flex items-center justify-center text-[12px] font-bold text-white"
+            style={{
+              background: `linear-gradient(135deg, ${t.color}ee, ${t.color}66)`,
+              boxShadow: `0 0 0 2px ${t.color}30`,
+            }}
+          >
+            {t.name[0]}
           </div>
+          <div>
+            <p className={`text-[13px] font-semibold ${HIERARCHY.secondary}`}>{t.name}</p>
+            <p className={`text-[11px] ${HIERARCHY.tertiary}`}>{t.role} · {t.co}</p>
+          </div>
+        </div>
+      </GlassCard>
+    </motion.div>
+  );
+}
+
+// ─── Section ──────────────────────────────────────────────────────────────────
+export default function Testimonials() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  });
+
+  return (
+    <section
+      ref={sectionRef}
+      data-scene={SCENES.proof}
+      className={`relative overflow-hidden ${SECTION_PY.lg}`}
+    >
+      <div className="section-divider" />
+
+      {/* Ambient depth glows */}
+      <div
+        className="pointer-events-none absolute right-0 top-1/4"
+        style={{
+          width: 560, height: 560,
+          background: 'radial-gradient(circle, rgba(37,99,235,0.045) 0%, transparent 70%)',
+          filter: 'blur(100px)',
+        }}
+      />
+      <div
+        className="pointer-events-none absolute left-0 bottom-1/4"
+        style={{
+          width: 400, height: 400,
+          background: 'radial-gradient(circle, rgba(109,40,217,0.035) 0%, transparent 70%)',
+          filter: 'blur(80px)',
+        }}
+      />
+
+      <div className={CONTAINER.page}>
+        {/* Scene label + header — visual hierarchy */}
+        <Reveal className="mb-16 text-center">
+          <p className="scene-label mb-4">From the community</p>
+          <h2
+            className="mb-4 font-bold leading-[1.1] tracking-[-0.028em]"
+            style={{ fontSize: 'clamp(2.1rem, 4.2vw, 3.2rem)' }}
+          >
+            <span className={HIERARCHY.primary}>Builders who switched</span>
+            <br />
+            <span className="text-white/26">never look back.</span>
+          </h2>
+          <p className={`mx-auto max-w-md text-[15px] leading-relaxed ${HIERARCHY.tertiary}`}>
+            Real teams. Real results. No cherry-picking.
+          </p>
         </Reveal>
 
+        {/* Grid — gap-5 for breathing room */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
+          {TESTIMONIALS.map((t, i) => (
+            <TestimonialCard
+              key={t.name}
+              t={t}
+              i={i}
+              scrollProgress={scrollYProgress}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );

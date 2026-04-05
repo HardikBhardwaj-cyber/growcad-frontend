@@ -1,96 +1,118 @@
-"use client";
+'use client';
 
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from "framer-motion";
-import { ReactNode } from "react";
+import { ReactNode, useRef, useState, MouseEvent as RMouseEvent, useEffect } from 'react';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
-type Props = {
-  children: ReactNode;
+interface MagneticButtonProps {
+  children:  ReactNode;
+  variant?:  'primary' | 'outline';
   className?: string;
-};
+  onClick?:  () => void;
+}
 
 export default function MagneticButton({
   children,
-  className = "",
-}: Props) {
-  /* ================= MAGNETIC ================= */
+  variant  = 'primary',
+  className,
+  onClick,
+}: MagneticButtonProps) {
+  const ref      = useRef<HTMLButtonElement>(null);
+  const [hovered, setHovered] = useState(false);
+  const canHover =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(hover: hover)').matches;
 
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const x = useSpring(rawX, { damping: 18, stiffness: 200, mass: 0.4 });
+  const y = useSpring(rawY, { damping: 18, stiffness: 200, mass: 0.4 });
 
-  const sx = useSpring(mx, { stiffness: 160, damping: 16 });
-  const sy = useSpring(my, { stiffness: 160, damping: 16 });
-
-  const handleMove = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-
-    const x = e.clientX - (rect.left + rect.width / 2);
-    const y = e.clientY - (rect.top + rect.height / 2);
-
-    // 🔥 softer magnetic
-    mx.set(x * 0.15);
-    my.set(y * 0.15);
+  const onMouseMove = (e: RMouseEvent<HTMLButtonElement>) => {
+    if (!canHover) return;
+    const el   = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    rawX.set((e.clientX - (rect.left + rect.width  / 2)) * 0.4);
+    rawY.set((e.clientY - (rect.top  + rect.height / 2)) * 0.4);
   };
 
-  const handleLeave = () => {
-    mx.set(0);
-    my.set(0);
-  };
+  const onMouseLeave = () => { rawX.set(0); rawY.set(0); setHovered(false); };
+  const onMouseEnter = () => setHovered(true);
 
-  /* ================= LIGHT ================= */
-
-  const lightX = useTransform(mx, [-40, 40], [20, 80]);
-  const lightY = useTransform(my, [-40, 40], [20, 80]);
-
-  /* ================= COMPONENT ================= */
+  const isPrimary = variant === 'primary';
 
   return (
     <motion.button
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
-      style={{
-        x: sx,
-        y: sy,
-      }}
-      whileHover={{ scale: 1.03 }} // 🔥 calmer
-      whileTap={{ scale: 0.96 }}
-      transition={{ type: "spring", stiffness: 260, damping: 20 }}
-      className={`relative px-8 py-3.5 rounded-xl font-semibold text-white overflow-hidden will-change-transform ${className}`}
+      ref={ref}
+      style={{ x, y }}
+      onMouseMove={onMouseMove}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      onClick={onClick}
+      whileHover={{ scale: 1.055 }}
+      whileTap={{ scale: 0.955 }}
+      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+      className={cn(
+        'group relative inline-flex cursor-pointer select-none items-center justify-center gap-2.5',
+        'overflow-hidden rounded-full text-[13.5px] font-semibold',
+        isPrimary
+          ? 'bg-gradient-to-r from-violet-600 to-blue-600 px-8 py-4 text-white'
+          : 'border border-white/[0.11] bg-white/[0.04] px-8 py-4 text-white/75 hover:text-white',
+        className
+      )}
+      animate={
+        isPrimary
+          ? {
+              boxShadow: hovered
+                ? '0 0 60px rgba(139,92,246,0.62), 0 0 120px rgba(139,92,246,0.22)'
+                : '0 0 30px rgba(139,92,246,0.30), 0 0 60px rgba(139,92,246,0.10)',
+            }
+          : {}
+      }
     >
-      {/* 🔥 BASE GRADIENT */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500" />
+      {/* ── Animated gradient border ring (primary only) ── */}
+      {isPrimary && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -inset-[1px] rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          style={{
+            background: 'linear-gradient(90deg, #8b5cf6, #3b82f6, #22d3ee, #8b5cf6)',
+            backgroundSize: '200% 200%',
+            padding: '1px',
+            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+            WebkitMaskComposite: 'xor',
+            maskComposite: 'exclude',
+          }}
+        />
+      )}
 
-      {/* 🔥 SOFT SHIMMER */}
-      <motion.div
-        initial={{ x: "-120%" }}
-        whileHover={{ x: "120%" }}
-        transition={{ duration: 1.2, ease: "easeInOut" }}
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-      />
+      {/* ── Shimmer sweep ── */}
+      {isPrimary && (
+        <motion.span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -skew-x-[14deg] bg-gradient-to-r from-transparent via-white/[0.18] to-transparent"
+          initial={{ x: '-120%' }}
+          animate={hovered ? { x: '220%' } : { x: '-120%' }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        />
+      )}
 
-      {/* 🔥 CURSOR LIGHT (SOFTER) */}
-      <motion.div
-        style={{
-          background: useTransform(
-            [lightX, lightY],
-            ([x, y]) =>
-              `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.18), transparent 65%)`
-          ),
-        }}
-        className="absolute inset-0 pointer-events-none"
-      />
+      {/* ── Secondary hover bg lift ── */}
+      {!isPrimary && (
+        <motion.span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-full"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: hovered ? 1 : 0 }}
+          transition={{ duration: 0.25 }}
+          style={{
+            background: 'linear-gradient(135deg, rgba(139,92,246,0.07), rgba(59,130,246,0.05))',
+          }}
+        />
+      )}
 
-      {/* 🔥 DEPTH */}
-      <div className="absolute inset-0 bg-black/10 opacity-0 hover:opacity-80 transition duration-300" />
-
-      {/* 🔥 CONTENT (BREATHABLE) */}
-      <span className="relative z-10 text-sm tracking-wide px-1">
-        {children}
-      </span>
+      <span className="relative z-10 flex items-center gap-2">{children}</span>
     </motion.button>
   );
 }

@@ -1,69 +1,88 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 
+/**
+ * 3-layer cursor glow system:
+ *  Ring A (slow, large)   — 680px ambient field
+ *  Ring B (medium, mid)   — 280px accent glow
+ *  Ring C (fast, small)   — 80px sharp highlight
+ *
+ * Each ring has a different spring config creating a
+ * parallax-in-depth effect on cursor movement.
+ */
 export default function CursorGlow() {
-  const glowRef = useRef<HTMLDivElement | null>(null);
+  const rawX = useMotionValue(-800);
+  const rawY = useMotionValue(-800);
+  const frameRef = useRef<number>(0);
 
-  const mouse = useRef({ x: 0, y: 0 });
-  const current = useRef({ x: 0, y: 0 });
-
-  const rafRef = useRef<number | null>(null);
-  const mounted = useRef(true);
+  // Three spring configs — slow / medium / fast
+  const slowX  = useSpring(rawX, { damping: 45, stiffness: 100, mass: 1.2 });
+  const slowY  = useSpring(rawY, { damping: 45, stiffness: 100, mass: 1.2 });
+  const midX   = useSpring(rawX, { damping: 30, stiffness: 180, mass: 0.7 });
+  const midY   = useSpring(rawY, { damping: 30, stiffness: 180, mass: 0.7 });
+  const fastX  = useSpring(rawX, { damping: 18, stiffness: 350, mass: 0.3 });
+  const fastY  = useSpring(rawY, { damping: 18, stiffness: 350, mass: 0.3 });
 
   useEffect(() => {
-    // 🔥 disable on touch devices
-    if ("ontouchstart" in window) {
-      if (glowRef.current) glowRef.current.style.display = "none";
-      return;
-    }
+    if (!window.matchMedia('(hover: hover)').matches) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      mouse.current.x = e.clientX;
-      mouse.current.y = e.clientY;
+    let pending = false;
+    const onMove = (e: MouseEvent) => {
+      if (pending) return;
+      pending = true;
+      frameRef.current = requestAnimationFrame(() => {
+        rawX.set(e.clientX);
+        rawY.set(e.clientY);
+        pending = false;
+      });
     };
 
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-
-    // 🔥 smoother easing than lerp
-    const ease = 0.12;
-
-    const animate = () => {
-      if (!mounted.current) return;
-
-      current.current.x += (mouse.current.x - current.current.x) * ease;
-      current.current.y += (mouse.current.y - current.current.y) * ease;
-
-      if (glowRef.current) {
-        glowRef.current.style.transform = `translate3d(${current.current.x}px, ${current.current.y}px, 0) translate(-50%, -50%)`;
-      }
-
-      rafRef.current = requestAnimationFrame(animate);
-    };
-
-    rafRef.current = requestAnimationFrame(animate);
-
+    window.addEventListener('mousemove', onMove, { passive: true });
     return () => {
-      mounted.current = false;
-
-      window.removeEventListener("mousemove", handleMouseMove);
-
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      window.removeEventListener('mousemove', onMove);
+      cancelAnimationFrame(frameRef.current);
     };
-  }, []);
+  }, [rawX, rawY]);
+
+  const shared = 'pointer-events-none fixed z-[8] hidden lg:block rounded-full';
+  const center = { translateX: '-50%', translateY: '-50%' };
 
   return (
-    <div
-      ref={glowRef}
-      className="
-        pointer-events-none fixed top-0 left-0 z-[0]
-        w-[420px] h-[420px]
-        -translate-x-1/2 -translate-y-1/2
-        rounded-full
-        bg-white/10
-        blur-[120px]
-        will-change-transform
-      "
-    />
+    <>
+      {/* Ring A — large ambient, slowest (deepest layer feel) */}
+      <motion.div
+        aria-hidden="true"
+        className={shared}
+        style={{
+          ...center, x: slowX, y: slowY,
+          width: 680, height: 680,
+          background: 'radial-gradient(circle, rgba(109,40,217,0.065) 0%, rgba(37,99,235,0.035) 45%, transparent 72%)',
+        }}
+      />
+
+      {/* Ring B — medium accent, mid speed */}
+      <motion.div
+        aria-hidden="true"
+        className={shared}
+        style={{
+          ...center, x: midX, y: midY,
+          width: 290, height: 290,
+          background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, rgba(99,102,241,0.055) 50%, transparent 72%)',
+        }}
+      />
+
+      {/* Ring C — tight sharp highlight, fastest */}
+      <motion.div
+        aria-hidden="true"
+        className={shared}
+        style={{
+          ...center, x: fastX, y: fastY,
+          width: 90, height: 90,
+          background: 'radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%)',
+        }}
+      />
+    </>
   );
 }

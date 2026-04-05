@@ -1,64 +1,40 @@
-"use client";
+import { useRef, MouseEvent as ReactMouseEvent } from 'react';
+import { useMotionValue, useSpring } from 'framer-motion';
 
-import { useRef } from "react";
+interface TiltOptions {
+  max?: number;
+  scale?: number;
+}
 
-export function useTilt(maxTilt = 15) {
-  const ref = useRef<HTMLDivElement | null>(null);
+export function useTilt<T extends HTMLElement = HTMLDivElement>({ max = 10, scale = 1.02 }: TiltOptions = {}) {
+  const ref = useRef<T>(null);
 
-  const state = useRef({
-    x: 0,
-    y: 0,
-    targetX: 0,
-    targetY: 0,
-    raf: 0 as number | 0,
-  });
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const rawScale = useMotionValue(1);
 
-  const lerp = (start: number, end: number, factor: number) =>
-    start + (end - start) * factor;
+  const rotateX = useSpring(rawX, { damping: 25, stiffness: 300 });
+  const rotateY = useSpring(rawY, { damping: 25, stiffness: 300 });
+  const scaleValue = useSpring(rawScale, { damping: 25, stiffness: 300 });
 
-  const animate = () => {
-    const s = state.current;
-
-    s.x = lerp(s.x, s.targetX, 0.12);
-    s.y = lerp(s.y, s.targetY, 0.12);
-
-    if (ref.current) {
-      ref.current.style.transform = `
-        perspective(1000px)
-        rotateX(${s.x}deg)
-        rotateY(${s.y}deg)
-        scale3d(1.02, 1.02, 1.02)
-      `;
-    }
-
-    s.raf = requestAnimationFrame(animate);
+  const onMouseMove = (e: ReactMouseEvent<T>) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = (e.clientX - cx) / (rect.width / 2);
+    const dy = (e.clientY - cy) / (rect.height / 2);
+    rawX.set(-dy * max);
+    rawY.set(dx * max);
+    rawScale.set(scale);
   };
 
-  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const midX = rect.width / 2;
-    const midY = rect.height / 2;
-
-    state.current.targetX = ((y - midY) / midY) * maxTilt;
-    state.current.targetY = ((x - midX) / midX) * -maxTilt;
-
-    if (!state.current.raf) {
-      state.current.raf = requestAnimationFrame(animate);
-    }
+  const onMouseLeave = () => {
+    rawX.set(0);
+    rawY.set(0);
+    rawScale.set(1);
   };
 
-  const handleLeave = () => {
-    state.current.targetX = 0;
-    state.current.targetY = 0;
-  };
-
-  return {
-    ref,
-    handleMove,
-    handleLeave,
-  };
+  return { ref, rotateX, rotateY, scale: scaleValue, onMouseMove, onMouseLeave };
 }

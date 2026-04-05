@@ -1,57 +1,77 @@
-"use client";
+import { useEffect, useRef, RefObject } from 'react';
+import gsap from 'gsap';
+import ScrollTrigger from 'gsap/ScrollTrigger';
 
-import {
-  useScroll,
-  useTransform,
-  MotionValue,
-} from "framer-motion";
-import type { UseScrollOptions } from "framer-motion";
-import { RefObject } from "react";
+gsap.registerPlugin(ScrollTrigger);
 
-/* ================= TYPES ================= */
+export interface ScrollStoryOptions {
+  /** Pin the trigger element for the duration. Default: false */
+  pin?: boolean;
+  /** Scrub amount — true = 1, number = custom lag. Default: 1.2 */
+  scrub?: boolean | number;
+  /** ScrollTrigger start position. Default: 'top 80%' */
+  start?: string;
+  /** ScrollTrigger end position. Default: 'bottom 20%' */
+  end?: string;
+  /** Markers for debugging (dev only) */
+  markers?: boolean;
+  /** Run once, no reverse. Default: false */
+  once?: boolean;
+}
 
-type ScrollOffset = NonNullable<UseScrollOptions["offset"]>;
+type SetupFn<T extends HTMLElement> = (tl: gsap.core.Timeline, el: T) => void;
 
-type ScrollStory = {
-  progress: MotionValue<number>;
+/**
+ * Creates a GSAP timeline pinned to a scroll trigger.
+ * Automatically syncs with Lenis via `window.__lenis`.
+ *
+ * @example
+ * const ref = useScrollStory<HTMLDivElement>((tl, el) => {
+ *   tl.from(el.querySelectorAll('.item'), { y: 60, opacity: 0, stagger: 0.1 });
+ * }, { scrub: 1.5, start: 'top 70%' });
+ */
+export function useScrollStory<T extends HTMLElement = HTMLDivElement>(
+  setup:   SetupFn<T>,
+  options: ScrollStoryOptions = {}
+): RefObject<T> {
+  const ref      = useRef<T>(null);
+  const ctxRef   = useRef<gsap.Context | null>(null);
 
-  y: MotionValue<number>;
-  opacity: MotionValue<number>;
-  scale: MotionValue<number>;
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
 
-  blur: MotionValue<number>;
-};
+    // Sync Lenis with ScrollTrigger
+    const lenis = window.__lenis as {
+      on: (event: string, cb: () => void) => void;
+      off: (event: string, cb: () => void) => void;
+    } | undefined;
 
-/* ================= HOOK ================= */
+    const syncST = () => ScrollTrigger.update();
+    lenis?.on('scroll', syncST);
 
-export function useScrollStory(
-  ref: RefObject<HTMLElement>,
-  offset: ScrollOffset = ["start end", "end start"]
-): ScrollStory {
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset,
-  });
+    ctxRef.current = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger:  el,
+          pin:      options.pin     ?? false,
+          scrub:    options.scrub   ?? 1.2,
+          start:    options.start   ?? 'top 80%',
+          end:      options.end     ?? 'bottom 20%',
+          markers:  options.markers ?? false,
+          once:     options.once    ?? false,
+          invalidateOnRefresh: true,
+        },
+      });
+      setup(tl, el);
+    }, el);
 
-  const progress = scrollYProgress;
+    return () => {
+      lenis?.off('scroll', syncST);
+      ctxRef.current?.revert();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const y = useTransform(progress, [0, 1], [80, -80]);
-
-  const opacity = useTransform(
-    progress,
-    [0, 0.2, 0.8, 1],
-    [0, 1, 1, 0]
-  );
-
-  const scale = useTransform(progress, [0, 1], [0.96, 1]);
-
-  const blur = useTransform(progress, [0, 1], [10, 0]);
-
-  return {
-    progress,
-    y,
-    opacity,
-    scale,
-    blur,
-  };
+  return ref as RefObject<T>;
 }

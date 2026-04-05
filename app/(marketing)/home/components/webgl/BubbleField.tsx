@@ -1,59 +1,110 @@
-"use client";
+'use client';
 
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Sphere } from "@react-three/drei";
-import { useRef } from "react";
-import * as THREE from "three";
+import { Suspense, useRef, useMemo } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 
-function FloatingBubble({
-  position,
-  scale,
-}: {
-  position: [number, number, number];
-  scale: number;
-}) {
-  const mesh = useRef<THREE.Mesh>(null!);
+const BUBBLE_COUNT = 16;
 
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
+// ✅ move random logic OUTSIDE render lifecycle
+function generateBubbleData() {
+  const bp = new Float32Array(BUBBLE_COUNT * 3);
+  const sp = new Float32Array(BUBBLE_COUNT);
+  const ph = new Float32Array(BUBBLE_COUNT);
+  const ra = new Float32Array(BUBBLE_COUNT);
 
-    mesh.current.position.y =
-      position[1] + Math.sin(t + position[0]) * 0.3;
+  for (let i = 0; i < BUBBLE_COUNT; i++) {
+    bp[i * 3]     = (Math.random() - 0.5) * 9;
+    bp[i * 3 + 1] = (Math.random() - 0.5) * 7;
+    bp[i * 3 + 2] = (Math.random() - 0.5) * 3;
 
-    mesh.current.rotation.x += 0.002;
-    mesh.current.rotation.y += 0.002;
+    sp[i] = 0.18 + Math.random() * 0.32;
+    ph[i] = Math.random() * Math.PI * 2;
+    ra[i] = 0.12 + Math.random() * 0.55;
+  }
+
+  return { basePos: bp, speeds: sp, phases: ph, radii: ra };
+}
+
+function Bubbles() {
+  const meshRef  = useRef<THREE.InstancedMesh>(null);
+  const clockRef = useRef(0);
+
+  // ✅ keep dummy optimized
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+
+  // ✅ stable random data (NO ESLint error)
+  const dataRef = useRef(generateBubbleData());
+  const { basePos, speeds, phases, radii } = dataRef.current;
+
+  useFrame((_, delta) => {
+    clockRef.current += delta;
+    const t = clockRef.current;
+
+    const mesh = meshRef.current;
+    if (!mesh) return;
+
+    for (let i = 0; i < BUBBLE_COUNT; i++) {
+      const sp = speeds[i];
+      const ph = phases[i];
+
+      dummy.position.set(
+        basePos[i * 3]     + Math.cos(t * sp * 0.55 + ph) * 0.22,
+        basePos[i * 3 + 1] + Math.sin(t * sp * 0.40 + ph) * 0.30,
+        basePos[i * 3 + 2]
+      );
+
+      dummy.scale.setScalar(radii[i]);
+      dummy.updateMatrix();
+
+      mesh.setMatrixAt(i, dummy.matrix);
+    }
+
+    mesh.instanceMatrix.needsUpdate = true;
   });
 
   return (
-    <Sphere args={[scale, 32, 32]} ref={mesh} position={position}>
+    <instancedMesh ref={meshRef} args={[undefined, undefined, BUBBLE_COUNT]}>
+      <sphereGeometry args={[1, 12, 12]} />
       <meshStandardMaterial
-        color="#60a5fa"
+        color="#6d28d9"
         transparent
-        opacity={0.2}
+        opacity={0.055}
         roughness={0.1}
+        metalness={0.4}
+        depthWrite={false}
       />
-    </Sphere>
-  );
-}
-
-function Scene() {
-  return (
-    <>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[2, 2, 2]} />
-
-      <FloatingBubble position={[-2, 0, 0]} scale={0.3} />
-      <FloatingBubble position={[2, 1, -1]} scale={0.4} />
-      <FloatingBubble position={[0, -1, -2]} scale={0.5} />
-    </>
+    </instancedMesh>
   );
 }
 
 export default function BubbleField() {
   return (
-    <div className="absolute inset-0 -z-10">
-      <Canvas camera={{ position: [0, 0, 5] }}>
-        <Scene />
+    <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+      <Canvas
+        camera={{ position: [0, 0, 5.5], fov: 52 }}
+        gl={{
+          antialias: false,
+          alpha: true,
+          powerPreference: 'high-performance',
+          stencil: false,
+          depth: false,
+        }}
+        dpr={[
+          1,
+          typeof window !== 'undefined'
+            ? Math.min(window.devicePixelRatio, 1.5)
+            : 1,
+        ]}
+        frameloop="always"
+        style={{ background: 'transparent' }}
+      >
+        <ambientLight intensity={0.5} />
+        <pointLight position={[2, 2, 2]} intensity={0.9} color="#8b5cf6" />
+
+        <Suspense fallback={null}>
+          <Bubbles />
+        </Suspense>
       </Canvas>
     </div>
   );

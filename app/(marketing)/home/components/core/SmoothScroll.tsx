@@ -1,78 +1,54 @@
-"use client";
+'use client';
 
-import { ReactNode, useEffect, useRef } from "react";
-import Lenis from "lenis";
-import { ScrollTrigger } from "@/lib/gsap";
+import { useEffect, useRef } from 'react';
+import Lenis from 'lenis';
 
-export default function SmoothScroll({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function SmoothScroll({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
-  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // 🔥 prevent double init (strict mode safe)
-    if (lenisRef.current) return;
+    // Respect prefers-reduced-motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
 
     const lenis = new Lenis({
-      duration: 1.1,
+      duration: 1.35,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
       smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 1,
-      lerp: 0.08,
+      wheelMultiplier: 0.85,
+      touchMultiplier: 1.6,
+      infinite: false,
     });
 
     lenisRef.current = lenis;
 
-    // 🔥 RAF LOOP (SINGLE SOURCE OF TRUTH)
-    const raf = (time: number) => {
-      lenis.raf(time);
-      rafRef.current = requestAnimationFrame(raf);
-    };
+    // Expose globally for GSAP ScrollTrigger sync
+    window.__lenis = lenis;
 
-    rafRef.current = requestAnimationFrame(raf);
-
-    // 🔥 SYNC GSAP (ONLY ONE METHOD)
-    lenis.on("scroll", ScrollTrigger.update);
-
-    // 🔥 PROPER SCROLLER PROXY
-    ScrollTrigger.scrollerProxy(document.documentElement, {
-      scrollTop(value) {
-        if (arguments.length) {
-          lenis.scrollTo(value as number, { immediate: true });
-        }
-        return lenis.scroll;
-      },
-      getBoundingClientRect() {
-        return {
-          top: 0,
-          left: 0,
-          width: window.innerWidth,
-          height: window.innerHeight,
-        };
-      },
+    // Sync with GSAP ScrollTrigger if loaded
+    lenis.on('scroll', () => {
+      const ST = window.ScrollTrigger as { update?: () => void } | undefined;
+      ST?.update?.();
     });
 
-    // 🔥 REFRESH HANDLING
-    const handleResize = () => {
-      ScrollTrigger.refresh();
-    };
+    let rafId: number;
+    function raf(time: number) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
+    rafId = requestAnimationFrame(raf);
 
-    window.addEventListener("resize", handleResize);
+    // Handle resize
+    const onResize = () => lenis.resize();
+    window.addEventListener('resize', onResize, { passive: true });
 
-    ScrollTrigger.addEventListener("refresh", () => lenis.resize());
-    ScrollTrigger.refresh();
-
-    // 🔥 CLEANUP
     return () => {
-      window.removeEventListener("resize", handleResize);
-
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', onResize);
       lenis.destroy();
-      lenisRef.current = null;
+      delete window.__lenis;
     };
   }, []);
 
