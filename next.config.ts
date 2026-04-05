@@ -118,19 +118,19 @@ const nextConfig: NextConfig = {
   // ─────────────────────────────────────────────────────────────
   // WEBPACK (Three.js compatibility)
   // ─────────────────────────────────────────────────────────────
-  webpack(config) {
-    config.resolve = {
-      ...config.resolve,
-      fallback: {
-        ...config.resolve?.fallback,
-        fs: false,
-        path: false,
-        crypto: false,
-      },
-    };
+//  webpack(config) {
+//    config.resolve = {
+//      ...config.resolve,
+//      fallback: {
+//        ...config.resolve?.fallback,
+//        fs: false,
+//        path: false,
+//        crypto: false,
+//      },
+//    };
 
-    return config;
-  },
+//    return config;
+//  },
 };
 
 export default nextConfig;
