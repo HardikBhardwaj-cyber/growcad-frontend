@@ -41,7 +41,7 @@ export default function GridBackground() {
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 60% 80% at -8% 45%, rgba(109,40,217,0.07) 0%, transparent 65%)',
+            'radial-gradient(ellipse 60% 80% at -8% 45%, rgba(109,40,217,0.05) 0%, transparent 65%)',
         }}
       />
 
@@ -50,7 +50,7 @@ export default function GridBackground() {
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 60% 80% at 108% 55%, rgba(37,99,235,0.055) 0%, transparent 65%)',
+            'radial-gradient(ellipse 60% 80% at 108% 55%, rgba(37,99,235,0.04) 0%, transparent 65%)',
         }}
       />
 
@@ -59,7 +59,7 @@ export default function GridBackground() {
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 80% 35% at 50% 110%, rgba(109,40,217,0.08) 0%, transparent 60%)',
+            'radial-gradient(ellipse 80% 35% at 50% 110%, rgba(109,40,217,0.055) 0%, transparent 60%)',
         }}
       />
 

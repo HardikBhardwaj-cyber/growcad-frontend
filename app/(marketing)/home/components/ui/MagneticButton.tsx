@@ -19,9 +19,26 @@ export default function MagneticButton({
 }: MagneticButtonProps) {
   const ref      = useRef<HTMLButtonElement>(null);
   const [hovered, setHovered] = useState(false);
-  const canHover =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(hover: hover)').matches;
+  const [canHover, setCanHover] = useState(false);
+
+  const canHoverRef = useRef(false);
+
+  useEffect(() => {
+  if (typeof window === 'undefined') return;
+
+  const media = window.matchMedia('(hover: hover)');
+  canHoverRef.current = media.matches;
+
+  const handler = (e: MediaQueryListEvent) => {
+    canHoverRef.current = e.matches;
+  };
+
+  media.addEventListener('change', handler);
+  return () => media.removeEventListener('change', handler);
+}, []);
+
+
+  
 
   const rawX = useMotionValue(0);
   const rawY = useMotionValue(0);
@@ -29,7 +46,7 @@ export default function MagneticButton({
   const y = useSpring(rawY, { damping: 18, stiffness: 200, mass: 0.4 });
 
   const onMouseMove = (e: RMouseEvent<HTMLButtonElement>) => {
-    if (!canHover) return;
+    if (!canHoverRef.current) return;
     const el   = ref.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -55,9 +72,9 @@ export default function MagneticButton({
       transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
         'group relative inline-flex cursor-pointer select-none items-center justify-center gap-2.5',
-        'overflow-hidden rounded-full text-[13.5px] font-semibold',
+        'overflow-hidden rounded-full text-[14px] font-semibold tracking-[-0.01em]',
         isPrimary
-          ? 'bg-gradient-to-r from-violet-600 to-blue-600 px-8 py-4 text-white'
+          ? 'bg-gradient-to-r from-violet-600 via-violet-600 to-blue-600 px-8 py-4 text-white shadow-[0_1px_0_rgba(255,255,255,0.12)_inset]'
           : 'border border-white/[0.11] bg-white/[0.04] px-8 py-4 text-white/75 hover:text-white',
         className
       )}
@@ -65,8 +82,8 @@ export default function MagneticButton({
         isPrimary
           ? {
               boxShadow: hovered
-                ? '0 0 60px rgba(139,92,246,0.62), 0 0 120px rgba(139,92,246,0.22)'
-                : '0 0 30px rgba(139,92,246,0.30), 0 0 60px rgba(139,92,246,0.10)',
+                ? '0 0 60px rgba(139,92,246,0.80), 0 0 120px rgba(139,92,246,0.32), 0 4px 24px rgba(59,130,246,0.24)'
+                : '0 0 40px rgba(139,92,246,0.48), 0 0 80px rgba(139,92,246,0.16), 0 4px 16px rgba(59,130,246,0.10)',
             }
           : {}
       }

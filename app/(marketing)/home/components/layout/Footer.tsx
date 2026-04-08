@@ -41,8 +41,8 @@ export default function Footer() {
                 <span className="text-[13.5px] font-semibold tracking-[-0.01em] text-white">Growcad</span>
               </div>
               <p className="text-[13.5px] leading-[1.7] text-white/32">
-                The operating system for modern growth teams.
-                Analytics, experiments, and revenue — in one place.
+                Replace your analytics, A/B testing, and revenue tools
+                with one AI-powered workspace your whole team will use.
               </p>
             </div>
 

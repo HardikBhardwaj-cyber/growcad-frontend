@@ -58,26 +58,26 @@ export default function DashboardPreview() {
         className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{
           width: 800, height: 800,
-          background: 'radial-gradient(circle, rgba(109,40,217,0.05) 0%, transparent 68%)',
+          background: 'radial-gradient(circle, rgba(109,40,217,0.038) 0%, transparent 68%)',
           filter: 'blur(100px)',
         }}
       />
 
       <div className={CONTAINER.page}>
         {/* Header — visual hierarchy enforced */}
-        <Reveal className="mb-16 text-center">
-          <p className="scene-label mb-4">Product</p>
+        <Reveal className="mb-14 text-center">
+          <p className="scene-label mb-5">Live product preview</p>
           <h2
-            className="mb-5 font-bold leading-[1.1] tracking-[-0.028em]"
+            className="mb-6 font-bold leading-[1.1] tracking-[-0.028em]"
             style={{ fontSize: 'clamp(2.1rem, 4.2vw, 3.2rem)' }}
           >
-            <span className="text-white">One workspace.</span>
+            <span className="text-white">Everything in one view.</span>
             <br />
-            <span className="text-white/28">Infinite clarity.</span>
+            <span className="text-white/30">Zero switching.</span>
           </h2>
-          <p className="mx-auto max-w-md text-[15px] leading-relaxed text-white/36">
-            Switch between views without switching tools.
-            Every growth signal, always in focus.
+          <p className="mx-auto max-w-md text-[15px] leading-relaxed mt-1 text-white/55">
+            This is what your team opens on Monday morning.
+            Click any tab to explore.
           </p>
         </Reveal>
 

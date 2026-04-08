@@ -1,18 +1,18 @@
 'use client';
 
-import { Suspense, useRef, useMemo } from 'react';
+import { Suspense, useRef, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 const COUNT = 90;
 
-// ✅ generate once (outside render lifecycle)
-function generateParticleData() {
-  const pos = new Float32Array(COUNT * 3);
-  const pha = new Float32Array(COUNT);
-  const spd = new Float32Array(COUNT);
+// ─── Particle generator ──────────────────────────────────────────────────────
+function generateParticles(count: number) {
+  const pos = new Float32Array(count * 3);
+  const pha = new Float32Array(count);
+  const spd = new Float32Array(count);
 
-  for (let i = 0; i < COUNT; i++) {
+  for (let i = 0; i < count; i++) {
     pos[i * 3]     = (Math.random() - 0.5) * 9;
     pos[i * 3 + 1] = (Math.random() - 0.5) * 7;
     pos[i * 3 + 2] = (Math.random() - 0.5) * 4;
@@ -24,43 +24,70 @@ function generateParticleData() {
   return { positions: pos, phases: pha, speeds: spd };
 }
 
-// ─── Instanced particle field ─────────────────────────────────────────────────
+// ─── Particle Field ──────────────────────────────────────────────────────────
 function ParticleField() {
-  const meshRef  = useRef<THREE.InstancedMesh>(null);
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy   = useRef(new THREE.Object3D());
+
   const clockRef = useRef(0);
+  const mouseRef = useRef({ x: 0, y: 0 });
 
-  // ✅ stable data (fixes ESLint)
-  const dataRef = useRef(generateParticleData());
-  const { positions, phases, speeds } = dataRef.current;
+  const dataRef = useRef<ReturnType<typeof generateParticles> | null>(null);
 
-  // keep your optimization
-  const dummy = useMemo(() => new THREE.Object3D(), []);
+  // Generate once
+  useEffect(() => {
+    dataRef.current = generateParticles(COUNT);
+
+    const handleMouse = (e: MouseEvent) => {
+      mouseRef.current.x = (e.clientX / window.innerWidth - 0.5) * 2;
+      mouseRef.current.y = (e.clientY / window.innerHeight - 0.5) * 2;
+    };
+
+    window.addEventListener('mousemove', handleMouse);
+    return () => window.removeEventListener('mousemove', handleMouse);
+  }, []);
 
   useFrame((_, delta) => {
+    const mesh = meshRef.current;
+    const data = dataRef.current;
+
+    if (!mesh || !data) return;
+
     clockRef.current += delta;
     const t = clockRef.current;
 
-    const mesh = meshRef.current;
-    if (!mesh) return;
+    const { positions, phases, speeds } = data;
+    const mouse = mouseRef.current;
 
     for (let i = 0; i < COUNT; i++) {
       const bx = positions[i * 3];
       const by = positions[i * 3 + 1];
       const bz = positions[i * 3 + 2];
+
       const ph = phases[i];
       const sp = speeds[i];
 
-      dummy.position.set(
-        bx + Math.sin(t * sp * 0.4 + ph) * 0.18,
-        by + Math.cos(t * sp * 0.3 + ph) * 0.22,
-        bz
-      );
+      // ✨ base motion
+      let x = bx + Math.sin(t * sp * 0.4 + ph) * 0.2;
+      let y = by + Math.cos(t * sp * 0.3 + ph) * 0.25;
 
-      const sc = 0.014 + Math.sin(t * sp + ph) * 0.005;
-      dummy.scale.setScalar(sc);
+      // ✨ mouse magnetic pull (cinematic)
+      const dist = Math.sqrt(x * x + y * y);
+      const influence = Math.max(0, 1 - dist / 5);
 
-      dummy.updateMatrix();
-      mesh.setMatrixAt(i, dummy.matrix);
+      x += mouse.x * influence * 0.6;
+      y += mouse.y * influence * 0.6;
+
+      // ✨ subtle depth breathing
+      const z = bz + Math.sin(t * 0.2 + ph) * 0.2;
+
+      dummy.current.position.set(x, y, z);
+
+      const scale = 0.012 + Math.sin(t * sp + ph) * 0.006;
+      dummy.current.scale.setScalar(scale);
+
+      dummy.current.updateMatrix();
+      mesh.setMatrixAt(i, dummy.current.matrix);
     }
 
     mesh.instanceMatrix.needsUpdate = true;
@@ -68,18 +95,18 @@ function ParticleField() {
 
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, COUNT]}>
-      <sphereGeometry args={[1, 6, 6]} />
+      <icosahedronGeometry args={[1, 0]} />
       <meshBasicMaterial
         color="#8b5cf6"
         transparent
-        opacity={0.45}
+        opacity={0.35}
         depthWrite={false}
       />
     </instancedMesh>
   );
 }
 
-// ─── Canvas wrapper ───────────────────────────────────────────────────────────
+// ─── Canvas ──────────────────────────────────────────────────────────────────
 export default function Particles() {
   return (
     <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
@@ -92,14 +119,7 @@ export default function Particles() {
           stencil: false,
           depth: false,
         }}
-        dpr={[
-          1,
-          typeof window !== 'undefined'
-            ? Math.min(window.devicePixelRatio, 1.5)
-            : 1,
-        ]}
-        frameloop="always"
-        style={{ background: 'transparent' }}
+        dpr={[1, 1]}
       >
         <Suspense fallback={null}>
           <ParticleField />

@@ -23,84 +23,109 @@ export const metadata: Metadata = {
 };
 
 /**
- * DOM stacking order (outermost = lowest, innermost JSX = rendered last):
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Layout architecture — fixed Navbar edition
+ * ─────────────────────────────────────────────────────────────────────────────
  *
- *  ReducedMotionConfig              — React context, no DOM node
- *  ├── Splash                       — z-[99999]  fixed, pointer-events-auto (blocks on load, animates out)
- *  ├── TransitionOverlay            — z-[9998]   fixed, pointer-events-none (wipe on load, animates out)
- *  ├── Cursor                       — z-[9999]   fixed, pointer-events-none
- *  ├── CursorGlow                   — z-[8]      fixed, pointer-events-none ✓
- *  ├── GridBackground               — z-[0]      fixed, pointer-events-none ✓
- *  ├── NoiseLayer                   — z-[5]      fixed, pointer-events-none ✓
- *  ├── ScrollFix                    — null render
- *  │
- *  ├── Navbar ← OUTSIDE SmoothScroll — z-[99999] sticky, pointer-events-auto
- *  │     ┌──────────────────────────────────────────────────────────────────┐
- *  │     │  CRITICAL FIX: Navbar was previously INSIDE SmoothScroll's      │
- *  │     │  <div className="relative"> which creates a stacking context.   │
- *  │     │  A `fixed` element inside a stacking context is clipped to that  │
- *  │     │  context's z-index band. Moving Navbar here (before SmoothScroll)│
- *  │     │  puts it at the root stacking context — above everything.        │
- *  │     └──────────────────────────────────────────────────────────────────┘
- *  │
- *  └── SmoothScroll (Lenis wrapper, renders children as <>{children}</>)
- *        └── <div> (scroll content — bg-[#070709])
- *              ├── <main>{children}</main>
- *              └── <Footer />
+ * DOM structure (actual browser DOM):
+ *
+ *   <body>
+ *     ← ReducedMotionConfig renders zero DOM nodes (React context only)
+ *
+ *     [FIXED VIEWPORT LAYERS — paint relative to viewport, not document flow]
+ *     <div.splash>         z-99999  fixed  pointer-events-auto  exits on load
+ *     <div.transition>     z-9998   fixed  pointer-events-none  exits on load
+ *     <div.cursor>         z-9999   fixed  pointer-events-none
+ *     <div.cursor-glow>    z-8      fixed  pointer-events-none
+ *     <div.grid-bg>        z-0      fixed  pointer-events-none
+ *     <div.noise>          z-5      fixed  pointer-events-none
+ *     (ScrollFix = null render)
+ *
+ *     [FIXED NAVBAR — viewport-anchored, immune to scroll container changes]
+ *     <header.navbar>      z-99999  fixed  top-0 left-0 w-full
+ *                          isolation:isolate  pointerEvents:auto
+ *                          NO transform on this element — ever
+ *
+ *     [DOCUMENT FLOW — scrollable content]
+ *     <div.scroll-content>   position:relative  min-height:100vh
+ *                            NO overflow:hidden  NO transform  NO filter
+ *       <main>               padding-top: var(--navbar-h, 64px)
+ *         {children}         page sections
+ *       <Footer>             always visible, never clipped
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * WHY FIXED INSTEAD OF STICKY:
+ *
+ *   sticky requires every ancestor to have overflow:visible. In this stack:
+ *     - Lenis intercepts wheel events on window (fine for sticky normally)
+ *     - BUT: AnimatePresence (Splash exit), WebGL canvases, and backdrop-filter
+ *       on multiple siblings create an environment where sticky rendering is
+ *       inconsistent across browsers and React render cycles.
+ *
+ *   fixed is viewport-relative and immune to ALL of these:
+ *     - ancestor overflow values
+ *     - ancestor transforms (as long as NO ancestor has transform)
+ *     - Lenis scroll interception
+ *     - stacking contexts from WebGL/canvas parents
+ *
+ * WHY NO WRAPPER DIV AROUND NAVBAR + SCROLL-CONTENT:
+ *
+ *   A wrapper div would be tempting for layout clarity, but:
+ *   - If it has position:relative → it becomes a containing block,
+ *     but doesn't help fixed since fixed ignores all containing blocks
+ *   - If it has transform → it would trap the fixed Navbar inside its
+ *     stacking context (the #1 cause of fixed navbar disappearing)
+ *   - Without either → it adds no value and adds a DOM node
+ *
+ *   Fixed Navbar + flat DOM structure is the most robust approach.
+ *
+ * WHY padding-top ON <main>:
+ *
+ *   fixed Navbar is removed from document flow. Without padding-top on
+ *   main, the first section's content starts at y=0 and is hidden behind
+ *   the Navbar. padding-top: var(--navbar-h, 64px) compensates exactly.
+ *   The CSS variable is set by Navbar.tsx on mount via:
+ *     document.documentElement.style.setProperty('--navbar-h', '64px')
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
     <ReducedMotionConfig>
 
-      {/* ── z-[99999]: Splash loader ── */}
+      {/* ── Fixed viewport layers (z < 10000, pointer-events-none) ── */}
       <Splash />
-
-      {/* ── z-[9998]: Page wipe (pointer-events-none, animates out on load) ── */}
       <TransitionOverlay />
-
-      {/* ── z-[9999]: Custom cursor ring+dot (pointer-events-none) ── */}
       <Cursor />
-
-      {/* ── z-[8]: Cursor ambient glow (pointer-events-none) ── */}
       <CursorGlow />
-
-      {/* ── z-[0]: Persistent grid bg (pointer-events-none) ── */}
       <GridBackground />
-
-      {/* ── z-[5]: Film grain (pointer-events-none) ── */}
       <NoiseLayer />
-
-      {/* ── null render: resets scroll on route change ── */}
       <ScrollFix />
 
       {/*
-        ── z-[99999]: NAVBAR — MUST stay here, OUTSIDE SmoothScroll ──
-        Using `sticky top-0` (not fixed) because:
-        1. It participates in document flow naturally
-        2. No need to fight stacking contexts from transforms/filters
-        3. Works correctly with Lenis smooth-scroll (Lenis operates on the
-           scroll container below, not on this element)
-        4. `isolation: isolate` in the component prevents ancestor filters
-           from creating a new stacking context that could trap it
+        Navbar — fixed, z-[99999], NO transform on the header element.
+        See Navbar.tsx for full architecture notes.
+        Sets --navbar-h CSS variable on <html> via useEffect on mount.
       */}
       <Navbar />
 
       {/*
-        ── Lenis smooth scroll wrapper ──
-        SmoothScroll renders <>{children}</> with no wrapper DOM node,
-        so it introduces no stacking context. The inner <div> here IS
-        a stacking context (bg + relative) but Navbar is safely outside it.
+        Scrollable content — Lenis targets window (default).
+        SmoothScroll renders zero DOM nodes (<>{children}</>).
+        scroll-content is the only DOM wrapper, with no stacking triggers.
       */}
       <SmoothScroll>
-        <div
-          className="relative min-h-screen bg-[#070709] text-white selection:bg-violet-500/30"
-          /**
-           * Do NOT add transform, filter, or perspective here.
-           * Those properties create a new stacking context that would
-           * trap any fixed-position children below their z-index.
-           */
-        >
-          <main>{children}</main>
+        <div className="scroll-content selection:bg-violet-500/30">
+          {/*
+            padding-top compensates for the fixed Navbar height.
+            var(--navbar-h) is set by Navbar.tsx on mount.
+            64px fallback handles the pre-hydration flash.
+            
+            DO NOT add overflow:hidden here — clips Footer and section glows.
+            DO NOT add transform here — creates stacking context.
+          */}
+          <main style={{ paddingTop: 'var(--navbar-h, 64px)' }}>
+            {children}
+          </main>
           <Footer />
         </div>
       </SmoothScroll>

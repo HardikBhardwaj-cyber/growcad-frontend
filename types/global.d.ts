@@ -5,12 +5,12 @@ export {};
 declare global {
   interface Window {
     /**
-     * Global Lenis instance for scroll control
+     * Global Lenis instance
      */
     __lenis?: Lenis;
 
     /**
-     * GSAP ScrollTrigger (optional, loaded at runtime)
+     * GSAP ScrollTrigger (optional runtime injection)
      */
     ScrollTrigger?: {
       update?: () => void;

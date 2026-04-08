@@ -17,7 +17,7 @@ const FEATURES = [
   {
     Icon: BrainCircuit,
     title: 'AI-Native Intelligence',
-    desc: 'Surface anomalies, predict churn, and auto-generate executive summaries — before you even ask.',
+    desc: 'Catch revenue drops, predict churn, and get AI-written summaries delivered to your inbox — before a meeting even starts.',
     accent:   'from-violet-500/15 to-transparent',
     iconBg:   'bg-violet-500/10',
     iconRing: 'ring-violet-500/14',
@@ -31,7 +31,7 @@ const FEATURES = [
   {
     Icon: BarChart2,
     title: 'Unified Analytics',
-    desc: 'Every metric, funnel, and cohort in one composable workspace. No BI tool required.',
+    desc: 'All your metrics, funnels, and cohorts in one place. Stop jumping between tabs — your BI tool days are over.',
     accent:   'from-blue-500/13 to-transparent',
     iconBg:   'bg-blue-500/10',
     iconRing: 'ring-blue-500/14',
@@ -44,7 +44,7 @@ const FEATURES = [
   {
     Icon: Zap,
     title: 'Instant Experiments',
-    desc: 'Ship A/B tests in seconds. Statistical confidence, not hope.',
+    desc: 'Run 10× more A/B tests without engineering help. Get statistically valid results — not gut feelings.',
     accent:   'from-amber-500/12 to-transparent',
     iconBg:   'bg-amber-500/10',
     iconRing: 'ring-amber-500/14',
@@ -57,7 +57,7 @@ const FEATURES = [
   {
     Icon: Globe2,
     title: 'Global Edge CDN',
-    desc: 'P99 under 12ms across 40+ regions. Your data everywhere, instantly.',
+    desc: 'Dashboards load instantly for every teammate, everywhere. No slow queries, no waiting, no excuses.',
     accent:   'from-cyan-500/12 to-transparent',
     iconBg:   'bg-cyan-500/10',
     iconRing: 'ring-cyan-500/14',
@@ -70,7 +70,7 @@ const FEATURES = [
   {
     Icon: Lock,
     title: 'Enterprise Security',
-    desc: 'SOC 2 Type II · GDPR · HIPAA. Encrypted, audited, yours.',
+    desc: 'SOC 2 Type II, GDPR, and HIPAA certified. Security review in days, not months — we have the docs.',
     accent:   'from-emerald-500/12 to-transparent',
     iconBg:   'bg-emerald-500/10',
     iconRing: 'ring-emerald-500/14',
@@ -83,7 +83,7 @@ const FEATURES = [
   {
     Icon: RefreshCw,
     title: 'Real-time Sync',
-    desc: '500+ native integrations. Zero-lag pipelines via webhooks, API, and SDK.',
+    desc: 'Connect your entire stack in minutes. 500+ integrations, real-time webhooks, and an SDK your engineers will actually like.',
     accent:   'from-pink-500/11 to-transparent',
     iconBg:   'bg-pink-500/10',
     iconRing: 'ring-pink-500/14',
@@ -133,7 +133,7 @@ function FeatureCard({ f, i, isActive, cardRef }: FeatureCardProps) {
   return (
     <div
       ref={cardRef}
-      className="snap-center flex-shrink-0 w-[85vw] max-w-[340px] md:w-[420px]"
+      className="snap-center flex-shrink-0 w-[300px] md:w-[380px]"
       style={{
         transition,
         transform:  isActive ? 'scale(1)'     : 'scale(0.90)',
@@ -253,7 +253,7 @@ function FeatureCard({ f, i, isActive, cardRef }: FeatureCardProps) {
 
         {/* Description */}
         <p
-          className="leading-[1.68]"
+          className="leading-[1.68] text-white/52"
           style={{
             fontSize: isActive ? '14px' : '13px',
             color: isActive ? 'rgba(255,255,255,0.52)' : 'rgba(255,255,255,0.32)',
@@ -271,7 +271,7 @@ function FeatureCard({ f, i, isActive, cardRef }: FeatureCardProps) {
             transition: 'color 0.3s',
           }}
         >
-          Explore feature
+          See how →
           <motion.span
             animate={{ x: isActive ? [0, 4, 0] : 0 }}
             transition={{ duration: 1.8, repeat: isActive ? Infinity : 0, ease: 'easeInOut' }}
@@ -347,30 +347,38 @@ function FeatureCarousel() {
     return () => track.removeEventListener('scroll', updateScroll);
   }, [updateScroll]);
 
-  
-
-  // ── Scroll to a specific card index ────────────────────────────────────
-  const scrollToCard = useCallback((idx: number) => {
-    const track = trackRef.current;
-    const card  = cardRefs.current[idx];
-    if (!track || !card) return;
-    const center = track.getBoundingClientRect().width / 2;
-    track.scrollTo({
-      left:     card.offsetLeft + card.offsetWidth / 2 - center,
-      behavior: 'smooth',
-    });
-    setHintVisible(false);
-  }, []);
-
   // ── Keyboard navigation (accessibility) ────────────────────────────────
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft')  scrollToCard(Math.max(0, activeIdx - 1));
-      if (e.key === 'ArrowRight') scrollToCard(Math.min(FEATURES.length - 1, activeIdx + 1));
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [activeIdx, scrollToCard]);
+  // ✅ DEFINE FIRST
+const scrollToCard = useCallback((idx: number) => {
+  const track = trackRef.current;
+  const card  = cardRefs.current[idx];
+  if (!track || !card) return;
+
+  const center = track.getBoundingClientRect().width / 2;
+  track.scrollTo({
+    left: card.offsetLeft + card.offsetWidth / 2 - center,
+    behavior: 'smooth',
+  });
+
+  setHintVisible(false);
+}, []);
+
+
+// ✅ THEN USE IT
+useEffect(() => {
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') {
+      scrollToCard(Math.max(0, activeIdx - 1));
+    }
+    if (e.key === 'ArrowRight') {
+      scrollToCard(Math.min(FEATURES.length - 1, activeIdx + 1));
+    }
+  };
+
+  window.addEventListener('keydown', onKey);
+  return () => window.removeEventListener('keydown', onKey);
+}, [activeIdx, scrollToCard]);
+  
 
   const prev = () => scrollToCard(Math.max(0, activeIdx - 1));
   const next = () => scrollToCard(Math.min(FEATURES.length - 1, activeIdx + 1));
@@ -420,7 +428,7 @@ function FeatureCarousel() {
       {/* ── Scroll track ── */}
       <div
         ref={trackRef}
-        className="flex gap-6 overflow-x-auto snap-x snap-mandatory px-6 pb-8"
+        className="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-10"
         style={{
           scrollbarWidth:  'none',
           msOverflowStyle: 'none',
@@ -433,7 +441,7 @@ function FeatureCarousel() {
       >
         {/* Leading spacer — makes first card centerable */}
         <div
-          className="flex-shrink-0 w-[calc((100vw-340px)/2)] md:w-[calc((100vw-420px)/2)]"
+          className="flex-shrink-0 w-[calc(50vw-150px)] md:w-[calc(50vw-190px)]"
           aria-hidden="true"
         />
 
@@ -449,7 +457,7 @@ function FeatureCarousel() {
 
         {/* Trailing spacer — makes last card centerable */}
         <div
-          className="flex-shrink-0 w-[calc(50vw-160px)] md:w-[calc(50vw-210px)]"
+          className="flex-shrink-0 w-[calc(50vw-150px)] md:w-[calc(50vw-190px)]"
           aria-hidden="true"
         />
       </div>
@@ -570,7 +578,7 @@ export default function Value() {
 
       {/* ── Header — constrained to standard container ── */}
       <div className={CONTAINER.page}>
-        <Reveal className="mb-16 text-center">
+        <Reveal className="mb-14 text-center">
           {/*
             Visual hierarchy (unchanged from grid version):
             scene-label → tertiary context setter
@@ -578,18 +586,18 @@ export default function Value() {
             sub-headline → secondary (reduced white)
             body copy → tertiary
           */}
-          <p className="scene-label mb-4">Why Growcad</p>
+          <p className="scene-label mb-5">Built different, by design</p>
           <h2
-            className="mb-5 font-bold leading-[1.1] tracking-[-0.028em]"
+            className="mb-6 font-bold leading-[1.1] tracking-[-0.028em]"
             style={{ fontSize: 'clamp(2.1rem, 4.2vw, 3.2rem)' }}
           >
-            <span className="text-white">Why Growcad wins</span>
+            <span className="text-white">Replace five tools with one.</span>
             <br />
-            <span className="text-white/28">everything your team needs.</span>
+            <span className="text-white/30">And actually use it.</span>
           </h2>
-          <p className="mx-auto max-w-lg text-[15px] leading-relaxed text-white/36">
-            Not another dashboard. A system that thinks alongside your team —
-            automating the grunt work so you ship faster.
+          <p className="mx-auto max-w-lg text-[15px] leading-relaxed text-white/55">
+            Not another tool to manage. Growcad replaces your entire growth stack
+            and surfaces the insights your team actually needs — automatically.
           </p>
         </Reveal>
       </div>

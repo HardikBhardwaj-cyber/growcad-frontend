@@ -1,32 +1,41 @@
 'use client';
 
 /**
- * STACKING CONTEXT FIX NOTES
+ * Navbar — fixed positioning, always top-most
  * ─────────────────────────────────────────────────────────────────────────────
- * Root bug: Navbar was inside <SmoothScroll> → <div className="relative">.
- * That `relative` div creates a stacking context. A `fixed` child of a
- * stacking context is clipped to that context's z-index band, making it
- * invisible above siblings like TransitionOverlay (z-9998).
+ * Uses position:fixed (not sticky) for this high-motion environment because:
  *
- * Fix applied in layout.tsx:
- *   1. Navbar is NOW OUTSIDE <SmoothScroll> — it sits at the ReducedMotionConfig
- *      root, completely free of any scroll container stacking context.
- *   2. z-[99999] — above TransitionOverlay (z-9998), Splash (z-99999 ties),
- *      and all overlays.
- *   3. isolation: isolate — prevents parent filters/transforms from creating
- *      a new stacking context that could trap the Navbar.
- *   4. hide-on-scroll REMOVED — Navbar is always visible, always stable.
- *   5. pointer-events-auto is explicit so no parent `pointer-events-none`
- *      can accidentally propagate.
+ *   1. sticky depends on scroll container having overflow:visible on every
+ *      ancestor. With Lenis + WebGL + AnimatePresence siblings in the tree,
+ *      this is not guaranteed across all browsers and render cycles.
  *
- * Visual architecture:
- *   z-[99999] — Navbar (this file)
- *   z-[99999] — Splash (same tier, renders first and animates out)
- *   z-[9998]  — TransitionOverlay (page wipe, animates out on load)
- *   z-[9999]  — Cursor ring/dot
- *   z-[8]     — CursorGlow (pointer-events-none ✓)
- *   z-[5]     — NoiseLayer  (pointer-events-none ✓)
- *   z-[0]     — GridBackground (pointer-events-none ✓)
+ *   2. fixed is viewport-relative — completely immune to:
+ *        - stacking contexts on parent elements
+ *        - transform/filter/perspective on ancestors
+ *        - overflow on scroll containers
+ *        - Lenis scroll interception
+ *
+ *   3. The only risk with fixed is a parent with `transform` — but layout.tsx
+ *      explicitly guarantees no transform on any Navbar ancestor.
+ *
+ * Height contract:
+ *   Navbar renders at ~64px. This value is set as --navbar-h on <html> via
+ *   a useEffect, and main uses pt-[var(--navbar-h)] to prevent content hiding
+ *   behind the navbar. The layout.tsx <main> has className="pt-[--navbar-h]".
+ *
+ * No transform on <header>:
+ *   The <header> has NO transform, NO scale, NO translateY.
+ *   Internal animations (logo hover, link underline) are scoped to children
+ *   and do not affect the header's stacking context.
+ *
+ * Z-index architecture:
+ *   z-[99999]  — this Navbar (fixed)
+ *   z-[99999]  — Splash (fixed, exits on load)
+ *   z-[9998]   — TransitionOverlay (fixed, exits on load)
+ *   z-[9999]   — Cursor (fixed, pointer-events-none)
+ *   z-[8]      — CursorGlow (fixed, pointer-events-none)
+ *   z-[5]      — NoiseLayer (fixed, pointer-events-none)
+ *   z-[0]      — GridBackground (fixed, pointer-events-none)
  */
 
 import {
@@ -41,15 +50,19 @@ import { Menu, X } from 'lucide-react';
 import MagneticButton from '../ui/MagneticButton';
 import { T, DUR, EASE_OUT } from '../../systems/design';
 
-// ─── Nav link data ─────────────────────────────────────────────────────────────
+// ─── Constants ──────────────────────────────────────────────────────────────
+/** Navbar rendered height in px — kept in sync with the padding wrapper below */
+export const NAVBAR_HEIGHT = 64;
+
+// ─── Nav link data ──────────────────────────────────────────────────────────
 const NAV_LINKS = [
-  { label: 'Product',   href: '#',        sectionId: null       },
-  { label: 'Pricing',   href: '#pricing', sectionId: 'pricing'  },
-  { label: 'Docs',      href: '#',        sectionId: null       },
-  { label: 'Changelog', href: '#',        sectionId: null       },
+  { label: 'Product',   href: '#',        sectionId: null      },
+  { label: 'Pricing',   href: '#pricing', sectionId: 'pricing' },
+  { label: 'Docs',      href: '#',        sectionId: null      },
+  { label: 'Changelog', href: '#',        sectionId: null      },
 ] as const;
 
-// ─── Magnetic nav link ─────────────────────────────────────────────────────────
+// ─── Magnetic nav link ───────────────────────────────────────────────────────
 function MagneticLink({
   href,
   children,
@@ -61,11 +74,11 @@ function MagneticLink({
   isActive: boolean;
   onClick?: () => void;
 }) {
-  const ref     = useRef<HTMLAnchorElement>(null);
-  const rawX    = useMotionValue(0);
-  const rawY    = useMotionValue(0);
-  const x       = useSpring(rawX, { damping: 20, stiffness: 220, mass: 0.4 });
-  const y       = useSpring(rawY, { damping: 20, stiffness: 220, mass: 0.4 });
+  const ref   = useRef<HTMLAnchorElement>(null);
+  const rawX  = useMotionValue(0);
+  const rawY  = useMotionValue(0);
+  const x     = useSpring(rawX, { damping: 20, stiffness: 220, mass: 0.4 });
+  const y     = useSpring(rawY, { damping: 20, stiffness: 220, mass: 0.4 });
 
   const onMouseMove = (e: React.MouseEvent) => {
     const el = ref.current;
@@ -88,61 +101,77 @@ function MagneticLink({
       style={{
         x,
         y,
-        color: isActive ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.46)',
-        transition: 'color 0.2s ease',
+        color: isActive ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.54)',
+        transition: 'color 0.18s ease',
       }}
-      whileHover={{ color: 'rgba(255,255,255,0.95)' }}
+      whileHover={{ color: 'rgba(255,255,255,0.96)' }}
     >
+      {/* Hover background glow */}
+      <span
+        className="absolute inset-0 rounded-xl opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+        style={{
+          background: 'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(139,92,246,0.1), transparent)',
+        }}
+      />
       {children}
 
-      {/* Animated underline — slides in from left */}
+      {/* Active underline — slides in from left */}
       <span
         className="absolute bottom-[5px] left-4 right-4 h-px rounded-full"
         style={{
-          background:  'linear-gradient(90deg, #8b5cf6, #3b82f6)',
-          transformOrigin: isActive ? 'left' : 'left',
-          transform:   isActive ? 'scaleX(1)' : 'scaleX(0)',
-          opacity:     isActive ? 0.8 : 0,
-          transition:  'transform 0.28s cubic-bezier(0.16,1,0.3,1), opacity 0.2s',
+          background:      'linear-gradient(90deg, #8b5cf6, #3b82f6)',
+          transformOrigin: 'left',
+          transform:       isActive ? 'scaleX(1)' : 'scaleX(0)',
+          opacity:         isActive ? 0.85 : 0,
+          transition:      'transform 0.3s cubic-bezier(0.16,1,0.3,1), opacity 0.2s',
         }}
       />
 
-      {/* Hover underline (separate from active, so both can coexist) */}
+      {/* Hover underline */}
       <span
-        className="absolute bottom-[5px] left-4 right-4 h-px origin-left scale-x-0 rounded-full bg-white/20 transition-transform duration-200 group-hover:scale-x-100"
-        style={{ opacity: isActive ? 0 : 1 }}
+        className="absolute bottom-[5px] left-4 right-4 h-px origin-left scale-x-0 rounded-full transition-transform duration-250 group-hover:scale-x-100"
+        style={{
+          background: 'linear-gradient(90deg, rgba(139,92,246,0.5), rgba(59,130,246,0.4))',
+          opacity:    isActive ? 0 : 1,
+        }}
       />
     </motion.a>
   );
 }
 
-// ─── Main Navbar ───────────────────────────────────────────────────────────────
+// ─── Main Navbar ─────────────────────────────────────────────────────────────
 export default function Navbar() {
-  // ── Scroll state — no useState, all MotionValues (zero re-renders) ──────
-  const lastYRef    = useRef(0);
+  // Set --navbar-h CSS variable on <html> so main can use it for padding-top
+  useEffect(() => {
+    document.documentElement.style.setProperty('--navbar-h', `${NAVBAR_HEIGHT}px`);
+  }, []);
+
+  // ── Scroll-driven glass morph — all MotionValues, zero re-renders ────────
   const { scrollY } = useScroll();
+  const scrollProgress = useMotionValue(0);
+  const smoothProgress = useSpring(scrollProgress, { damping: 30, stiffness: 180 });
 
-  // Motion values for scroll-driven CSS transitions (GPU-composited)
-  const scrollProgress  = useMotionValue(0); // 0 at top → 1 after threshold
+  // At top: slight background so navbar is always readable against dark hero
+  // On scroll: full glass
+  const smoothBlur     = useTransform(smoothProgress, [0, 1], [6,  28]);
+  const smoothBgOp     = useTransform(smoothProgress, [0, 1], [0.22, 0.80]);
+  const smoothBorderOp = useTransform(smoothProgress, [0, 1], [0.04, 0.12]);
+  const smoothPy       = useTransform(smoothProgress, [0, 1], [14, 9]);
+  const smoothShadow   = useTransform(smoothProgress, [0, 1], [0,  1]);
 
-  // Smooth the progress value so transitions feel organic, not jumpy
-  const smoothProgress  = useSpring(scrollProgress, { damping: 30, stiffness: 180 });
-  const smoothBlur      = useTransform(smoothProgress, [0, 1], [0, 24]);
-  const smoothBgOp      = useTransform(smoothProgress, [0, 1], [0, 0.72]);
-  const smoothBorderOp  = useTransform(smoothProgress, [0, 1], [0, 0.09]);
-  const smoothScale     = useTransform(smoothProgress, [0, 1], [1, 0.985]);
-  const smoothPy        = useTransform(smoothProgress, [0, 1], [12, 8]);
-  const smoothShadow    = useTransform(smoothProgress, [0, 1], [0, 1]);
+  // Map numeric values to CSS strings (must be top-level, not inline)
+  const bgColor      = useTransform(smoothBgOp,    (v) => `rgba(7,7,9,${v})`);
+  const blurFilter   = useTransform(smoothBlur,    (v) => `blur(${v}px) saturate(180%)`);
+  const borderClr    = useTransform(smoothBorderOp,(v) => `rgba(255,255,255,${v})`);
+  const boxShadowVal = useTransform(smoothShadow,
+    (v) => `0 10px 40px rgba(0,0,0,${v * 0.4}), 0 1px 0 rgba(255,255,255,${v * 0.04}) inset`
+  );
 
-  // ── Update scroll progress — no setState ────────────────────────────────
   useMotionValueEvent(scrollY, 'change', (y) => {
-    // Threshold: 0–40px → 0–1 progress
-    const progress = Math.min(y / 40, 1);
-    scrollProgress.set(progress);
-    lastYRef.current = y;
+    scrollProgress.set(Math.min(y / 40, 1));
   });
 
-  // ── Active section tracking via IntersectionObserver ────────────────────
+  // ── Active section tracking ───────────────────────────────────────────────
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   useEffect(() => {
@@ -166,7 +195,7 @@ export default function Navbar() {
     return () => obs.disconnect();
   }, []);
 
-  // ── Mobile drawer ────────────────────────────────────────────────────────
+  // ── Mobile drawer ─────────────────────────────────────────────────────────
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
@@ -175,46 +204,51 @@ export default function Navbar() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  // ── String-mapped MotionValues for CSS properties ───────────────────────
-  // These MUST be declared at component top level (Rules of Hooks).
-  // They map the numeric 0–1 smoothProgress into CSS string values.
-  const bgColor     = useTransform(smoothBgOp,     (v) => `rgba(7,7,9,${v})`);
-  const blurFilter  = useTransform(smoothBlur,      (v) => `blur(${v}px) saturate(180%)`);
-  const borderClr   = useTransform(smoothBorderOp,  (v) => `rgba(255,255,255,${v})`);
-  const boxShadowVal = useTransform(smoothShadow,
-    (v) => `0 10px 40px rgba(0,0,0,${v * 0.4}), 0 1px 0 rgba(255,255,255,${v * 0.04}) inset`
-  );
-
   return (
-    /**
-     * CRITICAL: position:sticky (not fixed) + top-0 + z-[99999]
+    /*
+     * <header> — position:fixed, z-[99999], no transform, isolation:isolate
      *
-     * Why sticky instead of fixed?
-     * The Navbar is now OUTSIDE SmoothScroll — it lives in the normal document
-     * flow above the scroll container. `sticky` keeps it at the top of the
-     * viewport without needing to fight stacking contexts. This is more robust
-     * than `fixed` when sibling elements have transforms.
-     *
-     * isolation: isolate prevents any ancestor filter/transform (WebGL canvas
-     * parents, blur effects) from creating a new stacking context that could
-     * trap this navbar below its z-index.
+     * RULES (do not violate):
+     *   ✓ position: fixed      — viewport-relative, immune to ancestor contexts
+     *   ✓ z-index: 99999       — above all overlays
+     *   ✓ isolation: isolate   — self-contained stacking context
+     *   ✓ pointerEvents: auto  — explicit, not inherited
+     *   ✗ NO transform         — would create stacking context, causing z-index issues
+     *   ✗ NO scale             — same issue as transform
+     *   ✗ NO translateY        — same issue as transform
+     *   ✗ NO filter/backdrop   — on the header itself (fine on children)
+     *   ✗ NO will-change       — on the header itself
      */
     <header
-      className="sticky top-0 z-[99999] w-full"
-      style={{ isolation: 'isolate', pointerEvents: 'auto' }}
+      className="fixed top-0 left-0 w-full z-[99999]"
+      style={{
+        isolation:     'isolate',
+        pointerEvents: 'auto',
+        // No transform property here — ever
+      }}
     >
-      {/* ── Glass pill container — scroll-morphing ── */}
+      {/* Pill wrapper — provides viewport-edge padding */}
       <div className="flex justify-center px-4 pt-3 pb-1">
+
+        {/*
+         * <nav> — motion only for padding transition.
+         * NO transform, NO scale, NO opacity animation on this element.
+         * Only paddingTop/paddingBottom change — these are layout props
+         * but do not create stacking contexts.
+         */}
         <motion.nav
           style={{
-            scale:     smoothScale,
             paddingTop:    smoothPy,
             paddingBottom: smoothPy,
           }}
-          className="relative flex w-full max-w-[1240px] items-center justify-between rounded-2xl px-5 transition-[border-radius] duration-500"
+          className="relative flex w-full max-w-[1240px] items-center justify-between rounded-2xl px-5"
           aria-label="Main navigation"
         >
-          {/* Glass background — driven by MotionValues, GPU-composited */}
+          {/*
+           * Glass background layer — this element has backdropFilter.
+           * backdrop-filter creates a stacking context, but only on THIS
+           * child element, not on <header>. This is intentional and safe.
+           */}
           <motion.div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 rounded-2xl"
@@ -229,7 +263,7 @@ export default function Navbar() {
             }}
           />
 
-          {/* Top-edge inner reflection (appears as glass brightens) */}
+          {/* Inner top-edge reflection */}
           <motion.div
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-3 top-0 h-px rounded-full"
@@ -245,6 +279,11 @@ export default function Navbar() {
             className="relative z-10 flex items-center gap-2.5 select-none"
             aria-label="Growcad home"
           >
+            {/*
+             * Logo mark — whileHover scale is on this small child element only.
+             * This is safe: the stacking context created by this transform is
+             * scoped to the 28px logo box and does not affect <header>.
+             */}
             <motion.div
               className="relative h-7 w-7 overflow-hidden rounded-[9px] bg-gradient-to-br from-violet-500 to-blue-600"
               style={{ boxShadow: '0 0 16px rgba(139,92,246,0.45)' }}
@@ -277,22 +316,19 @@ export default function Navbar() {
 
           {/* ── Desktop CTAs ── */}
           <div className="relative z-10 hidden items-center gap-2 md:flex">
-            {/* Secondary — ghost */}
             <motion.button
               className="rounded-xl px-4 py-2 text-[13px] font-medium text-white/40 transition-colors duration-200 hover:text-white/82"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{  scale: 0.97 }}
+              whileTap={{ scale: 0.97 }}
               transition={T.micro}
             >
               Sign in
             </motion.button>
 
-            {/* Primary CTA — magnetic + glow */}
             <MagneticButton
               variant="primary"
               className="!px-5 !py-2.5 !text-[12.5px] !font-semibold"
             >
-              Get started →
+              Start free →
             </MagneticButton>
           </div>
 
@@ -329,6 +365,7 @@ export default function Navbar() {
               )}
             </AnimatePresence>
           </motion.button>
+
         </motion.nav>
       </div>
 
@@ -336,18 +373,17 @@ export default function Navbar() {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            className="absolute inset-x-4 top-[calc(100%-4px)] z-[99999] overflow-hidden rounded-2xl border border-white/[0.09] backdrop-blur-2xl"
+            className="absolute inset-x-4 top-[calc(100%-4px)] z-50 overflow-hidden rounded-2xl border border-white/[0.09] backdrop-blur-2xl"
             style={{
-              background:  'rgba(7,7,9,0.96)',
-              boxShadow:   '0 24px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04)',
+              background:    'rgba(7,7,9,0.96)',
+              boxShadow:     '0 24px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04)',
               pointerEvents: 'auto',
             }}
-            initial={{ opacity: 0, y: -12, scale: 0.97 }}
-            animate={{ opacity: 1, y:   0, scale: 1   }}
-            exit={{   opacity: 0, y: -10, scale: 0.98 }}
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y:   0 }}
+            exit={{   opacity: 0, y: -10 }}
             transition={{ duration: DUR.FAST, ease: EASE_OUT }}
           >
-            {/* Inner top-edge shine */}
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.12] to-transparent" />
 
             <nav className="flex flex-col p-3 gap-0.5" aria-label="Mobile navigation">
@@ -374,7 +410,7 @@ export default function Navbar() {
                   className="justify-center !w-full !py-3.5 !text-[14px]"
                   onClick={() => setMobileOpen(false)}
                 >
-                  Get started free →
+                  Start free →
                 </MagneticButton>
               </div>
             </nav>

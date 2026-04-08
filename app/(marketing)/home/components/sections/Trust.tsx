@@ -13,10 +13,10 @@ import {
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const STATS = [
-  { target: 4200, opts: { suffix: '+',   separator: ',' }, label: 'Teams onboarded',       sub: 'and growing 18% MoM'   },
-  { target: 99,   opts: { suffix: '.9%'                }, label: 'Uptime SLA',             sub: '→ zero downtime promise' },
-  { target: 2,    opts: { suffix: 'B+'                 }, label: 'Events processed / mo',  sub: 'across all customers'   },
-  { target: 12,   opts: { suffix: 'ms', prefix: 'p99 ' }, label: 'Query latency',          sub: 'across 40+ regions'     },
+  { target: 4200, opts: { suffix: '+',   separator: ',' }, label: 'Teams onboarded',       sub: 'joined in the last 12 months'  },
+  { target: 99,   opts: { suffix: '.9%'                }, label: 'Uptime SLA',             sub: 'backed by our guarantee'       },
+  { target: 2,    opts: { suffix: 'B+'                 }, label: 'Events tracked / mo',    sub: 'across every customer account' },
+  { target: 12,   opts: { suffix: 'ms', prefix: 'p99 ' }, label: 'Query latency',          sub: 'fastest in the category'       },
 ];
 
 const LOGOS = [
@@ -57,9 +57,9 @@ function StatCard({ target, opts, label, sub, delay = 0 }: {
         {formatted}
       </div>
       {/* Label — secondary */}
-      <p className={`text-[13.5px] font-medium ${HIERARCHY.secondary}`}>{label}</p>
+      <p className={`text-[13.5px] font-semibold ${HIERARCHY.secondary}`}>{label}</p>
       {/* Sub — tertiary (lowest, but provides context) */}
-      <p className={`text-[11px] ${HIERARCHY.muted}`}>{sub}</p>
+      <p className={`text-[11.5px] ${HIERARCHY.tertiary}`}>{sub}</p>
     </motion.div>
   );
 }
@@ -123,19 +123,19 @@ export default function Trust() {
       <div className={CONTAINER.page}>
         {/* Scene narrative label */}
         <Reveal className="mb-14 text-center">
-          <p className="scene-label mb-3">By the numbers</p>
+          <p className="scene-label mb-4">Proven at scale</p>
           <h2
             className="font-bold leading-[1.1] tracking-[-0.028em]"
             style={{ fontSize: 'clamp(2.1rem, 4.2vw, 3.2rem)' }}
           >
-            <span className={HIERARCHY.primary}>The proof is in</span>
+            <span className={HIERARCHY.primary}>The numbers speak.</span>
             <br />
-            <span className="text-white/26">the data.</span>
+            <span className="text-white/30">We let them.</span>
           </h2>
         </Reveal>
 
         {/* Stats — individually timed reveals */}
-        <div className="mb-20 grid grid-cols-2 gap-x-8 gap-y-14 md:grid-cols-4">
+        <div className="mb-20 grid grid-cols-2 gap-x-8 gap-y-12 md:grid-cols-4">
           {STATS.map((s, i) => (
             <StatCard key={s.label} {...s} delay={staggerDelay(i, 0.06)} />
           ))}
@@ -144,7 +144,7 @@ export default function Trust() {
         {/* Trusted by header */}
         <Reveal delay={0.05} className="mb-10 text-center">
           <p className={`text-[11px] font-medium uppercase tracking-[0.26em] ${HIERARCHY.muted}`}>
-            Trusted by teams at
+            Trusted by teams shipping faster at
           </p>
         </Reveal>
 
@@ -164,7 +164,7 @@ export default function Trust() {
             <div
               className="pointer-events-none absolute -inset-4 rounded-3xl blur-2xl"
               style={{
-                background: 'radial-gradient(ellipse, rgba(109,40,217,0.08) 0%, transparent 70%)',
+                background: 'radial-gradient(ellipse, rgba(109,40,217,0.055) 0%, transparent 70%)',
               }}
             />
             <div
@@ -185,9 +185,9 @@ export default function Trust() {
               </div>
 
               {/* Quote — secondary (this is the key message, but body-weight) */}
-              <p className="relative mb-8 text-[17px] font-medium leading-[1.75] text-white/55">
-                Growcad cut our time-to-insight from days to minutes.
-                It is the first growth tool that actually grows with us.
+              <p className="relative mb-8 text-[17px] font-medium leading-[1.75] text-white/75">
+                We went from gut-feel decisions to data-backed conviction in two weeks.
+                Growcad is the first tool that actually changed how we work.
               </p>
 
               {/* Author */}
@@ -199,8 +199,8 @@ export default function Trust() {
                   </div>
                 </div>
                 <div className="text-left">
-                  <p className={`text-[14px] font-semibold ${HIERARCHY.secondary}`}>Sarah Chen</p>
-                  <p className={`text-[12px] ${HIERARCHY.tertiary}`}>Head of Growth · Loom</p>
+                  <p className="text-[14px] font-semibold text-white/80">Sarah Chen</p>
+                  <p className={`text-[12px] ${HIERARCHY.tertiary}`}>Head of Growth, Loom</p>
                 </div>
                 {/* Stars */}
                 <div className="ml-6 flex gap-0.5">

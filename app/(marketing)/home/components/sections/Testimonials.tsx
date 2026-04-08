@@ -46,7 +46,7 @@ interface CardProps {
   t:        typeof TESTIMONIALS[0];
   i:        number;
   isActive: boolean;
-  cardRef?: (el: HTMLDivElement | null) => void;
+  cardRef: (el: HTMLDivElement | null) => void;
 }
 
 function TestimonialCard({ t, i, isActive, cardRef }: CardProps) {
@@ -60,7 +60,7 @@ function TestimonialCard({ t, i, isActive, cardRef }: CardProps) {
      */
     <div
       ref={cardRef}
-      className="snap-center flex-shrink-0 w-[320px] md:w-[380px]"
+      className="snap-center flex-shrink-0 w-[300px] md:w-[360px]"
       style={{
         // Use CSS transitions rather than Framer on these — smoother
         // for continuous scroll-driven state changes
@@ -127,8 +127,8 @@ function TestimonialCard({ t, i, isActive, cardRef }: CardProps) {
 
         {/* Quote body */}
         <p
-          className="mb-6 text-[13.5px] leading-[1.72] transition-colors duration-300"
-          style={{ color: isActive ? 'rgba(255,255,255,0.58)' : 'rgba(255,255,255,0.38)' }}
+          className="mb-6 text-[13.5px] leading-[1.72] transition-colors duration-300 text-white/60"
+          style={{ color: isActive ? 'rgba(255,255,255,0.72)' : 'rgba(255,255,255,0.48)' }}
         >
           {t.quote}
         </p>
@@ -148,11 +148,11 @@ function TestimonialCard({ t, i, isActive, cardRef }: CardProps) {
           <div>
             <p
               className="text-[13px] font-semibold transition-colors duration-300"
-              style={{ color: isActive ? 'rgba(255,255,255,0.82)' : 'rgba(255,255,255,0.45)' }}
+              style={{ color: isActive ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.52)' }}
             >
               {t.name}
             </p>
-            <p className={`text-[11px] ${HIERARCHY.tertiary}`}>{t.role} · {t.co}</p>
+            <p className={`text-[11px] ${HIERARCHY.tertiary}`}>{t.role}, {t.co}</p>
           </div>
         </div>
       </GlassCard>
@@ -163,7 +163,7 @@ function TestimonialCard({ t, i, isActive, cardRef }: CardProps) {
 // ─── Carousel ─────────────────────────────────────────────────────────────────
 function Carousel() {
   const trackRef  = useRef<HTMLDivElement>(null);
-  const cardRefs  = useRef<(HTMLDivElement | null)[]>([]);
+  const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
 
   // Active card index — driven by IntersectionObserver
   const [activeIdx, setActiveIdx]   = useState(0);
@@ -295,7 +295,7 @@ function Carousel() {
       {/* ── Scroll track ── */}
       <div
         ref={trackRef}
-        className="flex gap-6 overflow-x-auto snap-x snap-mandatory px-6 pb-6"
+        className="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-10"
         style={{
           // Hide scrollbar visually — keep scroll functionality
           scrollbarWidth: 'none',
@@ -308,7 +308,7 @@ function Carousel() {
         }}
       >
         {/* Leading spacer — centers first card */}
-        <div className="flex-shrink-0 w-[calc(50vw-160px)] md:w-[calc(50vw-190px)]" aria-hidden="true" />
+        <div className="flex-shrink-0 w-[calc(50vw-150px)] md:w-[calc(50vw-180px)]" aria-hidden="true" />
 
         {TESTIMONIALS.map((t, i) => (
           <TestimonialCard
@@ -316,14 +316,14 @@ function Carousel() {
             t={t}
             i={i}
             isActive={i === activeIdx}
-            cardRef={(el) => {
+            cardRef={(el: HTMLDivElement | null) => {
               cardRefs.current[i] = el;
             }}
           />
         ))}
 
         {/* Trailing spacer — centers last card */}
-        <div className="flex-shrink-0 w-[calc(50vw-160px)] md:w-[calc(50vw-190px)]" aria-hidden="true" />
+        <div className="flex-shrink-0 w-[calc(50vw-150px)] md:w-[calc(50vw-180px)]" aria-hidden="true" />
       </div>
 
       {/* ── Dot indicators ── */}
@@ -383,17 +383,17 @@ export default function Testimonials() {
       {/* Header — constrained to standard container */}
       <div className={CONTAINER.page}>
         <Reveal className="mb-14 text-center">
-          <p className="scene-label mb-4">From the community</p>
+          <p className="scene-label mb-5">Direct from our customers</p>
           <h2
-            className="mb-4 font-bold leading-[1.1] tracking-[-0.028em]"
+            className="mb-5 font-bold leading-[1.1] tracking-[-0.028em]"
             style={{ fontSize: 'clamp(2.1rem, 4.2vw, 3.2rem)' }}
           >
-            <span className={HIERARCHY.primary}>Builders who switched</span>
+            <span className={HIERARCHY.primary}>Results teams actually see.</span>
             <br />
-            <span className="text-white/26">never look back.</span>
+            <span className="text-white/30">In their own words.</span>
           </h2>
-          <p className={`mx-auto max-w-md text-[15px] leading-relaxed ${HIERARCHY.tertiary}`}>
-            Real teams. Real results. No cherry-picking.
+          <p className={`mx-auto max-w-md text-[15px] leading-relaxed mt-2 ${HIERARCHY.tertiary}`}>
+            Unedited. Unsponsored. Every result is verified.
           </p>
         </Reveal>
       </div>

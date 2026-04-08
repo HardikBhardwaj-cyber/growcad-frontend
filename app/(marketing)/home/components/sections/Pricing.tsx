@@ -19,8 +19,8 @@ const PLANS = [
     id: 'starter',
     name: 'Starter',
     prices: { monthly: 0, annual: 0 },
-    desc: 'For solo founders validating ideas fast.',
-    cta: 'Get started free',
+    desc: 'Start for free, no card needed. See your first insight in under 5 minutes.',
+    cta: 'Start for free',
     primary: false,
     badge: null as string | null,
     features: [
@@ -36,10 +36,10 @@ const PLANS = [
     id: 'pro',
     name: 'Pro',
     prices: { monthly: 79, annual: 59 },
-    desc: 'For growing teams that need speed and AI automation.',
-    cta: 'Start 14-day trial',
+    desc: 'For teams ready to run more experiments and make faster decisions with AI.',
+    cta: 'Try free for 14 days',
     primary: true,
-    badge: 'Most popular',
+    badge: '★  Most chosen plan',
     features: [
       'Unlimited workspaces',
       'Up to 10M monthly events',
@@ -55,8 +55,8 @@ const PLANS = [
     id: 'enterprise',
     name: 'Enterprise',
     prices: { monthly: null, annual: null },
-    desc: 'For large orgs with custom compliance and scale.',
-    cta: 'Talk to sales',
+    desc: 'Custom contracts, SSO, and a dedicated CSM. Security review in days, not months.',
+    cta: 'Talk to us',
     primary: false,
     badge: null as string | null,
     features: [
@@ -132,7 +132,7 @@ function PlanCard({ plan, cycle, i }: { plan: typeof PLANS[0]; cycle: Cycle; i: 
           {plan.name}
         </h3>
         {/* Desc — tertiary */}
-        <p className={`mb-8 text-[13px] leading-relaxed ${HIERARCHY.tertiary}`}>
+        <p className={`mb-8 text-[13px] leading-relaxed text-white/44`}>
           {plan.desc}
         </p>
 
@@ -209,7 +209,7 @@ function PlanCard({ plan, cycle, i }: { plan: typeof PLANS[0]; cycle: Cycle; i: 
         {/* Features — secondary weight, clean list */}
         <ul className="mt-auto space-y-3.5">
           {plan.features.map((f) => (
-            <li key={f} className={`flex items-start gap-3 text-[13.5px] ${HIERARCHY.secondary}`}>
+            <li key={f} className={`flex items-start gap-3 text-[13.5px] text-white/55`}>
               <Check
                 size={14}
                 className={`mt-[1px] flex-shrink-0 ${plan.primary ? 'text-violet-400' : 'text-white/24'}`}
@@ -251,25 +251,25 @@ export default function Pricing() {
         className="pointer-events-none absolute left-1/2 top-1/3 -translate-x-1/2"
         style={{
           width: 700, height: 700,
-          background: 'radial-gradient(circle, rgba(109,40,217,0.06) 0%, transparent 65%)',
+          background: 'radial-gradient(circle, rgba(109,40,217,0.045) 0%, transparent 65%)',
           filter: 'blur(130px)',
         }}
       />
 
       <motion.div style={{ scale }} className={CONTAINER.narrow}>
         {/* Header */}
-        <Reveal className="mb-16 text-center">
-          <p className="scene-label mb-4">Simple pricing</p>
+        <Reveal className="mb-14 text-center">
+          <p className="scene-label mb-5">Transparent pricing</p>
           <h2
-            className="mb-4 font-bold leading-[1.1] tracking-[-0.028em]"
+            className="mb-6 font-bold leading-[1.1] tracking-[-0.028em]"
             style={{ fontSize: 'clamp(2.1rem, 4.2vw, 3.2rem)' }}
           >
-            <span className={HIERARCHY.primary}>Simple, honest pricing.</span>
+            <span className={HIERARCHY.primary}>One price. Everything included.</span>
             <br />
-            <span className="text-white/26">No hidden seats.</span>
+            <span className="text-white/30">No hidden fees. Ever.</span>
           </h2>
-          <p className={`mb-8 text-[15px] ${HIERARCHY.tertiary}`}>
-            Start free. Scale when you are ready.
+          <p className={`mb-10 text-[15px] ${HIERARCHY.tertiary}`}>
+            Most teams are live in 20 minutes. No engineer required.
           </p>
 
           {/* Toggle — layoutId for spring transition */}
@@ -312,8 +312,8 @@ export default function Pricing() {
 
         {/* Footer note — muted (lowest hierarchy, just reassuring) */}
         <Reveal delay={0.28} className="mt-10 text-center">
-          <p className={`text-[12.5px] ${HIERARCHY.muted}`}>
-            14-day free trial on all plans · No credit card required · Cancel anytime
+          <p className="text-[12.5px] text-white/32">
+            14-day free trial · No credit card required · Cancel anytime · Used by teams at Vercel, Stripe & Linear
           </p>
         </Reveal>
       </motion.div>

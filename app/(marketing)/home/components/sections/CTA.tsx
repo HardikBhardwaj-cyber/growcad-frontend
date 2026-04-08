@@ -57,7 +57,7 @@ export default function CTA() {
 
             {/* ── Card inner ── */}
             <div
-              className="relative overflow-hidden rounded-[28.5px] bg-[#070810] px-8 py-20 text-center sm:px-16 sm:py-24"
+              className="relative overflow-hidden rounded-[24px] bg-[#070810] px-8 py-16 text-center sm:px-14 sm:py-20"
               style={{ boxShadow: SHADOW.dashCard }}
             >
               {/* ── Multi-layer inner depth glows ── */}
@@ -65,7 +65,7 @@ export default function CTA() {
                 className="pointer-events-none absolute left-1/4 top-0 -translate-x-1/2"
                 style={{
                   width: 450, height: 450,
-                  background: 'radial-gradient(circle, rgba(109,40,217,0.13) 0%, transparent 68%)',
+                  background: 'radial-gradient(circle, rgba(109,40,217,0.09) 0%, transparent 68%)',
                   filter: 'blur(70px)',
                 }}
               />
@@ -73,7 +73,7 @@ export default function CTA() {
                 className="pointer-events-none absolute right-1/4 bottom-0 translate-x-1/2"
                 style={{
                   width: 420, height: 420,
-                  background: 'radial-gradient(circle, rgba(37,99,235,0.10) 0%, transparent 68%)',
+                  background: 'radial-gradient(circle, rgba(37,99,235,0.07) 0%, transparent 68%)',
                   filter: 'blur(70px)',
                 }}
               />
@@ -82,7 +82,7 @@ export default function CTA() {
                 className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2"
                 style={{
                   width: 700, height: 200,
-                  background: 'radial-gradient(ellipse, rgba(139,92,246,0.09) 0%, transparent 70%)',
+                  background: 'radial-gradient(ellipse, rgba(139,92,246,0.065) 0%, transparent 70%)',
                   filter: 'blur(50px)',
                 }}
               />
@@ -103,9 +103,9 @@ export default function CTA() {
 
               {/* ── Content — timed to feel like page conclusion ── */}
 
-              {/* Eyebrow */}
+              {/* Eyebrow — reinforces zero-risk */}
               <motion.div
-                className="mb-8 inline-flex items-center gap-2 rounded-full border border-violet-500/22 bg-violet-500/10 px-4 py-2"
+                className="mb-7 inline-flex items-center gap-2 rounded-full border border-violet-500/22 bg-violet-500/10 px-4 py-2"
                 initial={{ opacity: 0, y: 16, filter: 'blur(5px)' }}
                 whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 viewport={{ once: true }}
@@ -113,41 +113,41 @@ export default function CTA() {
               >
                 <Sparkles size={12} className="text-violet-400" />
                 <span className="text-[11px] font-semibold text-violet-300">
-                  Free forever · No credit card
+                  Join 4,200+ teams · No card required · Live in 20 min
                 </span>
               </motion.div>
 
-              {/* Headline — largest text on page → maximum primary */}
+              {/* Headline */}
               <motion.h2
-                className="relative mb-6 font-bold leading-[1.04] tracking-[-0.038em] text-white"
+                className="relative mb-5 font-bold leading-[1.04] tracking-[-0.038em] text-white"
                 style={{ fontSize: 'clamp(2.4rem, 5.5vw, 4.2rem)' }}
                 initial={{ opacity: 0, y: 26, filter: 'blur(10px)' }}
                 whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 viewport={{ once: true }}
                 transition={{ duration: DUR.SLOW, delay: 0.08, ease: EASE_OUT }}
               >
-                Ready to grow
+                Your competitors are
                 <br />
                 <span className="bg-gradient-to-r from-violet-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                  without guessing?
+                  already here.
                 </span>
               </motion.h2>
 
-              {/* Sub-copy — secondary */}
+              {/* Sub-copy */}
               <motion.p
-                className="relative mx-auto mb-10 max-w-md text-[15px] leading-[1.75] text-white/40"
+                className="relative mx-auto mb-8 max-w-[440px] text-[15px] leading-[1.75] text-white/58"
                 initial={{ opacity: 0, y: 18, filter: 'blur(6px)' }}
                 whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 viewport={{ once: true }}
                 transition={{ duration: DUR.NORMAL, delay: 0.16, ease: EASE_OUT }}
               >
-                Join 4,200+ teams that replaced their messy data stack with one
-                intelligent workspace. Setup in 20 minutes, insights in 5.
+                4,200 growth teams already run on Growcad.
+                Most are live in 20 minutes and see their first insight in 5.
               </motion.p>
 
-              {/* CTAs — primary action is glowing, tactile */}
+              {/* CTAs */}
               <motion.div
-                className="relative mb-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
+                className="relative mb-4 flex flex-col items-center justify-center gap-3 sm:flex-row"
                 initial={{ opacity: 0, y: 16, scale: 0.96 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
@@ -157,14 +157,25 @@ export default function CTA() {
                   variant="primary"
                   className="!px-9 !py-[15px] !text-[14px] animate-glow-pulse"
                 >
-                  Start for free <ArrowRight size={15} />
+                  Start free — no setup needed <ArrowRight size={15} />
                 </MagneticButton>
                 <Button variant="secondary" size="lg">
-                  Book a demo
+                  Book a 15-min demo
                 </Button>
               </motion.div>
 
-              {/* Trust row — tertiary (lowest hierarchy, but reassuring) */}
+              {/* Microcopy under CTAs */}
+              <motion.p
+                className="relative mb-8 text-[12.5px] text-white/42 tracking-[0.01em]"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: DUR.NORMAL, delay: 0.32 }}
+              >
+                Setup takes 20 minutes · No engineer required · SOC 2 certified
+              </motion.p>
+
+              {/* Trust row */}
               <motion.div
                 className="relative flex flex-wrap items-center justify-center gap-x-7 gap-y-2"
                 initial={{ opacity: 0 }}
@@ -175,13 +186,13 @@ export default function CTA() {
                 {TRUST.map(({ Icon, label }, i) => (
                   <motion.div
                     key={label}
-                    className="flex items-center gap-1.5 text-[11.5px] text-white/22"
+                    className="flex items-center gap-1.5 text-[11.5px] text-white/36"
                     initial={{ opacity: 0, y: 8 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.42 + i * 0.07, duration: DUR.FAST }}
                   >
-                    <Icon size={12} className="text-white/24" />
+                    <Icon size={12} className="text-white/36" />
                     {label}
                   </motion.div>
                 ))}

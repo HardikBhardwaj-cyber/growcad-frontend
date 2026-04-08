@@ -12,10 +12,10 @@ interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
 }
 
 const BASE =
-  'relative inline-flex select-none items-center justify-center gap-2 overflow-hidden rounded-full font-medium transition-[background,border-color,color] disabled:pointer-events-none disabled:opacity-40';
+  'relative inline-flex select-none items-center justify-center gap-2 overflow-hidden rounded-full font-medium transition-[background,border-color,color,box-shadow] duration-200 disabled:pointer-events-none disabled:opacity-40';
 
 const SIZES: Record<string, string> = {
-  sm: 'px-5 py-2 text-xs',
+  sm: 'px-5 py-2 text-[12.5px]',
   md: 'px-7 py-[11px] text-[13.5px]',
   lg: 'px-9 py-[14px] text-[15px]',
 };
@@ -42,8 +42,8 @@ export default function Button({
           pulse && 'animate-glow-pulse',
         ],
         isSecondary && [
-          'border border-white/[0.10] bg-white/[0.038] text-white/70',
-          'hover:bg-white/[0.07] hover:border-white/[0.18] hover:text-white',
+          'border border-white/[0.12] bg-white/[0.042] text-white/78',
+          'hover:bg-white/[0.08] hover:border-white/[0.22] hover:text-white/95',
         ],
         variant === 'ghost' && 'text-white/48 hover:text-white/90',
         className
