@@ -48,6 +48,7 @@ export default function CTA() {
       />
 
       <div className={CONTAINER.narrow}>
+        <SceneWrapper exitScale={0.965} entryY={20}>
         <motion.div style={{ scale, opacity: rawOp, y }} className="will-both">
           {/* Pulsing outer container — scale 1→1.015→1 on loop */}
           <motion.div
@@ -225,6 +226,7 @@ export default function CTA() {
 
           </motion.div>
         </motion.div>
+        </SceneWrapper>
       </div>
     </section>
   );

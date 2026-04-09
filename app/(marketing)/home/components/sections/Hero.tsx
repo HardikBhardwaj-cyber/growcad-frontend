@@ -210,7 +210,6 @@ export default function Hero() {
       data-scene={SCENES.hero}
       className={`relative flex min-h-[100svh] items-center ${SECTION_PY.hero}`}
     >
-      <SceneWrapper className="relative z-[10] w-full" exitScale={0.985}>
       {/* WebGL layer */}
       <motion.div
         className="pointer-events-none absolute inset-0 z-0 hidden lg:block"
@@ -282,7 +281,7 @@ export default function Hero() {
             transition={{ duration: 0.55, delay: 0.48, ease: EASE_OUT }}
           >
             <MagneticButton variant="primary" className="!py-[14px] !px-8 animate-glow-pulse">
-              Start for free — see results in 5 min <ArrowRight size={14} />
+              Start free — see results in 5 min <ArrowRight size={14} />
             </MagneticButton>
             <Button variant="secondary" size="md">
               <span className="mr-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-[10px]">▶</span>
@@ -327,14 +326,12 @@ export default function Hero() {
         </div>
 
         {/* RIGHT — dashboard with 3D tilt */}
-        <div className="relative hidden lg:flex lg:items-center lg:justify-center">
-          <div className="w-full max-w-[480px]">
+        <div className="relative hidden lg:flex lg:items-center lg:justify-end">
+          <div className="w-full">
             <DashPreview />
           </div>
         </div>
       </motion.div>
-
-      </SceneWrapper>
 
       {/* Scroll cue */}
       <motion.div

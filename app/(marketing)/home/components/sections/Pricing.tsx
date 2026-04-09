@@ -266,8 +266,9 @@ export default function Pricing() {
         }}
       />
 
+      <div className={CONTAINER.page}>
       <SceneWrapper exitScale={0.97} entryY={28}>
-      <motion.div style={{ scale }} className={CONTAINER.narrow}>
+      <motion.div style={{ scale }} className="w-full">
         {/* Header */}
         <Reveal className="mb-14 text-center w-full">
           <p className="scene-label mb-4 w-full text-center">Start free. Upgrade when you are ready.</p>
@@ -279,7 +280,7 @@ export default function Pricing() {
             <br />
             <span className="text-white/30">Just honest pricing that scales with you.</span>
           </h2>
-          <p className={`mx-auto mb-10 w-full max-w-[600px] text-center text-[15px] leading-[1.7] ${HIERARCHY.tertiary}`}>
+          <p className={`mx-auto mb-10 max-w-[540px] text-center text-[15px] leading-[1.75] ${HIERARCHY.tertiary}`}>
             The free plan is genuinely useful. Upgrade only when you need more scale.
           </p>
 
@@ -329,6 +330,7 @@ export default function Pricing() {
         </Reveal>
       </motion.div>
       </SceneWrapper>
+      </div>
     </section>
   );
 }

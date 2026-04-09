@@ -80,8 +80,8 @@ export default function DashboardPreview() {
       <div className="pointer-events-none absolute right-[-12%] top-1/3"
         style={{ width: 500, height: 500, background: 'radial-gradient(circle, rgba(37,99,235,0.05) 0%, transparent 65%)', filter: 'blur(80px)' }} />
 
-      <SceneWrapper exitScale={0.975} entryY={40}>
       <div className={CONTAINER.page}>
+      <SceneWrapper exitScale={0.975} entryY={40}>
         <Reveal className="mb-14 text-center w-full">
           <p className="scene-label mb-4 w-full text-center">Your new Monday morning</p>
           <h2
@@ -92,7 +92,7 @@ export default function DashboardPreview() {
             <br />
             <span className="text-white/30">actually looks forward to opening.</span>
           </h2>
-          <p className="mx-auto w-full max-w-[600px] text-center text-[15px] leading-[1.7] mt-3 text-white/55">
+          <p className="mx-auto max-w-[540px] text-center text-[15px] leading-[1.75] mt-3 text-white/55">
             Every metric that matters, in one place. No setup call.
             No onboarding session. Just your data, ready on day one.
           </p>
@@ -301,11 +301,11 @@ export default function DashboardPreview() {
             </div>
           </div>
         </motion.div>
-        </div>
-          </motion.div>
+          
           </div>
-        
+        </motion.div>
       </SceneWrapper>
+      </div>
     </section>
   );
 }

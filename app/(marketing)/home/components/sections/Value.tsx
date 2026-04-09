@@ -366,7 +366,7 @@ function FeatureCarousel() {
     if (t.scrollLeft > 20) setHintVisible(false);
   }, []);
 
-    // ── Scroll to a specific card index ────────────────────────────────────
+  // ── Scroll to a specific card index ────────────────────────────────────
   const scrollToCard = useCallback((idx: number) => {
     const track = trackRef.current;
     const card  = cardRefs.current[idx];
@@ -605,10 +605,10 @@ export default function Value() {
         }}
       />
 
-      <SceneWrapper exitScale={0.97} entryY={30}>
       {/* ── Header — constrained to standard container ── */}
       <div className={CONTAINER.page}>
-        <Reveal className="mb-14 text-center">
+      <SceneWrapper exitScale={0.97} entryY={30}>
+        <Reveal className="mb-14 text-center w-full">
           {/*
             Visual hierarchy (unchanged from grid version):
             scene-label → tertiary context setter
@@ -616,20 +616,21 @@ export default function Value() {
             sub-headline → secondary (reduced white)
             body copy → tertiary
           */}
-          <p className="scene-label mb-4">Why teams switch and never go back</p>
+          <p className="scene-label mb-4 w-full text-center">Why teams switch and never go back</p>
           <h2
-            className="mb-6 font-bold leading-[1.1] tracking-[-0.028em] text-center"
+            className="mb-5 w-full font-bold leading-[1.08] tracking-[-0.03em] text-center"
             style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
           >
             <span className="text-white">One tool your whole team actually uses.</span>
             <br />
             <span className="text-white/30">Because scattered tools kill speed.</span>
           </h2>
-          <p className="mx-auto max-w-[520px] text-center text-[15px] leading-[1.7] text-white/55">
+          <p className="mx-auto max-w-[540px] text-center text-[15px] leading-[1.75] text-white/55">
             Most teams waste 30% of their sprint cycle reconciling data across tools.
             Growcad ends that — one workspace, every signal, zero tab-switching.
           </p>
         </Reveal>
+      </SceneWrapper>
       </div>
 
       {/*
@@ -638,7 +639,6 @@ export default function Value() {
         cards-emerging-from-darkness effect.
       */}
       <FeatureCarousel />
-      </SceneWrapper>
     </section>
   );
 }

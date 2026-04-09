@@ -126,10 +126,11 @@ export default function Trust() {
         className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"
         style={{ width: 700, height: 700, background: 'radial-gradient(circle, rgba(109,40,217,0.055) 0%, transparent 65%)', filter: 'blur(100px)' }}
       />
-    <SceneWrapper>        
+
       <div className={CONTAINER.page}>
+      <SceneWrapper exitScale={0.97} entryY={28}>
         <Reveal className="mb-14 text-center w-full">
-          <p className="scene-label mb-4 w-full text-center">Numbers that do not need a spin</p>
+          <p className="scene-label mb-4 w-full text-center">Numbers that donot need a spin</p>
           <h2
             className="w-full font-bold leading-[1.08] tracking-[-0.03em] text-center"
             style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
@@ -218,8 +219,8 @@ export default function Trust() {
             </div>
           </motion.div>
         </Reveal>
-      </div>
       </SceneWrapper>
+      </div>
     </section>
   );
 }
