@@ -120,7 +120,7 @@ function DashPreview() {
 
         <div className="p-5">
           {/* Revenue header */}
-          <div className="mb-5 flex items-start justify-between">
+          <div className="mb-5 p-4 flex items-start justify-between">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/30">Monthly Revenue</p>
               <div className="mt-1 flex items-end gap-2">
