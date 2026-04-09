@@ -41,8 +41,9 @@ const TESTIMONIALS = [
     name: 'Sofia Mendez', role: 'CEO',             co: 'Loops',       color: '#7c3aed', stars: 5,
   },
 ];
+
 const CAROUSEL = {
-  transition: 'all 0.45s cubic-bezier(0.16, 1, 0.3, 1)',
+  transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
 
   active: {
     transform: 'scale(1)',
@@ -53,7 +54,7 @@ const CAROUSEL = {
 
   inactive: {
     transform: 'scale(0.92)',
-    opacity: 0.55,
+    opacity: 0.6,
     filter: 'blur(1px)',
     zIndex: 1,
   },
@@ -402,18 +403,18 @@ export default function Testimonials() {
       <SceneWrapper exitScale={0.97} entryY={32}>
       {/* Header — constrained to standard container */}
       <div className={CONTAINER.page}>
-        <Reveal className="mb-14 text-center">
-          <p className="scene-label mb-5">What teams say after 30 days</p>
+        <Reveal className="mb-14 text-center w-full">
+          <p className="scene-label mb-4 w-full text-center">What teams say after 30 days</p>
           <h2
-            className="mb-5 font-bold leading-[1.1] tracking-[-0.028em] text-center"
+            className="mb-5 w-full font-bold leading-[1.08] tracking-[-0.03em] text-center"
             style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
           >
             <span className={HIERARCHY.primary}>Real teams. Real outcomes.</span>
             <br />
             <span className="text-white/30">No marketing. No edits.</span>
           </h2>
-          <p className={`mx-auto max-w-md text-center text-[15px] leading-relaxed mt-2 ${HIERARCHY.tertiary}`}>
-            Every quote is from a real user. We didn not ask them to be kind — they just were.
+          <p className={`mx-auto w-full max-w-[600px] text-center text-[15px] leading-[1.7] mt-3 ${HIERARCHY.tertiary}`}>
+            Every quote is from a real user. We did not ask them to be kind — they just were.
           </p>
         </Reveal>
       </div>

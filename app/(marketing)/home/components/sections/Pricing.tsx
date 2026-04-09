@@ -98,7 +98,7 @@ function PlanCard({ plan, cycle, i }: { plan: typeof PLANS[0]; cycle: Cycle; i: 
 
       <motion.div
         className={[
-          'relative flex h-full flex-col rounded-[18px] p-8',
+          'relative flex h-full flex-col rounded-[18px] p-7',
           plan.primary ? 'bg-[#0d0d14]' : 'border border-white/[0.07] bg-white/[0.022]',
         ].join(' ')}
         style={{
@@ -269,17 +269,17 @@ export default function Pricing() {
       <SceneWrapper exitScale={0.97} entryY={28}>
       <motion.div style={{ scale }} className={CONTAINER.narrow}>
         {/* Header */}
-        <Reveal className="mb-14 text-center">
-          <p className="scene-label mb-5">Start free. Upgrade when you are ready.</p>
+        <Reveal className="mb-14 text-center w-full">
+          <p className="scene-label mb-4 w-full text-center">Start free. Upgrade when you are ready.</p>
           <h2
-            className="mb-6 font-bold leading-[1.1] tracking-[-0.028em] text-center"
+            className="mb-5 w-full font-bold leading-[1.08] tracking-[-0.03em] text-center"
             style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
           >
             <span className={HIERARCHY.primary}>No gotchas. No upsells. No surprises.</span>
             <br />
             <span className="text-white/30">Just honest pricing that scales with you.</span>
           </h2>
-          <p className={`mb-10 text-center text-[15px] ${HIERARCHY.tertiary}`}>
+          <p className={`mx-auto mb-10 w-full max-w-[600px] text-center text-[15px] leading-[1.7] ${HIERARCHY.tertiary}`}>
             The free plan is genuinely useful. Upgrade only when you need more scale.
           </p>
 
@@ -315,7 +315,7 @@ export default function Pricing() {
         </Reveal>
 
         {/* Plan grid */}
-        <div className="mx-auto grid w-full max-w-[1000px] grid-cols-1 gap-5 md:grid-cols-3">
+        <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-3">
           {PLANS.map((plan, i) => (
             <PlanCard key={plan.id} plan={plan} cycle={cycle} i={i} />
           ))}

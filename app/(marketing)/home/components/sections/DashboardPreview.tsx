@@ -31,7 +31,7 @@ const METRICS: Record<TabId, { label: string; val: string; delta: string; up: bo
 };
 
 export default function DashboardPreview() {
-  const [tab, setTab] = useState<TabId>('analytics'); 
+  const [tab, setTab] = useState<TabId>('analytics');
   const sectionRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start 88%', 'center 48%'] });
@@ -82,17 +82,17 @@ export default function DashboardPreview() {
 
       <SceneWrapper exitScale={0.975} entryY={40}>
       <div className={CONTAINER.page}>
-        <Reveal className="mb-14 text-center">
-          <p className="scene-label mb-5">Your new Monday morning</p>
+        <Reveal className="mb-14 text-center w-full">
+          <p className="scene-label mb-4 w-full text-center">Your new Monday morning</p>
           <h2
-            className="mb-6 font-bold leading-[1.1] tracking-[-0.028em] text-center"
+            className="mb-5 w-full font-bold leading-[1.08] tracking-[-0.03em] text-center"
             style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
           >
             <span className="text-white">The dashboard your team</span>
             <br />
             <span className="text-white/30">actually looks forward to opening.</span>
           </h2>
-          <p className="mx-auto max-w-md text-center text-[15px] leading-relaxed mt-1 text-white/55">
+          <p className="mx-auto w-full max-w-[600px] text-center text-[15px] leading-[1.7] mt-3 text-white/55">
             Every metric that matters, in one place. No setup call.
             No onboarding session. Just your data, ready on day one.
           </p>
@@ -304,6 +304,7 @@ export default function DashboardPreview() {
         </div>
           </motion.div>
           </div>
+        
       </SceneWrapper>
     </section>
   );

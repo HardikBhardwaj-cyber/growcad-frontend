@@ -1,9 +1,10 @@
 'use client';
 
 import { useRef, ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 import {
   motion,
-  useScroll, useTransform, useSpring, useMotionTemplate,
+  useScroll, useTransform, useSpring,
 } from 'framer-motion';
 import { EASE_OUT } from '../../systems/design';
 
@@ -65,7 +66,7 @@ export default function SceneWrapper({
     <motion.div
       ref={ref}
       style={{ scale, opacity, y, willChange: 'transform, opacity' }}
-      className={className}
+      className={cn("w-full", className)}
     >
       {children}
     </motion.div>

@@ -126,12 +126,12 @@ export default function Trust() {
         className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"
         style={{ width: 700, height: 700, background: 'radial-gradient(circle, rgba(109,40,217,0.055) 0%, transparent 65%)', filter: 'blur(100px)' }}
       />
-        <SceneWrapper>
+    <SceneWrapper>        
       <div className={CONTAINER.page}>
-        <Reveal className="mb-14 text-center">
-          <p className="scene-label mb-4">Numbers that don not need a spin</p>
+        <Reveal className="mb-14 text-center w-full">
+          <p className="scene-label mb-4 w-full text-center">Numbers that do not need a spin</p>
           <h2
-            className="font-bold leading-[1.1] tracking-[-0.028em] text-center"
+            className="w-full font-bold leading-[1.08] tracking-[-0.03em] text-center"
             style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
           >
             <span className={HIERARCHY.primary}>Built for teams that ship.</span>
@@ -141,14 +141,14 @@ export default function Trust() {
         </Reveal>
 
         {/* Stats — individually timed reveals */}
-        <div className="mb-20 grid grid-cols-2 gap-x-8 gap-y-12 md:grid-cols-4">
+        <div className="mb-20 grid grid-cols-2 gap-x-10 gap-y-14 md:grid-cols-4">
           {STATS.map((s, i) => (
             <StatCard key={s.label} {...s} delay={staggerDelay(i, 0.06)} />
           ))}
         </div>
 
         {/* Trusted by header */}
-        <Reveal delay={0.05} className="mb-10 text-center">
+        <Reveal delay={0.05} className="mb-10 text-center w-full">
           <p className={`text-[11px] font-medium uppercase tracking-[0.26em] ${HIERARCHY.muted}`}>
             The stack behind teams at
           </p>
@@ -219,7 +219,7 @@ export default function Trust() {
           </motion.div>
         </Reveal>
       </div>
-    </SceneWrapper>
+      </SceneWrapper>
     </section>
   );
 }

@@ -145,7 +145,7 @@ export default function CTA() {
 
               {/* Headline */}
               <motion.h2
-                className="relative mb-5 text-center font-bold leading-[1.04] tracking-[-0.04em] text-white"
+                className="relative mb-5 w-full text-center font-bold leading-[1.04] tracking-[-0.04em] text-white"
                 style={{ fontSize: 'clamp(2.5rem, 5.5vw, 4.4rem)' }}
                 initial={{ opacity: 0, y: 28, filter: 'blur(12px)' }}
                 whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}

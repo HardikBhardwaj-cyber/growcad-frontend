@@ -240,10 +240,10 @@ export default function Hero() {
       {/* Content */}
       <motion.div
         style={{ y: contentY, opacity: rawOp }}
-        className={`relative z-[10] ${CONTAINER.page} grid w-full grid-cols-1 items-center gap-16 lg:grid-cols-2 lg:gap-16`}
+        className={`relative z-[10] ${CONTAINER.page} grid w-full grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_480px] lg:gap-16`}
       >
         {/* LEFT */}
-        <div className="flex flex-col max-w-[580px]">
+        <div className="flex flex-col w-full">
           <motion.div
             className="mb-6"
             initial={{ opacity: 0, y: 16 }}
@@ -266,7 +266,7 @@ export default function Hero() {
           </motion.h1>
 
           <motion.p
-            className="mb-8 max-w-[480px] text-[1.0625rem] leading-[1.78] text-white/60"
+            className="mb-8 max-w-[520px] text-[1.0625rem] leading-[1.78] text-white/60"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.40, ease: EASE_OUT }}
@@ -300,7 +300,7 @@ export default function Hero() {
           </motion.p>
 
           <motion.div
-            className="flex flex-wrap items-center gap-5"
+            className="flex flex-wrap items-center gap-4"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.62, ease: EASE_OUT }}
@@ -327,8 +327,8 @@ export default function Hero() {
         </div>
 
         {/* RIGHT — dashboard with 3D tilt */}
-        <div className="relative hidden lg:flex lg:items-center lg:justify-end lg:pr-2">
-          <div className="w-full max-w-[440px]">
+        <div className="relative hidden lg:flex lg:items-center lg:justify-center">
+          <div className="w-full max-w-[480px]">
             <DashPreview />
           </div>
         </div>

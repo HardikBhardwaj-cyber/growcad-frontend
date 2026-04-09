@@ -69,7 +69,7 @@ export default function Reveal({
   return (
     <motion.div
       ref={ref as React.RefObject<HTMLDivElement>}
-      className={cn(className)}
+      className={cn("w-full", className)}
       style={{ willChange: 'transform, opacity' }}
       variants={variants}
       initial="hidden"
