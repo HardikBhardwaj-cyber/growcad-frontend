@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Reveal from '../motion/Reveal';
+import SceneWrapper from '../core/SceneWrapper';
 import { useReveal } from '../hooks/useReveal';
 import { useCountUp } from '../../hooks/useCountUp';
 import {
@@ -13,9 +14,9 @@ import {
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const STATS = [
-  { target: 4200, opts: { suffix: '+',   separator: ',' }, label: 'Teams onboarded',       sub: 'joined in the last 12 months'  },
-  { target: 99,   opts: { suffix: '.9%'                }, label: 'Uptime SLA',             sub: 'backed by our guarantee'       },
-  { target: 2,    opts: { suffix: 'B+'                 }, label: 'Events tracked / mo',    sub: 'across every customer account' },
+  { target: 4200, opts: { suffix: '+',   separator: ',' }, label: 'Teams onboarded',       sub: '300+ joined in the last 30 days'  },
+  { target: 99,   opts: { suffix: '.9%'                }, label: 'Uptime SLA',             sub: 'with credits if we miss it'    },
+  { target: 2,    opts: { suffix: 'B+'                 }, label: 'Events tracked monthly', sub: 'without ever slowing down'     },
   { target: 12,   opts: { suffix: 'ms', prefix: 'p99 ' }, label: 'Query latency',          sub: 'fastest in the category'       },
 ];
 
@@ -35,7 +36,7 @@ function StatCard({ target, opts, label, sub, delay = 0 }: {
   const [ref, inView] = useReveal<HTMLDivElement>({ once: true, amount: 0.3 });
 
   const formatted = useCountUp(target, inView, {
-    duration:  2.6,
+    duration:  1.8,
     suffix:    opts.suffix    ?? '',
     prefix:    opts.prefix    ?? '',
     separator: opts.separator ?? ',',
@@ -45,20 +46,20 @@ function StatCard({ target, opts, label, sub, delay = 0 }: {
     <motion.div
       ref={ref as React.RefObject<HTMLDivElement>}
       className="flex flex-col items-center gap-2 text-center"
-      initial={{ opacity: 0, y: 28, filter: 'blur(8px)' }}
-      animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+      initial={{ opacity: 0, y: 32, filter: 'blur(10px)', scale: 0.92 }}
+      animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 } : {}}
       transition={{ duration: DUR.SLOW, delay, ease: EASE_OUT }}
     >
-      {/* Number — primary (gradient = maximum visual weight) */}
-      <div
+      {/* Number — scale-pop on arrival for attention lock */}
+      <motion.div
         className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text font-bold leading-none tracking-tight text-transparent tabular-nums"
-        style={{ fontSize: 'clamp(2.4rem, 4vw, 3.4rem)' }}
+        style={{ fontSize: 'clamp(2.6rem, 4.5vw, 3.8rem)' }}
+        animate={inView ? { scale: [0.88, 1.05, 1] } : { scale: 0.88 }}
+        transition={{ duration: 0.7, delay: delay + 0.1, ease: [0.16, 1, 0.3, 1] }}
       >
         {formatted}
-      </div>
-      {/* Label — secondary */}
+      </motion.div>
       <p className={`text-[13.5px] font-semibold ${HIERARCHY.secondary}`}>{label}</p>
-      {/* Sub — tertiary (lowest, but provides context) */}
       <p className={`text-[11.5px] ${HIERARCHY.tertiary}`}>{sub}</p>
     </motion.div>
   );
@@ -120,17 +121,22 @@ export default function Trust() {
         }}
       />
 
+      {/* Background glow anchor — gives center heavy sections visual depth */}
+      <div
+        className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"
+        style={{ width: 700, height: 700, background: 'radial-gradient(circle, rgba(109,40,217,0.055) 0%, transparent 65%)', filter: 'blur(100px)' }}
+      />
+        <SceneWrapper>
       <div className={CONTAINER.page}>
-        {/* Scene narrative label */}
         <Reveal className="mb-14 text-center">
-          <p className="scene-label mb-4">Proven at scale</p>
+          <p className="scene-label mb-4">Numbers that don not need a spin</p>
           <h2
-            className="font-bold leading-[1.1] tracking-[-0.028em]"
-            style={{ fontSize: 'clamp(2.1rem, 4.2vw, 3.2rem)' }}
+            className="font-bold leading-[1.1] tracking-[-0.028em] text-center"
+            style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
           >
-            <span className={HIERARCHY.primary}>The numbers speak.</span>
+            <span className={HIERARCHY.primary}>Built for teams that ship.</span>
             <br />
-            <span className="text-white/30">We let them.</span>
+            <span className="text-white/30">Proven by the teams using it.</span>
           </h2>
         </Reveal>
 
@@ -144,7 +150,7 @@ export default function Trust() {
         {/* Trusted by header */}
         <Reveal delay={0.05} className="mb-10 text-center">
           <p className={`text-[11px] font-medium uppercase tracking-[0.26em] ${HIERARCHY.muted}`}>
-            Trusted by teams shipping faster at
+            The stack behind teams at
           </p>
         </Reveal>
 
@@ -180,14 +186,14 @@ export default function Trust() {
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
 
               {/* Quote mark — tertiary */}
-              <div className="relative mb-6 font-serif text-5xl leading-none text-violet-500/20">
+              <div className="relative mb-6 font-serif text-5xl leading-none text-violet-500/30">
                 &ldquo;
               </div>
 
               {/* Quote — secondary (this is the key message, but body-weight) */}
               <p className="relative mb-8 text-[17px] font-medium leading-[1.75] text-white/75">
-                We went from gut-feel decisions to data-backed conviction in two weeks.
-                Growcad is the first tool that actually changed how we work.
+                We went from gut-feel decisions to data-backed conviction in under two weeks.
+                First tool we have used that actually changed how the team operates.
               </p>
 
               {/* Author */}
@@ -213,6 +219,7 @@ export default function Trust() {
           </motion.div>
         </Reveal>
       </div>
+    </SceneWrapper>
     </section>
   );
 }

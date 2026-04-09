@@ -10,45 +10,36 @@ type Direction = 'up' | 'down' | 'left' | 'right' | 'none';
 
 interface RevealProps {
   children:   ReactNode;
-  /** Stagger delay in seconds */
   delay?:     number;
-  /** Travel distance in px */
   distance?:  number;
-  /** Entry direction */
   direction?: Direction;
-  /** Gaussian blur on enter */
   blur?:      boolean;
-  /** Slight scale on enter */
   scale?:     boolean;
-  /** Class applied to wrapper div */
   className?: string;
-  /** Only animate once (default: true) */
   once?:      boolean;
-  /** Viewport intersection threshold */
   amount?:    number;
-  /** Animation duration in seconds */
   duration?:  number;
 }
 
 const OFFSET: Record<Direction, { x: number; y: number }> = {
-  up:    { x: 0,   y: 1 },
-  down:  { x: 0,   y: -1 },
-  left:  { x: 1,   y: 0 },
-  right: { x: -1,  y: 0 },
-  none:  { x: 0,   y: 0 },
+  up:    { x: 0,  y: 1  },
+  down:  { x: 0,  y: -1 },
+  left:  { x: 1,  y: 0  },
+  right: { x: -1, y: 0  },
+  none:  { x: 0,  y: 0  },
 };
 
 export default function Reveal({
   children,
   delay     = 0,
-  distance  = 24,
+  distance  = 40,
   direction = 'up',
   blur      = true,
   scale     = false,
   className,
   once      = true,
-  amount    = 0.1,
-  duration  = 0.68,
+  amount    = 0.08,
+  duration  = 0.72,
 }: RevealProps) {
   const [ref, inView] = useReveal<HTMLDivElement>({ once, amount });
 
@@ -62,8 +53,8 @@ export default function Reveal({
       opacity: 0,
       x: sx,
       y: sy,
-      ...(scale && { scale: 0.96 }),
-      ...(blur  && { filter: 'blur(7px)' }),
+      ...(scale && { scale: 0.95 }),
+      ...(blur  && { filter: 'blur(10px)' }),
     },
     visible: {
       opacity: 1,

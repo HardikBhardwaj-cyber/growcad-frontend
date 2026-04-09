@@ -3,13 +3,14 @@
 import {
   useRef, useEffect, useState, useCallback,
 } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
 import { BrainCircuit, BarChart2, Zap, Globe2, Lock, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import GlassCard from '../ui/GlassCard';
 import Reveal from '../motion/Reveal';
+import SceneWrapper from '../core/SceneWrapper';
 import {
   CONTAINER, SECTION_PY, SCENES,
-  T, DUR, EASE_OUT, HIERARCHY,
+  T, DUR, EASE_OUT, HIERARCHY, CAROUSEL,
 } from '../../systems/design';
 
 // ─── Feature data (unchanged from grid version) ────────────────────────────
@@ -17,7 +18,7 @@ const FEATURES = [
   {
     Icon: BrainCircuit,
     title: 'AI-Native Intelligence',
-    desc: 'Catch revenue drops, predict churn, and get AI-written summaries delivered to your inbox — before a meeting even starts.',
+    desc: 'Know about problems before your customers do. AI monitors every metric and sends you a plain-English brief — before you even open the dashboard.',
     accent:   'from-violet-500/15 to-transparent',
     iconBg:   'bg-violet-500/10',
     iconRing: 'ring-violet-500/14',
@@ -31,7 +32,7 @@ const FEATURES = [
   {
     Icon: BarChart2,
     title: 'Unified Analytics',
-    desc: 'All your metrics, funnels, and cohorts in one place. Stop jumping between tabs — your BI tool days are over.',
+    desc: 'Every metric, funnel, and cohort your team tracks — in one place. No more Slack threads asking "where does this number come from?"',
     accent:   'from-blue-500/13 to-transparent',
     iconBg:   'bg-blue-500/10',
     iconRing: 'ring-blue-500/14',
@@ -44,7 +45,7 @@ const FEATURES = [
   {
     Icon: Zap,
     title: 'Instant Experiments',
-    desc: 'Run 10× more A/B tests without engineering help. Get statistically valid results — not gut feelings.',
+    desc: 'Ship 10× more experiments without filing an eng ticket. Statistical significance built in — no PhD required to read the results.',
     accent:   'from-amber-500/12 to-transparent',
     iconBg:   'bg-amber-500/10',
     iconRing: 'ring-amber-500/14',
@@ -57,7 +58,7 @@ const FEATURES = [
   {
     Icon: Globe2,
     title: 'Global Edge CDN',
-    desc: 'Dashboards load instantly for every teammate, everywhere. No slow queries, no waiting, no excuses.',
+    desc: 'Dashboards open in under a second — for your engineer in Berlin and your PM in Tokyo. Speed is a feature, not a promise.',
     accent:   'from-cyan-500/12 to-transparent',
     iconBg:   'bg-cyan-500/10',
     iconRing: 'ring-cyan-500/14',
@@ -70,7 +71,7 @@ const FEATURES = [
   {
     Icon: Lock,
     title: 'Enterprise Security',
-    desc: 'SOC 2 Type II, GDPR, and HIPAA certified. Security review in days, not months — we have the docs.',
+    desc: 'SOC 2 Type II, GDPR, and HIPAA certified. Your security team gets a complete audit package — reviews that take months elsewhere take days here.',
     accent:   'from-emerald-500/12 to-transparent',
     iconBg:   'bg-emerald-500/10',
     iconRing: 'ring-emerald-500/14',
@@ -83,7 +84,7 @@ const FEATURES = [
   {
     Icon: RefreshCw,
     title: 'Real-time Sync',
-    desc: 'Connect your entire stack in minutes. 500+ integrations, real-time webhooks, and an SDK your engineers will actually like.',
+    desc: 'Connect your data stack in minutes, not sprints. 500+ native integrations, real-time webhooks, and an API your engineers won\'t hate.',
     accent:   'from-pink-500/11 to-transparent',
     iconBg:   'bg-pink-500/10',
     iconRing: 'ring-pink-500/14',
@@ -113,7 +114,7 @@ function FeatureCard({ f, i, isActive, cardRef }: FeatureCardProps) {
    * active  → scale(1)    opacity(1)    blur(0px)   padding(40px)  glow-strong
    * inactive → scale(0.90) opacity(0.55) blur(1px)   padding(24px)  glow-faint
    */
-  const transition = 'transform 0.42s cubic-bezier(0.16,1,0.3,1), opacity 0.42s cubic-bezier(0.16,1,0.3,1), filter 0.42s cubic-bezier(0.16,1,0.3,1), box-shadow 0.42s cubic-bezier(0.16,1,0.3,1), padding 0.42s cubic-bezier(0.16,1,0.3,1)';
+  const transition = CAROUSEL.transition + ', padding 0.48s cubic-bezier(0.16,1,0.3,1)';
 
   // Multi-layer shadow: tighter on inactive, full depth on active
   const restShadow = [
@@ -130,17 +131,42 @@ function FeatureCard({ f, i, isActive, cardRef }: FeatureCardProps) {
     `0 0 100px rgba(${f.accentRgb},0.08)`,
   ].join(', ');
 
+  // Active card cursor tilt — only when active
+  const rotX = useMotionValue(0);
+  const rotY = useMotionValue(0);
+  const sRotX = useSpring(rotX, { damping: 30, stiffness: 260 });
+  const sRotY = useSpring(rotY, { damping: 30, stiffness: 260 });
+  const innerRef = useRef<HTMLDivElement>(null);
+
+  const onTiltMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isActive || !innerRef.current) return;
+    const r = innerRef.current.getBoundingClientRect();
+    const nx = (e.clientX - r.left) / r.width  - 0.5;
+    const ny = (e.clientY - r.top)  / r.height - 0.5;
+    rotY.set(nx * 8);
+    rotX.set(-ny * 5);
+  };
+  const onTiltLeave = () => { rotX.set(0); rotY.set(0); };
+
   return (
     <div
       ref={cardRef}
-      className="snap-center flex-shrink-0 w-[300px] md:w-[380px]"
+      className="snap-center flex-shrink-0 w-[320px] md:w-[400px]"
       style={{
         transition,
-        transform:  isActive ? 'scale(1)'     : 'scale(0.90)',
-        opacity:    isActive ? 1              : 0.55,
-        filter:     isActive ? 'blur(0px)'    : 'blur(1px)',
+        transform:  isActive ? CAROUSEL.active.transform   : CAROUSEL.inactive.transform,
+        opacity:    isActive ? CAROUSEL.active.opacity     : CAROUSEL.inactive.opacity,
+        filter:     isActive ? CAROUSEL.active.filter      : CAROUSEL.inactive.filter,
+        zIndex:     isActive ? CAROUSEL.active.zIndex      : CAROUSEL.inactive.zIndex,
         willChange: 'transform, opacity, filter',
+        perspective: isActive ? 900 : 'none',
       }}
+      onMouseMove={onTiltMove}
+      onMouseLeave={onTiltLeave}
+    >
+    <motion.div
+      ref={innerRef}
+      style={isActive ? { rotateX: sRotX, rotateY: sRotY } : {}}
     >
       {/*
         GlassCard wraps the content. We pass `lift={false}` because
@@ -280,6 +306,7 @@ function FeatureCard({ f, i, isActive, cardRef }: FeatureCardProps) {
           </motion.span>
         </div>
       </div>
+    </motion.div>
     </div>
   );
 }
@@ -339,6 +366,22 @@ function FeatureCarousel() {
     if (t.scrollLeft > 20) setHintVisible(false);
   }, []);
 
+    // ── Scroll to a specific card index ────────────────────────────────────
+  const scrollToCard = useCallback((idx: number) => {
+    const track = trackRef.current;
+    const card  = cardRefs.current[idx];
+    if (!track || !card) return;
+    const center = track.getBoundingClientRect().width / 2;
+    track.scrollTo({
+      left:     card.offsetLeft + card.offsetWidth / 2 - center,
+      behavior: 'smooth',
+    });
+    setHintVisible(false);
+  }, []);
+
+  const prev = () => scrollToCard(Math.max(0, activeIdx - 1));
+  const next = () => scrollToCard(Math.min(FEATURES.length - 1, activeIdx + 1));
+
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
@@ -348,40 +391,16 @@ function FeatureCarousel() {
   }, [updateScroll]);
 
   // ── Keyboard navigation (accessibility) ────────────────────────────────
-  // ✅ DEFINE FIRST
-const scrollToCard = useCallback((idx: number) => {
-  const track = trackRef.current;
-  const card  = cardRefs.current[idx];
-  if (!track || !card) return;
-
-  const center = track.getBoundingClientRect().width / 2;
-  track.scrollTo({
-    left: card.offsetLeft + card.offsetWidth / 2 - center,
-    behavior: 'smooth',
-  });
-
-  setHintVisible(false);
-}, []);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft')  scrollToCard(Math.max(0, activeIdx - 1));
+      if (e.key === 'ArrowRight') scrollToCard(Math.min(FEATURES.length - 1, activeIdx + 1));
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [activeIdx]);
 
 
-// ✅ THEN USE IT
-useEffect(() => {
-  const onKey = (e: KeyboardEvent) => {
-    if (e.key === 'ArrowLeft') {
-      scrollToCard(Math.max(0, activeIdx - 1));
-    }
-    if (e.key === 'ArrowRight') {
-      scrollToCard(Math.min(FEATURES.length - 1, activeIdx + 1));
-    }
-  };
-
-  window.addEventListener('keydown', onKey);
-  return () => window.removeEventListener('keydown', onKey);
-}, [activeIdx, scrollToCard]);
-  
-
-  const prev = () => scrollToCard(Math.max(0, activeIdx - 1));
-  const next = () => scrollToCard(Math.min(FEATURES.length - 1, activeIdx + 1));
 
   return (
     <div className="relative">
@@ -428,7 +447,7 @@ useEffect(() => {
       {/* ── Scroll track ── */}
       <div
         ref={trackRef}
-        className="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-10"
+        className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-12"
         style={{
           scrollbarWidth:  'none',
           msOverflowStyle: 'none',
@@ -441,7 +460,7 @@ useEffect(() => {
       >
         {/* Leading spacer — makes first card centerable */}
         <div
-          className="flex-shrink-0 w-[calc(50vw-150px)] md:w-[calc(50vw-190px)]"
+          className="flex-shrink-0 w-[calc(50vw-160px)] md:w-[calc(50vw-200px)]"
           aria-hidden="true"
         />
 
@@ -457,7 +476,7 @@ useEffect(() => {
 
         {/* Trailing spacer — makes last card centerable */}
         <div
-          className="flex-shrink-0 w-[calc(50vw-150px)] md:w-[calc(50vw-190px)]"
+          className="flex-shrink-0 w-[calc(50vw-160px)] md:w-[calc(50vw-200px)]"
           aria-hidden="true"
         />
       </div>
@@ -554,6 +573,16 @@ export default function Value() {
     >
       <div className="section-divider" />
 
+      {/* Right-side anchor glow — balances left-heavy hero residue */}
+      <div
+        className="pointer-events-none absolute right-[-10%] top-[20%] hidden lg:block"
+        style={{
+          width: 640, height: 640,
+          background: 'radial-gradient(circle, rgba(109,40,217,0.07) 0%, rgba(37,99,235,0.04) 45%, transparent 70%)',
+          filter: 'blur(90px)',
+        }}
+      />
+
       {/* Ambient glow — moves opposite to scroll for depth */}
       <motion.div
         className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2"
@@ -576,6 +605,7 @@ export default function Value() {
         }}
       />
 
+      <SceneWrapper exitScale={0.97} entryY={30}>
       {/* ── Header — constrained to standard container ── */}
       <div className={CONTAINER.page}>
         <Reveal className="mb-14 text-center">
@@ -586,18 +616,18 @@ export default function Value() {
             sub-headline → secondary (reduced white)
             body copy → tertiary
           */}
-          <p className="scene-label mb-5">Built different, by design</p>
+          <p className="scene-label mb-4">Why teams switch and never go back</p>
           <h2
-            className="mb-6 font-bold leading-[1.1] tracking-[-0.028em]"
-            style={{ fontSize: 'clamp(2.1rem, 4.2vw, 3.2rem)' }}
+            className="mb-6 font-bold leading-[1.1] tracking-[-0.028em] text-center"
+            style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
           >
-            <span className="text-white">Replace five tools with one.</span>
+            <span className="text-white">One tool your whole team actually uses.</span>
             <br />
-            <span className="text-white/30">And actually use it.</span>
+            <span className="text-white/30">Because scattered tools kill speed.</span>
           </h2>
-          <p className="mx-auto max-w-lg text-[15px] leading-relaxed text-white/55">
-            Not another tool to manage. Growcad replaces your entire growth stack
-            and surfaces the insights your team actually needs — automatically.
+          <p className="mx-auto max-w-[520px] text-center text-[15px] leading-[1.7] text-white/55">
+            Most teams waste 30% of their sprint cycle reconciling data across tools.
+            Growcad ends that — one workspace, every signal, zero tab-switching.
           </p>
         </Reveal>
       </div>
@@ -608,6 +638,7 @@ export default function Value() {
         cards-emerging-from-darkness effect.
       */}
       <FeatureCarousel />
+      </SceneWrapper>
     </section>
   );
 }

@@ -1,61 +1,69 @@
 'use client';
 
-import { ReactNode, useRef, useState, MouseEvent as RMouseEvent, useEffect } from 'react';
+import {
+  ReactNode,
+  useRef,
+  useState,
+  MouseEvent as RMouseEvent,
+  useEffect,
+} from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface MagneticButtonProps {
-  children:  ReactNode;
-  variant?:  'primary' | 'outline';
+  children: ReactNode;
+  variant?: 'primary' | 'outline';
   className?: string;
-  onClick?:  () => void;
+  onClick?: () => void;
 }
 
 export default function MagneticButton({
   children,
-  variant  = 'primary',
+  variant = 'primary',
   className,
   onClick,
 }: MagneticButtonProps) {
-  const ref      = useRef<HTMLButtonElement>(null);
+  const ref = useRef<HTMLButtonElement>(null);
   const [hovered, setHovered] = useState(false);
+  const [pressed, setPressed] = useState(false);
   const [canHover, setCanHover] = useState(false);
 
-  const canHoverRef = useRef(false);
-
   useEffect(() => {
-  if (typeof window === 'undefined') return;
+    // ✅ FIX: defer state update to avoid sync setState warning
+    const mq = window.matchMedia('(hover: hover)');
+    const id = requestAnimationFrame(() => {
+      setCanHover(mq.matches);
+    });
 
-  const media = window.matchMedia('(hover: hover)');
-  canHoverRef.current = media.matches;
+    return () => cancelAnimationFrame(id);
+  }, []);
 
-  const handler = (e: MediaQueryListEvent) => {
-    canHoverRef.current = e.matches;
-  };
-
-  media.addEventListener('change', handler);
-  return () => media.removeEventListener('change', handler);
-}, []);
-
-
-  
-
+  // Magnetic follow — snappy spring, immediate response
   const rawX = useMotionValue(0);
   const rawY = useMotionValue(0);
-  const x = useSpring(rawX, { damping: 18, stiffness: 200, mass: 0.4 });
-  const y = useSpring(rawY, { damping: 18, stiffness: 200, mass: 0.4 });
+  const x = useSpring(rawX, { damping: 20, stiffness: 320, mass: 0.3 });
+  const y = useSpring(rawY, { damping: 20, stiffness: 320, mass: 0.3 });
 
   const onMouseMove = (e: RMouseEvent<HTMLButtonElement>) => {
-    if (!canHoverRef.current) return;
-    const el   = ref.current;
+    if (!canHover) return;
+    const el = ref.current;
     if (!el) return;
+
     const rect = el.getBoundingClientRect();
-    rawX.set((e.clientX - (rect.left + rect.width  / 2)) * 0.4);
-    rawY.set((e.clientY - (rect.top  + rect.height / 2)) * 0.4);
+
+    rawX.set(
+      (e.clientX - (rect.left + rect.width / 2)) * 0.38
+    );
+    rawY.set(
+      (e.clientY - (rect.top + rect.height / 2)) * 0.38
+    );
   };
 
-  const onMouseLeave = () => { rawX.set(0); rawY.set(0); setHovered(false); };
-  const onMouseEnter = () => setHovered(true);
+  const onMouseLeave = () => {
+    rawX.set(0);
+    rawY.set(0);
+    setHovered(false);
+  };
 
   const isPrimary = variant === 'primary';
 
@@ -64,72 +72,87 @@ export default function MagneticButton({
       ref={ref}
       style={{ x, y }}
       onMouseMove={onMouseMove}
-      onMouseEnter={onMouseEnter}
+      onMouseEnter={() => setHovered(true)}
       onMouseLeave={onMouseLeave}
+      onMouseDown={() => setPressed(true)}
+      onMouseUp={() => setPressed(false)}
       onClick={onClick}
-      whileHover={{ scale: 1.055 }}
-      whileTap={{ scale: 0.955 }}
-      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+      animate={{
+        scale: pressed ? 0.955 : hovered ? 1.06 : 1,
+        y: hovered && !pressed ? -2 : 0,
+        ...(isPrimary && {
+          boxShadow: hovered
+            ? '0 0 70px rgba(139,92,246,0.88), 0 0 140px rgba(139,92,246,0.36), 0 8px 32px rgba(59,130,246,0.28), 0 0 200px rgba(139,92,246,0.12)'
+            : '0 0 44px rgba(139,92,246,0.52), 0 0 88px rgba(139,92,246,0.18), 0 4px 18px rgba(59,130,246,0.12)',
+        }),
+      }}
+      transition={{
+        scale: { duration: 0.14, ease: [0.16, 1, 0.3, 1] },
+        y: { duration: 0.18, ease: [0.16, 1, 0.3, 1] },
+        boxShadow: { duration: 0.22, ease: [0.16, 1, 0.3, 1] },
+      }}
       className={cn(
-        'group relative inline-flex cursor-pointer select-none items-center justify-center gap-2.5',
+        'group relative inline-flex cursor-pointer select-none items-center justify-center gap-2',
         'overflow-hidden rounded-full text-[14px] font-semibold tracking-[-0.01em]',
         isPrimary
-          ? 'bg-gradient-to-r from-violet-600 via-violet-600 to-blue-600 px-8 py-4 text-white shadow-[0_1px_0_rgba(255,255,255,0.12)_inset]'
+          ? 'bg-gradient-to-r from-violet-600 via-violet-500 to-blue-600 px-8 py-4 text-white shadow-[0_1px_0_rgba(255,255,255,0.14)_inset,0_0_0_1px_rgba(139,92,246,0.22)]'
           : 'border border-white/[0.11] bg-white/[0.04] px-8 py-4 text-white/75 hover:text-white',
         className
       )}
-      animate={
-        isPrimary
-          ? {
-              boxShadow: hovered
-                ? '0 0 60px rgba(139,92,246,0.80), 0 0 120px rgba(139,92,246,0.32), 0 4px 24px rgba(59,130,246,0.24)'
-                : '0 0 40px rgba(139,92,246,0.48), 0 0 80px rgba(139,92,246,0.16), 0 4px 16px rgba(59,130,246,0.10)',
-            }
-          : {}
-      }
     >
-      {/* ── Animated gradient border ring (primary only) ── */}
+      {/* Gradient border ring */}
       {isPrimary && (
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute -inset-[1px] rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          className="pointer-events-none absolute -inset-[1px] rounded-full opacity-0 transition-opacity duration-150 group-hover:opacity-100"
           style={{
-            background: 'linear-gradient(90deg, #8b5cf6, #3b82f6, #22d3ee, #8b5cf6)',
+            background:
+              'linear-gradient(90deg, #8b5cf6, #3b82f6, #22d3ee, #8b5cf6)',
             backgroundSize: '200% 200%',
             padding: '1px',
-            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+            WebkitMask:
+              'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
             WebkitMaskComposite: 'xor',
             maskComposite: 'exclude',
           }}
         />
       )}
 
-      {/* ── Shimmer sweep ── */}
+      {/* Shimmer */}
       {isPrimary && (
         <motion.span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -skew-x-[14deg] bg-gradient-to-r from-transparent via-white/[0.18] to-transparent"
-          initial={{ x: '-120%' }}
-          animate={hovered ? { x: '220%' } : { x: '-120%' }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          className="pointer-events-none absolute inset-0 -skew-x-[14deg] bg-gradient-to-r from-transparent via-white/[0.20] to-transparent"
+          initial={{ x: '-130%' }}
+          animate={hovered ? { x: '230%' } : { x: '-130%' }}
+          transition={{ duration: 0.48, ease: [0.16, 1, 0.3, 1] }}
         />
       )}
 
-      {/* ── Secondary hover bg lift ── */}
+      {/* Secondary hover */}
       {!isPrimary && (
         <motion.span
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 rounded-full"
-          initial={{ opacity: 0 }}
           animate={{ opacity: hovered ? 1 : 0 }}
-          transition={{ duration: 0.25 }}
+          transition={{ duration: 0.12 }}
           style={{
-            background: 'linear-gradient(135deg, rgba(139,92,246,0.07), rgba(59,130,246,0.05))',
+            background:
+              'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(59,130,246,0.05))',
           }}
         />
       )}
 
-      <span className="relative z-10 flex items-center gap-2">{children}</span>
+      {/* Content */}
+      <span className="relative z-10 flex items-center gap-2">
+        <motion.span
+          className="flex items-center gap-2"
+          animate={{ x: hovered ? 1 : 0 }}
+          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {children}
+        </motion.span>
+      </span>
     </motion.button>
   );
 }

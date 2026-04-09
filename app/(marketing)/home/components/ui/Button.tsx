@@ -50,12 +50,13 @@ export default function Button({
       )}
       whileHover={{
         scale: isPrimary ? 1.04 : 1.025,
+        y: -1,
         ...(isPrimary && {
           boxShadow: '0 0 52px rgba(139,92,246,0.55), 0 0 100px rgba(139,92,246,0.18)',
         }),
       }}
-      whileTap={{ scale: 0.965 }}
-      transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+      whileTap={{ scale: 0.965, y: 0 }}
+      transition={{ duration: 0.14, ease: [0.16, 1, 0.3, 1] }}
       {...props}
     >
       {/* Shimmer sweep — primary only */}

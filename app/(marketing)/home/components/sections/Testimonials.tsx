@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import GlassCard from '../ui/GlassCard';
 import Reveal from '../motion/Reveal';
+import SceneWrapper from '../core/SceneWrapper';
 import {
   CONTAINER, SECTION_PY, SCENES,
   T, DUR, EASE_OUT,
@@ -40,6 +41,23 @@ const TESTIMONIALS = [
     name: 'Sofia Mendez', role: 'CEO',             co: 'Loops',       color: '#7c3aed', stars: 5,
   },
 ];
+const CAROUSEL = {
+  transition: 'all 0.45s cubic-bezier(0.16, 1, 0.3, 1)',
+
+  active: {
+    transform: 'scale(1)',
+    opacity: 1,
+    filter: 'blur(0px)',
+    zIndex: 2,
+  },
+
+  inactive: {
+    transform: 'scale(0.92)',
+    opacity: 0.55,
+    filter: 'blur(1px)',
+    zIndex: 1,
+  },
+};
 
 // ─── Card component ───────────────────────────────────────────────────────────
 interface CardProps {
@@ -60,14 +78,15 @@ function TestimonialCard({ t, i, isActive, cardRef }: CardProps) {
      */
     <div
       ref={cardRef}
-      className="snap-center flex-shrink-0 w-[300px] md:w-[360px]"
+      className="snap-center flex-shrink-0 w-[320px] md:w-[380px]"
       style={{
         // Use CSS transitions rather than Framer on these — smoother
         // for continuous scroll-driven state changes
-        transition: 'transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.4s cubic-bezier(0.16,1,0.3,1), filter 0.4s cubic-bezier(0.16,1,0.3,1)',
-        transform:  isActive ? 'scale(1)'    : 'scale(0.90)',
-        opacity:    isActive ? 1             : 0.55,
-        filter:     isActive ? 'blur(0px)'   : 'blur(1px)',
+        transition: CAROUSEL.transition,
+        transform:  isActive ? CAROUSEL.active.transform  : CAROUSEL.inactive.transform,
+        opacity:    isActive ? CAROUSEL.active.opacity    : CAROUSEL.inactive.opacity,
+        filter:     isActive ? CAROUSEL.active.filter     : CAROUSEL.inactive.filter,
+        zIndex:     isActive ? CAROUSEL.active.zIndex     : CAROUSEL.inactive.zIndex,
         willChange: 'transform, opacity, filter',
       }}
     >
@@ -163,7 +182,7 @@ function TestimonialCard({ t, i, isActive, cardRef }: CardProps) {
 // ─── Carousel ─────────────────────────────────────────────────────────────────
 function Carousel() {
   const trackRef  = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const cardRefs  = useRef<(HTMLDivElement | null)[]>([]);
 
   // Active card index — driven by IntersectionObserver
   const [activeIdx, setActiveIdx]   = useState(0);
@@ -295,7 +314,7 @@ function Carousel() {
       {/* ── Scroll track ── */}
       <div
         ref={trackRef}
-        className="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-10"
+        className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-12"
         style={{
           // Hide scrollbar visually — keep scroll functionality
           scrollbarWidth: 'none',
@@ -308,7 +327,7 @@ function Carousel() {
         }}
       >
         {/* Leading spacer — centers first card */}
-        <div className="flex-shrink-0 w-[calc(50vw-150px)] md:w-[calc(50vw-180px)]" aria-hidden="true" />
+        <div className="flex-shrink-0 w-[calc(50vw-160px)] md:w-[calc(50vw-190px)]" aria-hidden="true" />
 
         {TESTIMONIALS.map((t, i) => (
           <TestimonialCard
@@ -316,14 +335,14 @@ function Carousel() {
             t={t}
             i={i}
             isActive={i === activeIdx}
-            cardRef={(el: HTMLDivElement | null) => {
+            cardRef={(el) => {
               cardRefs.current[i] = el;
             }}
           />
         ))}
 
         {/* Trailing spacer — centers last card */}
-        <div className="flex-shrink-0 w-[calc(50vw-150px)] md:w-[calc(50vw-180px)]" aria-hidden="true" />
+        <div className="flex-shrink-0 w-[calc(50vw-160px)] md:w-[calc(50vw-190px)]" aria-hidden="true" />
       </div>
 
       {/* ── Dot indicators ── */}
@@ -380,20 +399,21 @@ export default function Testimonials() {
         }}
       />
 
+      <SceneWrapper exitScale={0.97} entryY={32}>
       {/* Header — constrained to standard container */}
       <div className={CONTAINER.page}>
         <Reveal className="mb-14 text-center">
-          <p className="scene-label mb-5">Direct from our customers</p>
+          <p className="scene-label mb-5">What teams say after 30 days</p>
           <h2
-            className="mb-5 font-bold leading-[1.1] tracking-[-0.028em]"
-            style={{ fontSize: 'clamp(2.1rem, 4.2vw, 3.2rem)' }}
+            className="mb-5 font-bold leading-[1.1] tracking-[-0.028em] text-center"
+            style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
           >
-            <span className={HIERARCHY.primary}>Results teams actually see.</span>
+            <span className={HIERARCHY.primary}>Real teams. Real outcomes.</span>
             <br />
-            <span className="text-white/30">In their own words.</span>
+            <span className="text-white/30">No marketing. No edits.</span>
           </h2>
-          <p className={`mx-auto max-w-md text-[15px] leading-relaxed mt-2 ${HIERARCHY.tertiary}`}>
-            Unedited. Unsponsored. Every result is verified.
+          <p className={`mx-auto max-w-md text-center text-[15px] leading-relaxed mt-2 ${HIERARCHY.tertiary}`}>
+            Every quote is from a real user. We didn not ask them to be kind — they just were.
           </p>
         </Reveal>
       </div>
@@ -404,6 +424,7 @@ export default function Testimonials() {
         The internal mask-image creates the cinematic reveal effect.
       */}
       <Carousel />
+      </SceneWrapper>
     </section>
   );
 }

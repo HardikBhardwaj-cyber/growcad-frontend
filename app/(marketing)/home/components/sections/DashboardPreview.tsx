@@ -1,9 +1,10 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring, AnimatePresence, useMotionValue } from 'framer-motion';
 import { BarChart2, TrendingUp, Users, Zap, Search, Bell, ChevronRight } from 'lucide-react';
 import Reveal from '../motion/Reveal';
+import SceneWrapper from '../core/SceneWrapper';
 import { CONTAINER, SECTION_PY, SCENES, T, DUR, EASE_OUT, staggerDelay, SHADOW, HIERARCHY } from '../../systems/design';
 
 type TabId = 'analytics' | 'growth' | 'users' | 'experiments';
@@ -30,7 +31,7 @@ const METRICS: Record<TabId, { label: string; val: string; delta: string; up: bo
 };
 
 export default function DashboardPreview() {
-  const [tab, setTab] = useState<TabId>('analytics');
+  const [tab, setTab] = useState<TabId>('analytics'); 
   const sectionRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start 88%', 'center 48%'] });
@@ -41,6 +42,26 @@ export default function DashboardPreview() {
   const rawY     = useTransform(scrollYProgress, [0, 1], [80, 0]);
   const scale    = useSpring(rawScale, { damping: 22, stiffness: 120 });
   const entryY   = useSpring(rawY,     { damping: 22, stiffness: 120 });
+
+  // 3D mouse tilt on dashboard
+  const tiltRef = useRef<HTMLDivElement>(null);
+  const rotX = useMotionValue(0);
+  const rotY = useMotionValue(0);
+  const sRotX = useSpring(rotX, { damping: 28, stiffness: 220 });
+  const sRotY = useSpring(rotY, { damping: 28, stiffness: 220 });
+  const [hovered, setHovered] = useState(false);
+
+  const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = tiltRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width  - 0.5;
+    const y = (e.clientY - r.top)  / r.height - 0.5;
+    rotY.set(x * 12);
+    rotX.set(-y * 8);
+  };
+  const onMouseLeave = () => { rotX.set(0); rotY.set(0); setHovered(false); };
+  const onMouseEnter = () => setHovered(true);
 
   const bars = BARS[tab];
   const mets = METRICS[tab];
@@ -53,51 +74,68 @@ export default function DashboardPreview() {
     >
       <div className="section-divider" />
 
-      {/* Center ambient */}
-      <div
-        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{
-          width: 800, height: 800,
-          background: 'radial-gradient(circle, rgba(109,40,217,0.038) 0%, transparent 68%)',
-          filter: 'blur(100px)',
-        }}
-      />
+      {/* Layered ambient glows — balanced left+right */}
+      <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        style={{ width: 900, height: 900, background: 'radial-gradient(circle, rgba(109,40,217,0.06) 0%, rgba(37,99,235,0.04) 45%, transparent 70%)', filter: 'blur(110px)' }} />
+      <div className="pointer-events-none absolute right-[-12%] top-1/3"
+        style={{ width: 500, height: 500, background: 'radial-gradient(circle, rgba(37,99,235,0.05) 0%, transparent 65%)', filter: 'blur(80px)' }} />
 
+      <SceneWrapper exitScale={0.975} entryY={40}>
       <div className={CONTAINER.page}>
-        {/* Header — visual hierarchy enforced */}
         <Reveal className="mb-14 text-center">
-          <p className="scene-label mb-5">Live product preview</p>
+          <p className="scene-label mb-5">Your new Monday morning</p>
           <h2
-            className="mb-6 font-bold leading-[1.1] tracking-[-0.028em]"
-            style={{ fontSize: 'clamp(2.1rem, 4.2vw, 3.2rem)' }}
+            className="mb-6 font-bold leading-[1.1] tracking-[-0.028em] text-center"
+            style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
           >
-            <span className="text-white">Everything in one view.</span>
+            <span className="text-white">The dashboard your team</span>
             <br />
-            <span className="text-white/30">Zero switching.</span>
+            <span className="text-white/30">actually looks forward to opening.</span>
           </h2>
-          <p className="mx-auto max-w-md text-[15px] leading-relaxed mt-1 text-white/55">
-            This is what your team opens on Monday morning.
-            Click any tab to explore.
+          <p className="mx-auto max-w-md text-center text-[15px] leading-relaxed mt-1 text-white/55">
+            Every metric that matters, in one place. No setup call.
+            No onboarding session. Just your data, ready on day one.
           </p>
         </Reveal>
 
-        {/* Dashboard — spring entry tied to scroll */}
+        {/* Dashboard — spring entry + 3D mouse tilt */}
         <motion.div
           style={{ scale, opacity: rawOp, y: entryY }}
           className="will-both"
         >
-          {/* Outer glow + shadow ring */}
+          {/* Glow halo — brightens on hover */}
           <div
-            className="pointer-events-none absolute -inset-px rounded-[23px] blur-xl"
+            className="pointer-events-none absolute -inset-6 rounded-[30px] transition-opacity duration-500"
             style={{
-              background: 'linear-gradient(135deg, rgba(139,92,246,0.13), rgba(59,130,246,0.09), rgba(139,92,246,0.06))',
+              background: 'radial-gradient(ellipse 90% 80% at 50% 50%, rgba(109,40,217,0.18) 0%, rgba(37,99,235,0.10) 50%, transparent 75%)',
+              filter: 'blur(36px)',
+              opacity: hovered ? 1 : 0.55,
               zIndex: -1,
             }}
           />
 
+          {/* 3D tilt wrapper */}
+          <div
+            ref={tiltRef}
+            onMouseMove={onMouseMove}
+            onMouseLeave={onMouseLeave}
+            onMouseEnter={onMouseEnter}
+            style={{ perspective: 1400, transformStyle: 'preserve-3d' }}
+          >
+          <motion.div
+            style={{ rotateX: sRotX, rotateY: sRotY, transformStyle: 'preserve-3d' }}
+            whileHover={{ scale: 1.018 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
+
           <div
             className="overflow-hidden rounded-[22px] border border-white/[0.08] bg-[#0a0a0e]"
-            style={{ boxShadow: SHADOW.dashCard }}
+            style={{
+              boxShadow: hovered
+                ? 'inset 0 1px 0 rgba(255,255,255,0.07), 0 4px 20px rgba(0,0,0,0.55), 0 40px 100px rgba(0,0,0,0.65), 0 0 80px rgba(109,40,217,0.18), 0 0 0 1px rgba(255,255,255,0.05)'
+                : SHADOW.dashCard,
+              transition: 'box-shadow 0.4s ease',
+            }}
           >
             {/* Top reflection */}
             <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-white/[0.14] to-transparent" />
@@ -263,7 +301,10 @@ export default function DashboardPreview() {
             </div>
           </div>
         </motion.div>
-      </div>
+        </div>
+          </motion.div>
+          </div>
+      </SceneWrapper>
     </section>
   );
 }

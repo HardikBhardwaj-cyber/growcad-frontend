@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'fra
 import { Check, Zap, ArrowRight } from 'lucide-react';
 import MagneticButton from '../ui/MagneticButton';
 import Reveal from '../motion/Reveal';
+import SceneWrapper from '../core/SceneWrapper';
 import {
   CONTAINER, SECTION_PY, SCENES,
   T, staggerDelay, DUR, EASE_OUT,
@@ -19,44 +20,43 @@ const PLANS = [
     id: 'starter',
     name: 'Starter',
     prices: { monthly: 0, annual: 0 },
-    desc: 'Start for free, no card needed. See your first insight in under 5 minutes.',
-    cta: 'Start for free',
+    desc: 'Everything you need to get started — no time limit, no card, no catch.',
+    cta: 'Start for free →',
     primary: false,
     badge: null as string | null,
     features: [
       '1 workspace',
-      'Up to 10K monthly events',
-      '3 dashboards',
-      'Basic analytics',
-      '7-day data retention',
-      'Community support',
+      'Up to 10,000 events / month',
+      '3 live dashboards',
+      'Core analytics & funnels',
+      '7-day data history',
+      'Community + docs',
     ],
   },
   {
     id: 'pro',
     name: 'Pro',
     prices: { monthly: 79, annual: 59 },
-    desc: 'For teams ready to run more experiments and make faster decisions with AI.',
-    cta: 'Try free for 14 days',
+    desc: 'Everything growth teams need to move faster and make decisions they can defend.',
+    cta: 'Start free — upgrade anytime →',
     primary: true,
-    badge: '★  Most chosen plan',
+    badge: '★  Chosen by 78% of teams',
     features: [
-      'Unlimited workspaces',
-      'Up to 10M monthly events',
-      'Unlimited dashboards',
-      'AI-powered insights',
-      'A/B testing engine',
-      '90-day data retention',
-      'Slack + 60+ integrations',
-      'Priority support (4h SLA)',
+      'Unlimited workspaces & dashboards',
+      'Up to 10M events / month',
+      'AI summaries & anomaly alerts',
+      'Full A/B testing engine',
+      '90-day data history',
+      '500+ integrations including Slack',
+      'Priority support — reply in 4h',
     ],
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
     prices: { monthly: null, annual: null },
-    desc: 'Custom contracts, SSO, and a dedicated CSM. Security review in days, not months.',
-    cta: 'Talk to us',
+    desc: 'White-glove onboarding, custom SLAs, and a dedicated success manager from day one.',
+    cta: 'Book a call →',
     primary: false,
     badge: null as string | null,
     features: [
@@ -91,8 +91,8 @@ function PlanCard({ plan, cycle, i }: { plan: typeof PLANS[0]; cycle: Cycle; i: 
       {/* Pro card glow halo */}
       {plan.primary && (
         <>
-          <div className="pointer-events-none absolute -inset-[3px] rounded-[21px] bg-gradient-to-br from-violet-500/30 via-blue-500/22 to-violet-500/12 blur-md" />
-          <div className="pointer-events-none absolute -inset-[1px] rounded-[20px] bg-gradient-to-br from-violet-500/42 via-blue-500/30 to-violet-500/18 p-[1px]" />
+          <div className="pointer-events-none absolute -inset-[4px] rounded-[22px] bg-gradient-to-br from-violet-500/38 via-blue-500/28 to-violet-500/18 blur-lg" />
+          <div className="pointer-events-none absolute -inset-[1px] rounded-[20px] bg-gradient-to-br from-violet-500/52 via-blue-500/38 to-violet-500/22 p-[1.5px]" />
         </>
       )}
 
@@ -121,10 +121,14 @@ function PlanCard({ plan, cycle, i }: { plan: typeof PLANS[0]; cycle: Cycle; i: 
 
         {/* Badge — primary indicator */}
         {plan.badge && (
-          <div className="mb-5 inline-flex w-fit items-center gap-1.5 rounded-full border border-violet-500/24 bg-violet-500/12 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-violet-300">
+          <motion.div
+            className="mb-5 inline-flex w-fit items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/14 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-violet-300"
+            animate={{ boxShadow: ['0 0 0px rgba(139,92,246,0)', '0 0 18px rgba(139,92,246,0.4)', '0 0 0px rgba(139,92,246,0)'] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
+          >
             <Zap size={9} />
             {plan.badge}
-          </div>
+          </motion.div>
         )}
 
         {/* Plan name — primary */}
@@ -246,6 +250,12 @@ export default function Pricing() {
     >
       <div className="section-divider" />
 
+      {/* Background glow — centers visual weight in the pricing section */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-1/3 -translate-x-1/2"
+        style={{ width: 800, height: 600, background: 'radial-gradient(ellipse, rgba(109,40,217,0.06) 0%, rgba(37,99,235,0.04) 45%, transparent 70%)', filter: 'blur(100px)' }}
+      />
+
       {/* Ambient — centered, builds the "decision" atmosphere */}
       <div
         className="pointer-events-none absolute left-1/2 top-1/3 -translate-x-1/2"
@@ -256,20 +266,21 @@ export default function Pricing() {
         }}
       />
 
+      <SceneWrapper exitScale={0.97} entryY={28}>
       <motion.div style={{ scale }} className={CONTAINER.narrow}>
         {/* Header */}
         <Reveal className="mb-14 text-center">
-          <p className="scene-label mb-5">Transparent pricing</p>
+          <p className="scene-label mb-5">Start free. Upgrade when you are ready.</p>
           <h2
-            className="mb-6 font-bold leading-[1.1] tracking-[-0.028em]"
-            style={{ fontSize: 'clamp(2.1rem, 4.2vw, 3.2rem)' }}
+            className="mb-6 font-bold leading-[1.1] tracking-[-0.028em] text-center"
+            style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
           >
-            <span className={HIERARCHY.primary}>One price. Everything included.</span>
+            <span className={HIERARCHY.primary}>No gotchas. No upsells. No surprises.</span>
             <br />
-            <span className="text-white/30">No hidden fees. Ever.</span>
+            <span className="text-white/30">Just honest pricing that scales with you.</span>
           </h2>
-          <p className={`mb-10 text-[15px] ${HIERARCHY.tertiary}`}>
-            Most teams are live in 20 minutes. No engineer required.
+          <p className={`mb-10 text-center text-[15px] ${HIERARCHY.tertiary}`}>
+            The free plan is genuinely useful. Upgrade only when you need more scale.
           </p>
 
           {/* Toggle — layoutId for spring transition */}
@@ -304,7 +315,7 @@ export default function Pricing() {
         </Reveal>
 
         {/* Plan grid */}
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+        <div className="mx-auto grid w-full max-w-[1000px] grid-cols-1 gap-5 md:grid-cols-3">
           {PLANS.map((plan, i) => (
             <PlanCard key={plan.id} plan={plan} cycle={cycle} i={i} />
           ))}
@@ -312,11 +323,12 @@ export default function Pricing() {
 
         {/* Footer note — muted (lowest hierarchy, just reassuring) */}
         <Reveal delay={0.28} className="mt-10 text-center">
-          <p className="text-[12.5px] text-white/32">
+          <p className="text-center text-[12.5px] text-white/32">
             14-day free trial · No credit card required · Cancel anytime · Used by teams at Vercel, Stripe & Linear
           </p>
         </Reveal>
       </motion.div>
+      </SceneWrapper>
     </section>
   );
 }
