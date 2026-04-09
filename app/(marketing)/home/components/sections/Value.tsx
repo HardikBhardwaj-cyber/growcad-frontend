@@ -616,7 +616,7 @@ export default function Value() {
             sub-headline → secondary (reduced white)
             body copy → tertiary
           */}
-          <p className="scene-label mb-4 w-full text-center">Why teams switch and never go back</p>
+          <p className="scene-label mb-4 w-full mx-auto text-center">Why teams switch and never go back</p>
           <h2
             className="mb-5 w-full font-bold leading-[1.08] tracking-[-0.03em] text-center"
             style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
