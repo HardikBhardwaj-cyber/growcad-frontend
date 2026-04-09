@@ -239,7 +239,7 @@ export default function Hero() {
       {/* Content */}
       <motion.div
         style={{ y: contentY, opacity: rawOp }}
-        className={`relative z-[10] ${CONTAINER.page} grid w-full grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_480px] lg:gap-16`}
+        className={`relative z-[10] ${CONTAINER.page} grid w-full grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16`}
       >
         {/* LEFT */}
         <div className="flex flex-col w-full">
