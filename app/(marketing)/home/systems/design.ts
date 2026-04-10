@@ -4,7 +4,7 @@ import type { Variants } from 'framer-motion';
 
 // ─── Container — 1200px max, px-6 mobile / px-10 desktop ──────────────────────
 export const CONTAINER = {
-  page:   'mx-auto w-full max-w-[1200px] px-6 md:px-10',
+  page:   'mx-auto w-full max-w-[1080px] px-6 md:px-10',
   narrow: 'mx-auto w-full max-w-[880px] px-6 md:px-10',
   wide:   'mx-auto w-full max-w-[1200px] px-6 md:px-10',
 } as const;
