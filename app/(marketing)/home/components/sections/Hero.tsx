@@ -243,7 +243,7 @@ export default function Hero() {
         className={`relative z-[10] ${CONTAINER.page} grid w-full grid-cols-1 relative h-screen items-center gap-12 lg:grid-cols-2 lg:gap-20`}
       >
         {/* LEFT — max-w constrains text for balance */}
-        <div className="flex flex-col pl-6 w-full max-w-[540px]">
+        <div className="flex flex-col ml-6 w-full max-w-[540px]">
 
           <motion.div
             className="mb-8 mt-6 flex items-center gap-3 self-start rounded-full bg-white/[0.06]"
