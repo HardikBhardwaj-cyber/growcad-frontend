@@ -243,10 +243,10 @@ export default function Hero() {
         className={`relative z-[10] ${CONTAINER.page} grid w-full grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20`}
       >
         {/* LEFT — max-w constrains text for balance */}
-        <div className="flex flex-col w-full max-w-[540px]">
+        <div className="flex leading-2.5 relative h-screen flex-col w-full max-w-[540px]">
 
           <motion.div
-            className="mb-6"
+            className="mb-6 mt-6 flex items-center gap-3 self-start rounded-full bg-white/[0.06] px-3 py-1.5"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.52, delay: 0.12, ease: EASE_OUT }}
