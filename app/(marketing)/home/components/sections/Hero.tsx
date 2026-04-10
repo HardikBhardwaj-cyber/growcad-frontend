@@ -11,17 +11,19 @@ import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 import WebGLErrorBoundary from '../core/WebGLErrorBoundary';
 import {
-  CONTAINER, SECTION_PY, HERO_INNER, SCENES,
-  HERO_PHASES, T, EASE_OUT, DUR,
+  HERO_INNER, SECTION_PY, SCENES,
+  HERO_PHASES, T, EASE_OUT,
 } from '../../systems/design';
 
 const BlobCanvas = lazy(() => import('../webgl/BlobCanvas'));
 const Particles  = lazy(() => import('../webgl/Particles'));
 
-const WORDS = ["Admissions Done.",
-  "Fees Secured.",
-  "Students Tracked.",
-  "Growth Autopilot."];
+const WORDS = [
+  'Admissions Done.',
+  'Fees Collected.',
+  'Students Tracked.',
+  'Growth Automated.',
+];
 
 function RotatingWord() {
   const [i, setI] = useState(0);
@@ -59,10 +61,8 @@ function DashPreview() {
     const el = cardRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width  - 0.5;
-    const y = (e.clientY - r.top)  / r.height - 0.5;
-    rotY.set(x * 14);
-    rotX.set(-y * 10);
+    rotY.set(((e.clientX - r.left) / r.width - 0.5) * 14);
+    rotX.set(-((e.clientY - r.top) / r.height - 0.5) * 10);
   };
 
   const onMouseLeave = () => { rotX.set(0); rotY.set(0); };
@@ -75,7 +75,6 @@ function DashPreview() {
       className="relative w-full"
       style={{ perspective: 1200 }}
     >
-      {/* Glow layer behind card */}
       <div
         className="pointer-events-none absolute -inset-10 rounded-3xl"
         style={{
@@ -84,21 +83,15 @@ function DashPreview() {
         }}
       />
 
-      {/* 3D tilt card */}
       <motion.div
         ref={cardRef}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
-        style={{
-          rotateX: sRotX,
-          rotateY: sRotY,
-          transformStyle: 'preserve-3d',
-        }}
+        style={{ rotateX: sRotX, rotateY: sRotY, transformStyle: 'preserve-3d' }}
         className="relative rounded-2xl border border-white/[0.09] bg-[#0c0c10]/96 overflow-hidden cursor-default"
         whileHover={{ scale: 1.015 }}
         transition={{ duration: 0.28, ease: EASE_OUT }}
       >
-        {/* Inset shadow overlay */}
         <div style={{
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07), 0 4px 16px rgba(0,0,0,0.4), 0 32px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03)',
           borderRadius: 'inherit',
@@ -107,10 +100,8 @@ function DashPreview() {
           pointerEvents: 'none',
         }} />
 
-        {/* All card content in one padded wrapper */}
         <div className="p-5">
-          {/* Chrome bar — padded naturally by parent p-5 */}
-          <div className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.04] px-3 pb-3 pt-2.5 mb-5">
+          <div className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.04] px-3 pb-3 pt-2.5">
             <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full bg-red-500/55" />
             <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full bg-yellow-500/55" />
             <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full bg-green-500/55" />
@@ -123,13 +114,12 @@ function DashPreview() {
             </div>
           </div>
 
-          {/* Revenue header */}
-          <div className="mb-5 flex items-start justify-between">
+          <div className="mt-5 flex items-start justify-between">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/30">Monthly Revenue</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/30">Students This Month</p>
               <div className="mt-1 flex items-end gap-2">
-                <span className="text-[22px] font-bold tracking-tight text-white">$2.4M</span>
-                <span className="mb-[3px] text-[13px] font-semibold text-emerald-400">↑ 24.8%</span>
+                <span className="text-[22px] font-bold tracking-tight text-white">2,847</span>
+                <span className="mb-[3px] text-[13px] font-semibold text-emerald-400">↑ 18.4%</span>
               </div>
             </div>
             <svg viewBox="0 0 100 40" className="h-8 w-24 flex-shrink-0">
@@ -140,15 +130,14 @@ function DashPreview() {
                 </linearGradient>
               </defs>
               <polyline
-                points={BARS.map((v, i) => `${(i/(BARS.length-1))*100},${40-(v/100)*36}`).join(' ')}
+                points={BARS.map((v, i) => `${(i / (BARS.length - 1)) * 100},${40 - (v / 100) * 36}`).join(' ')}
                 fill="none" stroke="url(#hsg)" strokeWidth="2.5"
                 strokeLinecap="round" strokeLinejoin="round"
               />
             </svg>
           </div>
 
-          {/* Chart */}
-          <div className="mb-5 flex items-end gap-[3px] rounded-xl bg-white/[0.02] p-3" style={{ height: 88 }}>
+          <div className="mt-5 flex items-end gap-[3px] rounded-xl bg-white/[0.02] p-3" style={{ height: 88 }}>
             {BARS.map((h, idx) => (
               <motion.div
                 key={idx}
@@ -161,12 +150,11 @@ function DashPreview() {
             ))}
           </div>
 
-          {/* Metrics */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="mt-5 grid grid-cols-3 gap-2">
             {[
-              { label: 'Active Users', val: '84.2K', delta: '+9%',   up: true  },
-              { label: 'Conversion',   val: '4.7%',  delta: '+1.2%', up: true  },
-              { label: 'Churn Rate',   val: '0.9%',  delta: '−0.3%', up: false },
+              { label: 'Admissions',  val: '342',   delta: '+12%',  up: true  },
+              { label: 'Fees Due',    val: '₹4.2L', delta: '+8.1%', up: true  },
+              { label: 'Pending',     val: '18',    delta: '−22%',  up: false },
             ].map(m => (
               <div key={m.label} className="rounded-xl border border-white/[0.055] bg-white/[0.025] p-2.5">
                 <p className="text-[9.5px] text-white/30">{m.label}</p>
@@ -178,7 +166,6 @@ function DashPreview() {
         </div>
       </motion.div>
 
-      {/* Floating badge */}
       <motion.div
         className="absolute -top-4 -right-4 z-10 flex items-center gap-2.5 rounded-2xl border border-violet-500/25 bg-[#0d0d14]/98 px-3.5 py-2.5 backdrop-blur-xl"
         style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(139,92,246,0.12)' }}
@@ -192,8 +179,8 @@ function DashPreview() {
           </svg>
         </div>
         <div>
-          <p className="text-[11px] font-semibold text-white/85">Revenue spiked</p>
-          <p className="text-[10px] text-white/40">+$18.4K in last hour</p>
+          <p className="text-[11px] font-semibold text-white/85">New admission</p>
+          <p className="text-[10px] text-white/40">Riya Sharma just enrolled</p>
         </div>
       </motion.div>
     </motion.div>
@@ -214,7 +201,7 @@ export default function Hero() {
       data-scene={SCENES.hero}
       className={`relative flex min-h-[min(100svh,900px)] items-center ${SECTION_PY.hero}`}
     >
-      {/* WebGL layer */}
+      {/* WebGL — absolute, no layout impact */}
       <motion.div
         className="pointer-events-none absolute inset-0 z-0 hidden lg:block"
         initial={{ opacity: 0 }}
@@ -229,7 +216,7 @@ export default function Hero() {
         </WebGLErrorBoundary>
       </motion.div>
 
-      {/* Ambient glows */}
+      {/* Ambient glows — absolute, no layout impact */}
       <motion.div
         className="pointer-events-none absolute inset-0 z-[1]"
         animate={{ y: [0, -12, 0] }}
@@ -240,79 +227,85 @@ export default function Hero() {
         <div style={{ position: 'absolute', bottom: '5%', left: '30%', width: 480, height: 480, background: 'radial-gradient(circle, rgba(109,40,217,0.05) 0%, transparent 65%)', filter: 'blur(110px)' }} />
       </motion.div>
 
-      {/* Content grid */}
+      {/* Content grid — scroll parallax only, no spacing role */}
       <motion.div
         style={{ y: contentY, opacity: rawOp }}
-        className={`relative z-[10] ${HERO_INNER} grid w-full min-h-screen items-start pt-[clamp(80px,12vh,140px)] grid-cols-1 gap-[clamp(1.75rem,3.5vw,4rem)] lg:grid-cols-[1.05fr_0.95fr]`}
+        className={`relative z-[10] ${HERO_INNER} grid w-full grid-cols-1 items-center gap-[clamp(1.75rem,3.5vw,4rem)] lg:grid-cols-[1.05fr_0.95fr]`}
       >
-        {/* LEFT — inner constraint removes left-heavy illusion */}
-        <div className="flex flex-col w-full lg:pl-[clamp(8px,1.8vw,28px)] mx-auto lg:mx-0" style={{ maxWidth: 'min(100%, clamp(460px, 44vw, 560px))' }}>
-        <div className="flex flex-col gap-[4px]">
+
+        {/* LEFT — single flat flex-col, spacing via mt-* only */}
+        <div
+          className="flex flex-col w-full lg:pl-[clamp(8px,1.8vw,28px)]"
+          style={{ maxWidth: 'min(100%, clamp(460px, 44vw, 560px))' }}
+        >
+          {/* Badge */}
           <motion.div
-            className="items-center"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.52, delay: 0.12, ease: EASE_OUT }}
           >
-            <Badge dot color="emerald"> Growth OS for Coaching Institutes </Badge>
+            <Badge dot color="emerald">Trusted by 4,200+ institutes · 300+ joined this month</Badge>
           </motion.div>
 
+          {/* Heading — 4px below badge */}
           <motion.h1
-            className="font-bold leading-[1.08] tracking-[-0.045em] text-white"
+            className="mt-[4px] font-bold leading-[1.08] tracking-[-0.045em] text-white"
             style={{ fontSize: 'clamp(2.3rem, 4.2vw, 4.2rem)' }}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.62, delay: 0.26, ease: EASE_OUT }}
           >
-            Your data is ready.
+            Your institute runs itself.
             <br />
             <RotatingWord />
           </motion.h1>
-          </div>
 
-          <div className="mt-[6px]">
+          {/* Subtext — 6px below heading */}
           <motion.p
-            className="text-[clamp(0.95rem,1vw,1.05rem)] leading-[1.75] text-white/60 max-w-[58ch]"
+            className="mt-[6px] text-[clamp(0.95rem,1vw,1.05rem)] leading-[1.75] text-white/60 max-w-[52ch]"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.40, ease: EASE_OUT }}
           >
-            Manage admissions, fees, and students - all in one powerful dashboard.
+            Manage admissions, fees, and students — all in one simple dashboard.
           </motion.p>
-          </div>
 
+          {/* CTAs — 4px below subtext */}
           <div className="mt-[4px] flex flex-wrap items-center gap-3">
-          <motion.div
-            className="mb-4 flex flex-wrap items-center gap-3"
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.48, ease: EASE_OUT }}
-          >
-            <MagneticButton variant="primary" className="!py-[14px] !px-8 animate-glow-pulse">
-              Start free — Setup your Institute <ArrowRight size={14} />
-            </MagneticButton>
-            <Button variant="secondary" p-2 size="md">
-              <span className="mr-1.5 mb-4 p-2 flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-[10px]">▶</span>
-              Watch Demo (2 min) 
-            </Button>
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.48, ease: EASE_OUT }}
+            >
+              <MagneticButton variant="primary" className="!py-[14px] !px-8 animate-glow-pulse">
+                Start Free — Setup Your Institute <ArrowRight size={14} />
+              </MagneticButton>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.54, ease: EASE_OUT }}
+            >
+              <Button variant="secondary" size="md">
+                <span className="mr-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-[10px]">▶</span>
+                Watch Demo (2 min)
+              </Button>
+            </motion.div>
           </div>
 
-          <div className="mt-[4px]">
+          {/* Microcopy — 4px below CTAs */}
           <motion.p
-            className="text-[12.5px] tracking-[0.01em] text-white/42"
+            className="mt-[4px] text-[12.5px] tracking-[0.01em] text-white/42"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.45, delay: 0.56 }}
           >
-            No Technical skills needed · No Setup cost · Cancel anytime
+            No Technical skills needed · No card needed · Cancel anytime
           </motion.p>
-          </div>
 
-
-          <div className="mt-[8px] flex flex-wrap items-center gap-4">
+          {/* Social proof — 8px below microcopy */}
           <motion.div
-            className="flex flex-wrap items-center gap-4"
+            className="mt-[8px] flex flex-wrap items-center gap-3"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.62, ease: EASE_OUT }}
@@ -326,8 +319,9 @@ export default function Hero() {
                 />
               ))}
             </div>
-            <p className="text-[13px] mb-4 text-white/50">
-              Handling <span className="font-semibold text-white">2,800+</span> Students daily - Smooth, Automated, Stress-free.
+            <p className="text-[13px] text-white/50">
+              <span className="font-semibold text-white">Handling 2,800+</span>{' '}
+              students daily — smooth, automated, stress-free.
             </p>
             <div className="flex items-center gap-0.5">
               {'★★★★★'.split('').map((s, idx) => (
@@ -337,17 +331,17 @@ export default function Hero() {
             </div>
           </motion.div>
         </div>
-        </div>
 
-        {/* RIGHT — controlled alignment, not full-center */}
+        {/* RIGHT — dashboard */}
         <div className="relative hidden lg:flex lg:items-center lg:justify-end lg:pr-[clamp(6px,1.2vw,20px)]">
           <div className="w-full -translate-y-[1.25%] 2xl:scale-[0.992] 3xl:scale-[0.978] 4xl:scale-[0.965]">
             <DashPreview />
           </div>
         </div>
+
       </motion.div>
 
-      {/* Scroll cue */}
+      {/* Scroll cue — absolute, no layout impact */}
       <motion.div
         className="absolute bottom-8 left-1/2 z-[10] -translate-x-1/2 flex flex-col items-center gap-2"
         style={{ opacity: rawOp }}
