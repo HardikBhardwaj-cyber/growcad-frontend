@@ -249,7 +249,7 @@ export default function Hero() {
         <div className="flex flex-col w-full gap-6 lg:gap-7 lg:pl-[clamp(8px,1.8vw,28px)] mx-auto lg:mx-0" style={{ maxWidth: 'min(100%, clamp(460px, 44vw, 560px))' }}>
 
           <motion.div
-            className="mb-8 items-center"
+            className="space-y-2 items-center"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.52, delay: 0.12, ease: EASE_OUT }}
@@ -258,7 +258,7 @@ export default function Hero() {
           </motion.div>
 
           <motion.h1
-            className="mb-8 font-bold leading-[1.08] tracking-[-0.045em] text-white"
+            className="space-y-8 font-bold leading-[1.08] tracking-[-0.045em] text-white"
             style={{ fontSize: 'clamp(2.3rem, 4.2vw, 4.2rem)' }}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
