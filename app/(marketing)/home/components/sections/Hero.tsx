@@ -18,7 +18,7 @@ import {
 const BlobCanvas = lazy(() => import('../webgl/BlobCanvas'));
 const Particles  = lazy(() => import('../webgl/Particles'));
 
-const WORDS = ['Grow faster.', 'Win with data.', 'Move as one team.', 'Ship more experiments.'];
+const WORDS = ['Get more Admissions.', 'Track every Fee.', 'Control your Institute.', 'Grow without Chaos.'];
 
 function RotatingWord() {
   const [i, setI] = useState(0);
@@ -246,16 +246,16 @@ export default function Hero() {
         <div className="flex flex-col w-full lg:pl-[clamp(8px,1.8vw,28px)] mx-auto lg:mx-0" style={{ maxWidth: 'min(100%, clamp(460px, 44vw, 560px))' }}>
 
           <motion.div
-            className="mb-6"
+            className="mb-8 p-2 items-center"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.52, delay: 0.12, ease: EASE_OUT }}
           >
-            <Badge dot color="emerald">Trusted by 4,200+ teams · 300+ joined this month</Badge>
+            <Badge dot color="emerald"> Growth OS for Coaching Institutes </Badge>
           </motion.div>
 
           <motion.h1
-            className="mb-6 font-bold leading-[1.08] tracking-[-0.045em] text-white"
+            className="mb-8 font-bold leading-[1.08] tracking-[-0.045em] text-white"
             style={{ fontSize: 'clamp(2.3rem, 4.2vw, 4.2rem)' }}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -272,22 +272,21 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.40, ease: EASE_OUT }}
           >
-            One platform for analytics, experiments, and revenue data.
-            See what is working, fix what is not, and ship faster — starting today.
+            Manage admissions, fees, and students - all in one powerful dashboard.
           </motion.p>
 
           <motion.div
-            className="mb-3 flex flex-wrap items-center gap-3"
+            className="mb-4 mt-4 flex flex-wrap items-center gap-3"
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.48, ease: EASE_OUT }}
           >
             <MagneticButton variant="primary" className="!py-[14px] !px-8 animate-glow-pulse">
-              Start free — see results in 5 min <ArrowRight size={14} />
+              Start free — Setup your Institute <ArrowRight size={14} />
             </MagneticButton>
-            <Button variant="secondary" size="md">
-              <span className="mr-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-[10px]">▶</span>
-              See it in action (2 min)
+            <Button variant="secondary" p-2 size="md">
+              <span className="mr-1.5 mb-4 p-2 flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-[10px]">▶</span>
+              Watch Demo (2 min) 
             </Button>
           </motion.div>
 
@@ -297,7 +296,7 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.45, delay: 0.56 }}
           >
-            Free forever on Starter · No card needed · Cancel in one click
+            No Technical skills needed · No Setup cost · Cancel anytime
           </motion.p>
 
           <motion.div
@@ -315,8 +314,8 @@ export default function Hero() {
                 />
               ))}
             </div>
-            <p className="text-[13px] text-white/50">
-              <span className="font-semibold text-white">2,800+</span> teams switched from Mixpanel, Amplitude, or both
+            <p className="text-[13px] mb-4 text-white/50">
+              Handling <span className="font-semibold text-white">2,800+</span> Students daily - Smooth, Automated, Stress-free.
             </p>
             <div className="flex items-center gap-0.5">
               {'★★★★★'.split('').map((s, idx) => (
