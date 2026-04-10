@@ -10,7 +10,6 @@ import MagneticButton from '../ui/MagneticButton';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 import WebGLErrorBoundary from '../core/WebGLErrorBoundary';
-import SceneWrapper from '../core/SceneWrapper';
 import {
   CONTAINER, SECTION_PY, SCENES,
   HERO_PHASES, T, EASE_OUT, DUR,
@@ -92,10 +91,11 @@ function DashPreview() {
           rotateY: sRotY,
           transformStyle: 'preserve-3d',
         }}
-        className="relative m-6 rounded-2xl border border-white/[0.09] bg-[#0c0c10]/96 overflow-hidden cursor-default"
+        className="relative rounded-2xl border border-white/[0.09] bg-[#0c0c10]/96 overflow-hidden cursor-default"
         whileHover={{ scale: 1.015 }}
         transition={{ duration: 0.28, ease: EASE_OUT }}
       >
+        {/* Inset shadow overlay */}
         <div style={{
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07), 0 4px 16px rgba(0,0,0,0.4), 0 32px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03)',
           borderRadius: 'inherit',
@@ -104,21 +104,22 @@ function DashPreview() {
           pointerEvents: 'none',
         }} />
 
-        {/* Chrome bar */}
-        <div className="flex items-center gap-2 border-b border-white/[0.05] bg-white/[0.012] px-4 py-3">
-          <span className="h-2.5 w-2.5 rounded-full bg-red-500/55" />
-          <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/55" />
-          <span className="h-2.5 w-2.5 rounded-full bg-green-500/55" />
-          <div className="mx-auto flex items-center gap-1.5 rounded-lg bg-white/[0.05] px-3 py-[5px]">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute h-full w-full animate-ping rounded-full bg-emerald-400 opacity-55" />
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-            </span>
-            <span className="text-[10px] text-white/30">app.growcad.in</span>
-          </div>
-        </div>
-
+        {/* All card content in one padded wrapper */}
         <div className="p-5">
+          {/* Chrome bar — padded naturally by parent p-5 */}
+          <div className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.04] px-3 pb-3 pt-2.5 mb-5">
+            <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full bg-red-500/55" />
+            <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full bg-yellow-500/55" />
+            <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full bg-green-500/55" />
+            <div className="mx-auto flex items-center gap-1.5 rounded-lg bg-white/[0.05] px-3 py-[5px]">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute h-full w-full animate-ping rounded-full bg-emerald-400 opacity-55" />
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              </span>
+              <span className="text-[10px] text-white/30">app.growcad.io</span>
+            </div>
+          </div>
+
           {/* Revenue header */}
           <div className="mb-5 flex items-start justify-between">
             <div>
@@ -200,8 +201,8 @@ export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] });
 
-  const rawY    = useTransform(scrollYProgress, [0, 1], [0, 100]);
-  const rawOp   = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
+  const rawY     = useTransform(scrollYProgress, [0, 1], [0, 100]);
+  const rawOp    = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
   const contentY = useSpring(rawY, { damping: 30, stiffness: 100 });
 
   return (
@@ -225,7 +226,7 @@ export default function Hero() {
         </WebGLErrorBoundary>
       </motion.div>
 
-      {/* Ambient glows — floating, three-layer depth */}
+      {/* Ambient glows */}
       <motion.div
         className="pointer-events-none absolute inset-0 z-[1]"
         animate={{ y: [0, -12, 0] }}
@@ -236,13 +237,14 @@ export default function Hero() {
         <div style={{ position: 'absolute', bottom: '5%', left: '30%', width: 480, height: 480, background: 'radial-gradient(circle, rgba(109,40,217,0.05) 0%, transparent 65%)', filter: 'blur(110px)' }} />
       </motion.div>
 
-      {/* Content */}
+      {/* Content grid */}
       <motion.div
         style={{ y: contentY, opacity: rawOp }}
-        className={`relative z-[10] ${CONTAINER.page} grid w-full grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16`}
+        className={`relative z-[10] ${CONTAINER.page} grid w-full grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20`}
       >
-        {/* LEFT */}
-        <div className="flex flex-col w-full">
+        {/* LEFT — max-w constrains text for balance */}
+        <div className="flex flex-col w-full max-w-[540px]">
+
           <motion.div
             className="mb-6"
             initial={{ opacity: 0, y: 16 }}
@@ -265,7 +267,7 @@ export default function Hero() {
           </motion.h1>
 
           <motion.p
-            className="mb-8 max-w-[520px] text-[1.0625rem] leading-[1.78] text-white/60"
+            className="mb-8 text-[1.0625rem] leading-[1.78] text-white/60"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.40, ease: EASE_OUT }}
@@ -325,8 +327,8 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* RIGHT — dashboard with 3D tilt */}
-        <div className="relative hidden lg:flex lg:items-center lg:justify-end">
+        {/* RIGHT — dashboard, slight inward push for balance */}
+        <div className="relative hidden lg:flex lg:items-center lg:justify-end lg:pl-8">
           <div className="w-full">
             <DashPreview />
           </div>
