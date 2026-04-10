@@ -43,14 +43,13 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     lenisRef.current = lenis;
 
     // Expose globally for GSAP ScrollTrigger integration
-    (window as Record<string, unknown>).__lenis = lenis;
+    window.__lenis = lenis;
 
     // Keep GSAP ScrollTrigger in sync on every Lenis scroll tick
     lenis.on('scroll', () => {
-      const ST = (window as Record<string, unknown>).ScrollTrigger as
-        { update?: () => void } | undefined;
-      ST?.update?.();
-    });
+      const ST = window.ScrollTrigger;
+        ST?.update?.();
+      });  
 
     // RAF loop — Lenis requires its own requestAnimationFrame
     let rafId: number;
@@ -76,7 +75,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       window.removeEventListener('resize', onResize);
       document.removeEventListener('visibilitychange', onVisChange);
       lenis.destroy();
-      delete (window as Record<string, unknown>).__lenis;
+      delete window.__lenis;
     };
   }, []);
 
