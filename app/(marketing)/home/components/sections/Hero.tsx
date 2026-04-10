@@ -230,7 +230,7 @@ export default function Hero() {
       {/* Content grid — scroll parallax only, no spacing role */}
       <motion.div
         style={{ y: contentY, opacity: rawOp }}
-        className={`relative z-[10] ${HERO_INNER} grid w-full grid-cols-1 items-start min-h-screen gap-[clamp(1.75rem,3.5vw,4rem)] lg:grid-cols-[1.1fr_0.9fr]`}
+        className={`relative z-[10] ${HERO_INNER} grid w-full grid-cols-1 items-center min-h-screen gap-[clamp(1.75rem,3.5vw,4rem)] lg:grid-cols-[1.3fr_0.7fr]`}
       >
 
         {/* LEFT — single flat flex-col, spacing via mt-* only */}
@@ -255,7 +255,7 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.62, delay: 0.26, ease: EASE_OUT }}
           >
-            Your institute runs itself.
+            Your institute runs.
             <br />
             <RotatingWord />
           </motion.h1>
