@@ -103,13 +103,21 @@ function PlanCard({ plan, cycle, i }: { plan: typeof PLANS[0]; cycle: Cycle; i: 
         ].join(' ')}
         style={{
           boxShadow: plan.primary ? SHADOW.dashCard : SHADOW.card,
+          scale: plan.primary ? 1.02 : 1,
         }}
         whileHover={
           !plan.primary
-            ? { y: -5, boxShadow: SHADOW.cardLift }
-            : undefined
+            ? { y: -4, boxShadow: SHADOW.cardLift, borderColor: 'rgba(255,255,255,0.14)' }
+            : { boxShadow: [
+                'inset 0 1px 0 rgba(139,92,246,0.12)',
+                '0 4px 24px rgba(0,0,0,0.5)',
+                '0 32px 80px rgba(0,0,0,0.6)',
+                '0 0 80px rgba(139,92,246,0.28)',
+                '0 0 0 1px rgba(255,255,255,0.04)',
+              ].join(', ')}
         }
-        transition={T.fast}
+        whileTap={{ scale: plan.primary ? 1.015 : 0.988 }}
+        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
       >
         {/* Inner shine — primary only */}
         {plan.primary && (
@@ -199,16 +207,29 @@ function PlanCard({ plan, cycle, i }: { plan: typeof PLANS[0]; cycle: Cycle; i: 
               className={[
                 'w-full rounded-full border border-white/[0.09] bg-white/[0.025] py-3.5',
                 `text-[13px] font-medium ${HIERARCHY.tertiary}`,
-                'transition-colors duration-200 hover:bg-white/[0.06] hover:border-white/[0.16] hover:text-white/80',
+                'transition-[colors,border-color,box-shadow] duration-[120ms] hover:bg-white/[0.06] hover:border-white/[0.16] hover:text-white/80',
               ].join(' ')}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={T.micro}
+              whileHover={{ scale: 1.015 }}
+              whileTap={{ scale: 0.982 }}
+              transition={{ duration: 0.12, ease: [0.16, 1, 0.3, 1] }}
             >
               {plan.cta}
             </motion.button>
           )}
         </div>
+
+        {/* Microcopy trust signal — fades in 220ms after CTA */}
+        {plan.primary && (
+          <motion.p
+            className="mb-5 text-center text-[11px] text-white/32 tracking-[0.01em]"
+            initial={{ opacity: 0, y: 4 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.38, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
+          >
+            Free 14-day trial · No card required · Cancel anytime
+          </motion.p>
+        )}
 
         {/* Features — secondary weight, clean list */}
         <ul className="mt-auto space-y-3.5">
@@ -274,13 +295,13 @@ export default function Pricing() {
           <p className="scene-label mb-4 w-full text-center">Start free. Upgrade when you are ready.</p>
           <h2
             className="mb-5 w-full font-bold leading-[1.08] tracking-[-0.03em] text-center"
-            style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
+            style={{ fontSize: 'clamp(1.8rem, 3.2vw, 3rem)' }}
           >
             <span className={HIERARCHY.primary}>No gotchas. No upsells. No surprises.</span>
             <br />
             <span className="text-white/30">Just honest pricing that scales with you.</span>
           </h2>
-          <p className={`mx-auto mb-10 max-w-[540px] text-center text-[15px] leading-[1.75] ${HIERARCHY.tertiary}`}>
+          <p className={`mx-auto mb-10 max-w-[540px] text-center text-[clamp(0.875rem,1vw,1rem)] leading-[1.75] ${HIERARCHY.tertiary}`}>
             The free plan is genuinely useful. Upgrade only when you need more scale.
           </p>
 

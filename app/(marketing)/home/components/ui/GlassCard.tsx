@@ -87,7 +87,7 @@ export default function GlassCard({
     'border border-white/[0.07]',
     deep ? 'bg-[#0c0c10]/90' : 'bg-white/[0.026]',
     'p-6 backdrop-blur-[10px]',
-    'transition-[border-color] duration-300',
+    'transition-[border-color,box-shadow] duration-[180ms]',
     glow && 'hover:border-white/[0.12]',
     className
   );
@@ -162,7 +162,8 @@ export default function GlassCard({
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
         whileHover={lift ? { boxShadow: liftShadow } : undefined}
-        transition={T.fast}
+        whileTap={lift ? { scale: 0.988 } : undefined}
+        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
       >
         {decoration}
         {children}
@@ -182,10 +183,11 @@ export default function GlassCard({
       onMouseLeave={onMouseLeave}
       whileHover={
         lift
-          ? { y: -5, boxShadow: liftShadow }
+          ? { y: -4, boxShadow: liftShadow }
           : undefined
       }
-      transition={T.fast}
+      whileTap={lift ? { scale: 0.988 } : undefined}
+      transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
     >
       {decoration}
       {children}

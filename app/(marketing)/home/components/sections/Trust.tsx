@@ -53,7 +53,7 @@ function StatCard({ target, opts, label, sub, delay = 0 }: {
       {/* Number — scale-pop on arrival for attention lock */}
       <motion.div
         className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text font-bold leading-none tracking-tight text-transparent tabular-nums"
-        style={{ fontSize: 'clamp(2.6rem, 4.5vw, 3.8rem)' }}
+        style={{ fontSize: 'clamp(2rem, 3.6vw, 3.4rem)' }}
         animate={inView ? { scale: [0.88, 1.05, 1] } : { scale: 0.88 }}
         transition={{ duration: 0.7, delay: delay + 0.1, ease: [0.16, 1, 0.3, 1] }}
       >
@@ -130,10 +130,10 @@ export default function Trust() {
       <div className={CONTAINER.page}>
       <SceneWrapper exitScale={0.97} entryY={28}>
         <Reveal className="mb-14 text-center w-full">
-          <p className="scene-label mb-4 w-full text-center">Numbers that donot need a spin</p>
+          <p className="scene-label mb-4 w-full text-center">Numbers that don not need a spin</p>
           <h2
             className="w-full font-bold leading-[1.08] tracking-[-0.03em] text-center"
-            style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
+            style={{ fontSize: 'clamp(1.8rem, 3.2vw, 3rem)' }}
           >
             <span className={HIERARCHY.primary}>Built for teams that ship.</span>
             <br />

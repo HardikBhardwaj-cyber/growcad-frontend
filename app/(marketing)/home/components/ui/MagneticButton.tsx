@@ -1,41 +1,29 @@
 'use client';
 
-import {
-  ReactNode,
-  useRef,
-  useState,
-  MouseEvent as RMouseEvent,
-  useEffect,
-} from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { ReactNode, useRef, useState, MouseEvent as RMouseEvent, useEffect } from 'react';
+import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface MagneticButtonProps {
-  children: ReactNode;
-  variant?: 'primary' | 'outline';
+  children:   ReactNode;
+  variant?:   'primary' | 'outline';
   className?: string;
-  onClick?: () => void;
+  onClick?:   () => void;
 }
 
 export default function MagneticButton({
   children,
-  variant = 'primary',
+  variant  = 'primary',
   className,
   onClick,
 }: MagneticButtonProps) {
-  const ref = useRef<HTMLButtonElement>(null);
-  const [hovered, setHovered] = useState(false);
-  const [pressed, setPressed] = useState(false);
-  const [canHover, setCanHover] = useState(false);
+  const ref      = useRef<HTMLButtonElement>(null);
+  const [hovered, setHovered]   = useState(false);
+  const [pressed, setPressed]   = useState(false);
+  const canHover = useRef(false);
 
   useEffect(() => {
-    // ✅ FIX: defer state update to avoid sync setState warning
-    const mq = window.matchMedia('(hover: hover)');
-    const id = requestAnimationFrame(() => {
-      setCanHover(mq.matches);
-    });
-
-    return () => cancelAnimationFrame(id);
+    canHover.current = window.matchMedia('(hover: hover)').matches;
   }, []);
 
   // Magnetic follow — snappy spring, immediate response
@@ -48,15 +36,9 @@ export default function MagneticButton({
     if (!canHover) return;
     const el = ref.current;
     if (!el) return;
-
     const rect = el.getBoundingClientRect();
-
-    rawX.set(
-      (e.clientX - (rect.left + rect.width / 2)) * 0.38
-    );
-    rawY.set(
-      (e.clientY - (rect.top + rect.height / 2)) * 0.38
-    );
+    rawX.set((e.clientX - (rect.left + rect.width  / 2)) * 0.38);
+    rawY.set((e.clientY - (rect.top  + rect.height / 2)) * 0.38);
   };
 
   const onMouseLeave = () => {
@@ -77,6 +59,7 @@ export default function MagneticButton({
       onMouseDown={() => setPressed(true)}
       onMouseUp={() => setPressed(false)}
       onClick={onClick}
+      // Immediate hover response <50ms — no transition delay on scale
       animate={{
         scale: pressed ? 0.955 : hovered ? 1.06 : 1,
         y: hovered && !pressed ? -2 : 0,
@@ -87,8 +70,8 @@ export default function MagneticButton({
         }),
       }}
       transition={{
-        scale: { duration: 0.14, ease: [0.16, 1, 0.3, 1] },
-        y: { duration: 0.18, ease: [0.16, 1, 0.3, 1] },
+        scale:     { duration: 0.14, ease: [0.16, 1, 0.3, 1] },
+        y:         { duration: 0.18, ease: [0.16, 1, 0.3, 1] },
         boxShadow: { duration: 0.22, ease: [0.16, 1, 0.3, 1] },
       }}
       className={cn(
@@ -100,25 +83,23 @@ export default function MagneticButton({
         className
       )}
     >
-      {/* Gradient border ring */}
+      {/* Gradient border ring — appears on hover */}
       {isPrimary && (
         <span
           aria-hidden="true"
           className="pointer-events-none absolute -inset-[1px] rounded-full opacity-0 transition-opacity duration-150 group-hover:opacity-100"
           style={{
-            background:
-              'linear-gradient(90deg, #8b5cf6, #3b82f6, #22d3ee, #8b5cf6)',
+            background: 'linear-gradient(90deg, #8b5cf6, #3b82f6, #22d3ee, #8b5cf6)',
             backgroundSize: '200% 200%',
             padding: '1px',
-            WebkitMask:
-              'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
             WebkitMaskComposite: 'xor',
             maskComposite: 'exclude',
           }}
         />
       )}
 
-      {/* Shimmer */}
+      {/* Shimmer sweep — fires on hover */}
       {isPrimary && (
         <motion.span
           aria-hidden="true"
@@ -129,7 +110,7 @@ export default function MagneticButton({
         />
       )}
 
-      {/* Secondary hover */}
+      {/* Secondary hover lift */}
       {!isPrimary && (
         <motion.span
           aria-hidden="true"
@@ -137,13 +118,12 @@ export default function MagneticButton({
           animate={{ opacity: hovered ? 1 : 0 }}
           transition={{ duration: 0.12 }}
           style={{
-            background:
-              'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(59,130,246,0.05))',
+            background: 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(59,130,246,0.05))',
           }}
         />
       )}
 
-      {/* Content */}
+      {/* Children — arrow shifts right on hover (directional intent) */}
       <span className="relative z-10 flex items-center gap-2">
         <motion.span
           className="flex items-center gap-2"

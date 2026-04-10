@@ -11,11 +11,9 @@ import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 import WebGLErrorBoundary from '../core/WebGLErrorBoundary';
 import {
-  CONTAINER, SECTION_PY, SCENES,
+  CONTAINER, SECTION_PY, HERO_INNER, SCENES,
   HERO_PHASES, T, EASE_OUT, DUR,
 } from '../../systems/design';
-
-
 
 const BlobCanvas = lazy(() => import('../webgl/BlobCanvas'));
 const Particles  = lazy(() => import('../webgl/Particles'));
@@ -211,7 +209,7 @@ export default function Hero() {
     <section
       ref={sectionRef}
       data-scene={SCENES.hero}
-      className={`relative flex min-h-[100svh] items-center ${SECTION_PY.hero}`}
+      className={`relative flex min-h-[min(100svh,900px)] items-center ${SECTION_PY.hero}`}
     >
       {/* WebGL layer */}
       <motion.div
@@ -242,23 +240,23 @@ export default function Hero() {
       {/* Content grid */}
       <motion.div
         style={{ y: contentY, opacity: rawOp }}
-        className={`relative z-[10] ${CONTAINER.page} grid w-full grid-cols-1 relative h-screen items-center gap-12 lg:grid-cols-2 lg:gap-20`}
+        className={`relative z-[10] ${HERO_INNER} grid w-full grid-cols-1 items-center gap-[clamp(1.75rem,3.5vw,4rem)] lg:grid-cols-[1.05fr_0.95fr]`}
       >
-        {/* LEFT — max-w constrains text for balance */}
-        <div className="flex flex-col w-full max-w-[540px]  lg:ml-6">
+        {/* LEFT — inner constraint removes left-heavy illusion */}
+        <div className="flex flex-col w-full lg:pl-[clamp(8px,1.8vw,28px)] mx-auto lg:mx-0" style={{ maxWidth: 'min(100%, clamp(460px, 44vw, 560px))' }}>
 
           <motion.div
-            className="mb-8 mt-6 flex items-center gap-3 self-start rounded-full bg-white/[0.06]"
+            className="mb-6"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.52, delay: 0.12, ease: EASE_OUT }}
           >
-            <Badge dot color="emerald"> Growth Operating System for Coaching Institutes</Badge>
+            <Badge dot color="emerald">Trusted by 4,200+ teams · 300+ joined this month</Badge>
           </motion.div>
 
           <motion.h1
-            className="mb-6 font-bold leading-[1.02] tracking-[-0.045em] text-white"
-            style={{ fontSize: 'clamp(2.9rem, 5.2vw, 4.6rem)' }}
+            className="mb-6 font-bold leading-[1.08] tracking-[-0.045em] text-white"
+            style={{ fontSize: 'clamp(2.3rem, 4.2vw, 4.2rem)' }}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.62, delay: 0.26, ease: EASE_OUT }}
@@ -269,7 +267,7 @@ export default function Hero() {
           </motion.h1>
 
           <motion.p
-            className="mb-8 text-[1.0625rem] leading-[1.78] text-white/60"
+            className="mb-8 text-[clamp(0.95rem,1vw,1.05rem)] leading-[1.75] text-white/60 max-w-[58ch]"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.40, ease: EASE_OUT }}
@@ -329,9 +327,9 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* RIGHT — dashboard, slight inward push for balance */}
-        <div className="relative hidden lg:flex lg:items-center lg:justify-end lg:pl-8">
-          <div className="w-full">
+        {/* RIGHT — controlled alignment, not full-center */}
+        <div className="relative hidden lg:flex lg:items-center lg:justify-end lg:pr-[clamp(6px,1.2vw,20px)]">
+          <div className="w-full -translate-y-[1.25%] 2xl:scale-[0.992] 3xl:scale-[0.978] 4xl:scale-[0.965]">
             <DashPreview />
           </div>
         </div>

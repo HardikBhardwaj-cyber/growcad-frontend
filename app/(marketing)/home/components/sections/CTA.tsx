@@ -53,7 +53,7 @@ export default function CTA() {
           {/* Pulsing outer container — scale 1→1.015→1 on loop */}
           <motion.div
             animate={{ scale: [1, 1.012, 1] }}
-            transition={{ duration: 2.8, repeat: Infinity, ease: [0.45, 0, 0.55, 1], repeatType: 'mirror' }}
+            transition={{ duration: 2.6, repeat: Infinity, ease: [0.45, 0, 0.55, 1], repeatType: 'mirror' }}
           >
 
           {/* Animated gradient border ring */}
@@ -147,7 +147,7 @@ export default function CTA() {
               {/* Headline */}
               <motion.h2
                 className="relative mb-5 w-full text-center font-bold leading-[1.04] tracking-[-0.04em] text-white"
-                style={{ fontSize: 'clamp(2.5rem, 5.5vw, 4.4rem)' }}
+                style={{ fontSize: 'clamp(2rem, 4.4vw, 4rem)' }}
                 initial={{ opacity: 0, y: 28, filter: 'blur(12px)' }}
                 whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 viewport={{ once: true }}
@@ -162,11 +162,11 @@ export default function CTA() {
 
               {/* Sub-copy */}
               <motion.p
-                className="relative mx-auto mb-8 max-w-[440px] text-[15px] leading-[1.78] text-white/60"
+                className="relative mx-auto mb-8 max-w-[440px] text-[clamp(0.875rem,1vw,1rem)] leading-[1.78] text-white/60"
                 initial={{ opacity: 0, y: 18, filter: 'blur(6px)' }}
                 whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 viewport={{ once: true }}
-                transition={{ duration: DUR.NORMAL, delay: 0.15, ease: EASE_OUT }}
+                transition={{ duration: DUR.NORMAL, delay: 0.28, ease: EASE_OUT }}
               >
                 Every minute you wait, a competitor gets another data point on you.
                 Set up in 20 minutes. Your first real insight in 5.
@@ -194,7 +194,7 @@ export default function CTA() {
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: DUR.NORMAL, delay: 0.30 }}
+                transition={{ duration: DUR.NORMAL, delay: 0.42 }}
               >
                 No engineer needed · No credit card · Cancel anytime, no questions asked
               </motion.p>

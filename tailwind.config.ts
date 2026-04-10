@@ -9,20 +9,29 @@ const config: Config = {
 
   theme: {
     extend: {
-      // ── Colors ────────────────────────────────────────────
+      // ── Custom breakpoints for ultra-wide handling ─────────────
+      screens: {
+        // Tailwind defaults kept: sm=640, md=768, lg=1024, xl=1280, 2xl=1536
+        // Added above:
+        '3xl': '1920px',   // 2K / large desktops
+        '4xl': '2560px',   // 2.5K / QHD
+        '5xl': '3840px',   // 4K
+      },
+
+      // ── Colors ─────────────────────────────────────────────────
       colors: {
         background: '#070709',
         surface:    'rgba(255,255,255,0.028)',
         raise:      '#0c0c10',
       },
 
-      // ── Typography ────────────────────────────────────────
+      // ── Typography ─────────────────────────────────────────────
       fontFamily: {
         sans: ['Geist', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         mono: ['Geist Mono', 'Fira Code', 'ui-monospace', 'monospace'],
       },
 
-      // ── Letter spacing ─────────────────────────────────────
+      // ── Letter spacing ──────────────────────────────────────────
       letterSpacing: {
         tightest: '-0.04em',
         tighter:  '-0.03em',
@@ -30,43 +39,50 @@ const config: Config = {
         snug:     '-0.01em',
       },
 
-      // ── Border radius ──────────────────────────────────────
+      // ── Border radius ───────────────────────────────────────────
       borderRadius: {
         '3xl': '1.5rem',
         '4xl': '2rem',
         '5xl': '2.5rem',
       },
 
-      // ── Max width ──────────────────────────────────────────
+      // ── Max width — fluid scale ─────────────────────────────────
       maxWidth: {
+        // Named tokens used by CONTAINER system
+        'container-sm':  '640px',
+        'container-md':  '880px',
+        'container':     '1200px',
+        'container-lg':  '1440px',
+        'container-xl':  '1680px',
+        // Legacy names kept for backward compat
         page:   '1152px',
         narrow: '768px',
         wide:   '1320px',
       },
 
-      // ── Background images ──────────────────────────────────
+      // ── Background images ───────────────────────────────────────
       backgroundImage: {
-        'gradient-brand':   'linear-gradient(135deg, #7c3aed, #2563eb)',
+        'gradient-brand':      'linear-gradient(135deg, #7c3aed, #2563eb)',
         'gradient-brand-soft': 'linear-gradient(135deg, #8b5cf6, #3b82f6)',
-        'gradient-text':    'linear-gradient(90deg, #a78bfa, #60a5fa, #22d3ee)',
-        'gradient-radial':  'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':   'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'gradient-dot':     'radial-gradient(circle, rgba(255,255,255,0.65) 1px, transparent 1px)',
+        'gradient-text':       'linear-gradient(90deg, #a78bfa, #60a5fa, #22d3ee)',
+        'gradient-radial':     'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic':      'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'gradient-dot':        'radial-gradient(circle, rgba(255,255,255,0.65) 1px, transparent 1px)',
       },
 
-      // ── Box shadows ────────────────────────────────────────
+      // ── Box shadows ─────────────────────────────────────────────
       boxShadow: {
-        'glow-violet':       '0 0 50px rgba(139,92,246,0.35)',
-        'glow-violet-lg':    '0 0 80px rgba(139,92,246,0.5)',
-        'glow-blue':         '0 0 50px rgba(59,130,246,0.3)',
-        'card':              '0 40px 120px rgba(0,0,0,0.55)',
-        'card-hover':        '0 56px 160px rgba(0,0,0,0.65)',
-        'focus-violet':      '0 0 0 3px rgba(139,92,246,0.2)',
-        'focus-blue':        '0 0 0 3px rgba(59,130,246,0.18)',
-        'inner-shine':       'inset 0 1px 0 rgba(255,255,255,0.06)',
+        'glow-violet':    '0 0 50px rgba(139,92,246,0.35)',
+        'glow-violet-lg': '0 0 80px rgba(139,92,246,0.5)',
+        'glow-blue':      '0 0 50px rgba(59,130,246,0.3)',
+        'card':           '0 40px 120px rgba(0,0,0,0.55)',
+        'card-hover':     '0 56px 160px rgba(0,0,0,0.65)',
+        'focus-violet':   '0 0 0 3px rgba(139,92,246,0.2)',
+        'focus-blue':     '0 0 0 3px rgba(59,130,246,0.18)',
+        'inner-shine':    'inset 0 1px 0 rgba(255,255,255,0.06)',
       },
 
-      // ── Transition timing ──────────────────────────────────
+      // ── Transition timing ───────────────────────────────────────
       transitionTimingFunction: {
         smooth:    'cubic-bezier(0.22, 1, 0.36, 1)',
         snappy:    'cubic-bezier(0.4, 0, 0.2, 1)',
@@ -74,7 +90,7 @@ const config: Config = {
         'out-expo':'cubic-bezier(0.16, 1, 0.3, 1)',
       },
 
-      // ── Animations ────────────────────────────────────────
+      // ── Animations ─────────────────────────────────────────────
       animation: {
         'ping-slow':   'ping-slow 1.4s cubic-bezier(0,0,0.2,1) infinite',
         'float':       'float-y 5s ease-in-out infinite',

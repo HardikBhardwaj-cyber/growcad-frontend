@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence, useMotionValue } from 'framer-motion';
 import { BarChart2, TrendingUp, Users, Zap, Search, Bell, ChevronRight } from 'lucide-react';
 import Reveal from '../motion/Reveal';
@@ -31,7 +31,12 @@ const METRICS: Record<TabId, { label: string; val: string; delta: string; up: bo
 };
 
 export default function DashboardPreview() {
-  const [tab, setTab] = useState<TabId>('analytics');
+  const [tab, setTab]             = useState<TabId>('analytics');
+  const [displayTab, setDisplayTab] = useState<TabId>('analytics');
+  useEffect(() => {
+    const t = setTimeout(() => setDisplayTab(tab), 140);
+    return () => clearTimeout(t);
+  }, [tab]);
   const sectionRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start 88%', 'center 48%'] });
@@ -47,8 +52,8 @@ export default function DashboardPreview() {
   const tiltRef = useRef<HTMLDivElement>(null);
   const rotX = useMotionValue(0);
   const rotY = useMotionValue(0);
-  const sRotX = useSpring(rotX, { damping: 28, stiffness: 220 });
-  const sRotY = useSpring(rotY, { damping: 28, stiffness: 220 });
+  const sRotX = useSpring(rotX, { damping: 34, stiffness: 140, mass: 1.1 });
+  const sRotY = useSpring(rotY, { damping: 34, stiffness: 140, mass: 1.1 });
   const [hovered, setHovered] = useState(false);
 
   const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -63,8 +68,8 @@ export default function DashboardPreview() {
   const onMouseLeave = () => { rotX.set(0); rotY.set(0); setHovered(false); };
   const onMouseEnter = () => setHovered(true);
 
-  const bars = BARS[tab];
-  const mets = METRICS[tab];
+  const bars = BARS[displayTab];
+  const mets = METRICS[displayTab];
 
   return (
     <section
@@ -86,13 +91,13 @@ export default function DashboardPreview() {
           <p className="scene-label mb-4 w-full text-center">Your new Monday morning</p>
           <h2
             className="mb-5 w-full font-bold leading-[1.08] tracking-[-0.03em] text-center"
-            style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
+            style={{ fontSize: 'clamp(1.8rem, 3.2vw, 3rem)' }}
           >
             <span className="text-white">The dashboard your team</span>
             <br />
             <span className="text-white/30">actually looks forward to opening.</span>
           </h2>
-          <p className="mx-auto max-w-[540px] text-center text-[15px] leading-[1.75] mt-3 text-white/55">
+          <p className="mx-auto max-w-[540px] text-center text-[clamp(0.875rem,1vw,1rem)] leading-[1.75] mt-3 text-white/55">
             Every metric that matters, in one place. No setup call.
             No onboarding session. Just your data, ready on day one.
           </p>
@@ -233,10 +238,10 @@ export default function DashboardPreview() {
                   <motion.div
                     key={`m-${tab}`}
                     className="mb-6 grid grid-cols-3 gap-3"
-                    initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
-                    animate={{ opacity: 1, y: 0,  filter: 'blur(0px)' }}
-                    exit={{   opacity: 0, y: -8,  filter: 'blur(4px)' }}
-                    transition={{ duration: DUR.FAST, ease: EASE_OUT }}
+                    initial={{ opacity: 0, y: 8, filter: 'blur(3px)' }}
+                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                    exit={{   opacity: 0, y: -6, filter: 'blur(3px)' }}
+                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                   >
                     {mets.map((m, i) => (
                       <motion.div
@@ -244,10 +249,10 @@ export default function DashboardPreview() {
                         className="rounded-[13px] border border-white/[0.06] bg-white/[0.028] p-3.5"
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.07, duration: DUR.FAST }}
+                        transition={{ delay: i * 0.045, duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                       >
                         <p className={`text-[10px] ${HIERARCHY.muted}`}>{m.label}</p>
-                        <p className={`mt-0.5 text-[15px] font-bold leading-tight ${HIERARCHY.primary}`}>
+                        <p className={`mt-0.5 text-[clamp(0.875rem,1vw,1rem)] font-bold leading-tight ${HIERARCHY.primary}`}>
                           {m.val}
                         </p>
                         {m.delta && (
@@ -265,10 +270,10 @@ export default function DashboardPreview() {
                   <motion.div
                     key={`c-${tab}`}
                     className="overflow-hidden rounded-[14px] border border-white/[0.05] bg-white/[0.018] p-4"
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1   }}
-                    exit={{   opacity: 0, scale: 0.98 }}
-                    transition={{ duration: DUR.FAST, ease: EASE_OUT }}
+                    initial={{ opacity: 0, scale: 0.985, y: 6 }}
+                    animate={{ opacity: 1, scale: 1,     y: 0 }}
+                    exit={{   opacity: 0, scale: 0.985, y: -4 }}
+                    transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
                   >
                     <div className="flex items-end gap-[3px]" style={{ height: 100 }}>
                       {bars.map((h, i) => (
@@ -283,9 +288,9 @@ export default function DashboardPreview() {
                           initial={{ scaleY: 0, originY: '100%' }}
                           animate={{ scaleY: 1 }}
                           transition={{
-                            delay: i * 0.022,
-                            duration: DUR.FAST + (h / 100) * 0.18,
-                            ease: EASE_OUT,
+                            delay: i * 0.018,
+                            duration: 0.22 + (h / 100) * 0.12,
+                            ease: [0.34, 1.56, 0.64, 1],
                           }}
                         />
                       ))}

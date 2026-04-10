@@ -43,11 +43,12 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     lenisRef.current = lenis;
 
     // Expose globally for GSAP ScrollTrigger integration
-    window.__lenis = lenis;
+    (window as Record<string, unknown>).__lenis = lenis;
 
     // Keep GSAP ScrollTrigger in sync on every Lenis scroll tick
     lenis.on('scroll', () => {
-      const ST = window.ScrollTrigger;
+      const ST = (window as Record<string, unknown>).ScrollTrigger as
+        { update?: () => void } | undefined;
       ST?.update?.();
     });
 
@@ -75,7 +76,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       window.removeEventListener('resize', onResize);
       document.removeEventListener('visibilitychange', onVisChange);
       lenis.destroy();
-      delete window.__lenis;
+      delete (window as Record<string, unknown>).__lenis;
     };
   }, []);
 

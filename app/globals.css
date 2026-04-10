@@ -153,9 +153,9 @@ body {
 canvas { display: block; }
 
 /* Typography — three clear weight/tracking tiers */
-h1 { letter-spacing: -0.038em; line-height: 1.05; font-weight: 800; }
-h2 { letter-spacing: -0.028em; line-height: 1.08; font-weight: 700; }
-h3 { letter-spacing: -0.018em; line-height: 1.14; font-weight: 600; }
+h1 { letter-spacing: -0.038em; line-height: 1.08; font-weight: 800; font-size: clamp(1.75rem, 4.2vw, 4.2rem); }
+h2 { letter-spacing: -0.026em; line-height: 1.08; font-weight: 700; font-size: clamp(1.375rem, 3vw, 2.8rem); }
+h3 { letter-spacing: -0.016em; line-height: 1.14; font-weight: 600; font-size: clamp(1.125rem, 1.8vw, 1.625rem); }
 h4, h5, h6 { letter-spacing: -0.015em; line-height: 1.2; font-weight: 600; }
 p  { line-height: 1.72; }
 code, kbd, pre, samp { font-family: 'Geist Mono', monospace; }
@@ -202,7 +202,7 @@ html.lenis           { height: auto; }
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: min(100%, 960px);
+  width: min(100%, clamp(640px, 80vw, 1120px));
   height: 1px;
   background: linear-gradient(
     90deg,
@@ -398,6 +398,16 @@ html.lenis           { height: auto; }
   :root { font-size: 17px; }
 }
 
+/* QHD / 1440p / 2560px — slight scale, container expands to fill space better */
+@media (min-width: 2560px) {
+  :root { font-size: 18px; }
+}
+
+/* 4K / 5K / 8K — premium scale, content stays proportional */
+@media (min-width: 3840px) {
+  :root { font-size: 20px; }
+}
+
 /* ── 10. Reduced motion ──────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
@@ -410,3 +420,9 @@ html.lenis           { height: auto; }
     animation-duration:  0.01ms !important;
   }
 }
+
+/* ── Readability ────────────────────────────────────────────── */
+/* Limit body text to optimal reading measure — 58–65 chars/line */
+.measure-body   { max-width: 65ch; }
+.measure-narrow { max-width: 58ch; }
+.measure-wide   { max-width: 72ch; }

@@ -616,16 +616,16 @@ export default function Value() {
             sub-headline → secondary (reduced white)
             body copy → tertiary
           */}
-          <p className="scene-label mb-4 w-full mx-auto text-center">Why teams switch and never go back</p>
+          <p className="scene-label mb-4 w-full text-center">Why teams switch and never go back</p>
           <h2
             className="mb-5 w-full font-bold leading-[1.08] tracking-[-0.03em] text-center"
-            style={{ fontSize: 'clamp(2.2rem, 4.2vw, 3.4rem)' }}
+            style={{ fontSize: 'clamp(1.8rem, 3.2vw, 3rem)' }}
           >
             <span className="text-white">One tool your whole team actually uses.</span>
             <br />
             <span className="text-white/30">Because scattered tools kill speed.</span>
           </h2>
-          <p className="mx-auto max-w-[540px] text-center text-[15px] leading-[1.75] text-white/55">
+          <p className="mx-auto max-w-[540px] text-center text-[clamp(0.875rem,1vw,1rem)] leading-[1.75] text-white/55">
             Most teams waste 30% of their sprint cycle reconciling data across tools.
             Growcad ends that — one workspace, every signal, zero tab-switching.
           </p>
