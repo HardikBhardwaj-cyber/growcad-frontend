@@ -92,7 +92,7 @@ function DashPreview() {
           rotateY: sRotY,
           transformStyle: 'preserve-3d',
         }}
-        className="relative rounded-2xl border border-white/[0.09] bg-[#0c0c10]/96 overflow-hidden cursor-default"
+        className="relative p-6 rounded-2xl border border-white/[0.09] bg-[#0c0c10]/96 overflow-hidden cursor-default"
         whileHover={{ scale: 1.015 }}
         transition={{ duration: 0.28, ease: EASE_OUT }}
       >
@@ -114,13 +114,13 @@ function DashPreview() {
               <span className="absolute h-full w-full animate-ping rounded-full bg-emerald-400 opacity-55" />
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
             </span>
-            <span className="text-[10px] text-white/30">app.growcad.io</span>
+            <span className="text-[10px] text-white/30">app.growcad.in</span>
           </div>
         </div>
 
         <div className="p-5">
           {/* Revenue header */}
-          <div className="mb-5 p-4 flex items-start justify-between">
+          <div className="mb-5 flex items-start justify-between">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/30">Monthly Revenue</p>
               <div className="mt-1 flex items-end gap-2">
