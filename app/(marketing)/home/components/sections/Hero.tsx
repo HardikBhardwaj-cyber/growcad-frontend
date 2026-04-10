@@ -18,7 +18,10 @@ import {
 const BlobCanvas = lazy(() => import('../webgl/BlobCanvas'));
 const Particles  = lazy(() => import('../webgl/Particles'));
 
-const WORDS = ['Get more Admissions.', 'Track every Fee.', 'Control your Institute.', 'Grow without Chaos.'];
+const WORDS = ["Admissions. Simplified.",
+  "Fees. Fully tracked.",
+  "Students. Organized.",
+  "Growth. On autopilot."];
 
 function RotatingWord() {
   const [i, setI] = useState(0);
