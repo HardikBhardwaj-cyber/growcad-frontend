@@ -240,10 +240,10 @@ export default function Hero() {
       {/* Content grid */}
       <motion.div
         style={{ y: contentY, opacity: rawOp }}
-        className={`relative z-[10] ${CONTAINER.page} grid w-full grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20`}
+        className={`relative z-[10] ${CONTAINER.page} grid w-full grid-cols-1 leading-2.5 relative h-screen items-center gap-12 lg:grid-cols-2 lg:gap-20`}
       >
         {/* LEFT — max-w constrains text for balance */}
-        <div className="flex leading-2.5 relative h-screen flex-col w-full max-w-[540px]">
+        <div className="flex flex-col w-full max-w-[540px]">
 
           <motion.div
             className="mb-6 mt-6 flex items-center gap-3 self-start rounded-full bg-white/[0.06] px-3 py-1.5"
