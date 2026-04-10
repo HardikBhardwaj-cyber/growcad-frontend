@@ -230,7 +230,7 @@ export default function Hero() {
       {/* Content grid — scroll parallax only, no spacing role */}
       <motion.div
         style={{ y: contentY, opacity: rawOp }}
-        className={`relative z-[10] ${HERO_INNER} grid w-full grid-cols-1 items-start min-h-screen pt-[clamp(80px,12vh,140px)] pb-[clamp(40px,8vh,100px)] pl-[12vh] gap-[clamp(1.75rem,3.5vw,4rem)] lg:grid-cols-[1.3fr_0.7fr]`}
+        className={`relative z-[10] ${HERO_INNER} grid w-full grid-cols-1 items-start min-h-screen pt-[clamp(80px,12vh,140px)] pb-[clamp(40px,8vh,100px)] px-[clamp(20px,5vw,80px)] gap-[clamp(1.75rem,3.5vw,4rem)] lg:grid-cols-[1.3fr_0.7fr]`}
       >
 
         {/* LEFT — single flat flex-col, spacing via mt-* only */}
