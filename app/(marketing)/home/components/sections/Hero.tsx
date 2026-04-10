@@ -246,10 +246,10 @@ export default function Hero() {
         className={`relative z-[10] ${HERO_INNER} grid w-full h-screen grid-cols-1 items-center gap-[clamp(1.75rem,3.5vw,4rem)] lg:grid-cols-[1.05fr_0.95fr]`}
       >
         {/* LEFT — inner constraint removes left-heavy illusion */}
-        <div className="flex flex-col w-full gap-6 lg:gap-7 lg:pl-[clamp(8px,1.8vw,28px)] mx-auto lg:mx-0" style={{ maxWidth: 'min(100%, clamp(460px, 44vw, 560px))' }}>
+        <div className="flex flex-col w-full lg:pl-[clamp(8px,1.8vw,28px)] mx-auto lg:mx-0" style={{ maxWidth: 'min(100%, clamp(460px, 44vw, 560px))' }}>
 
           <motion.div
-            className="space-y-2 items-center"
+            className="space-y-2 lg:space-y-3 items-center"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.52, delay: 0.12, ease: EASE_OUT }}
