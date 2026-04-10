@@ -249,7 +249,7 @@ export default function Hero() {
         <div className="flex flex-col w-full lg:pl-[clamp(8px,1.8vw,28px)] mx-auto lg:mx-0" style={{ maxWidth: 'min(100%, clamp(460px, 44vw, 560px))' }}>
 
           <motion.div
-            className="space-y-8 lg:space-y-8 items-center"
+            className="gap-16 items-center"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.52, delay: 0.12, ease: EASE_OUT }}
