@@ -92,7 +92,7 @@ function DashPreview() {
           rotateY: sRotY,
           transformStyle: 'preserve-3d',
         }}
-        className="relative p-6 rounded-2xl border border-white/[0.09] bg-[#0c0c10]/96 overflow-hidden cursor-default"
+        className="relative m-6 rounded-2xl border border-white/[0.09] bg-[#0c0c10]/96 overflow-hidden cursor-default"
         whileHover={{ scale: 1.015 }}
         transition={{ duration: 0.28, ease: EASE_OUT }}
       >
