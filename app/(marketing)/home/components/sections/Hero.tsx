@@ -15,6 +15,8 @@ import {
   HERO_PHASES, T, EASE_OUT, DUR,
 } from '../../systems/design';
 
+
+
 const BlobCanvas = lazy(() => import('../webgl/BlobCanvas'));
 const Particles  = lazy(() => import('../webgl/Particles'));
 
@@ -240,10 +242,10 @@ export default function Hero() {
       {/* Content grid */}
       <motion.div
         style={{ y: contentY, opacity: rawOp }}
-        className={`relative z-[10] ${CONTAINER.page} grid w-full grid-cols-1 relative h-screen items-center gap-12 lg:grid-cols-2 lg:gap-20`}
+        className={`relative z-[10] ${CONTAINER.page} grid w-full h-screen items-center gap-12 lg:grid-cols-2 lg:gap-20 lg:justify-items-center`}
       >
         {/* LEFT — max-w constrains text for balance */}
-        <div className="flex flex-col w-screen max-w-[540px]">
+        <div className="flex flex-col w-full max-w-[540px] justify-self-start">
 
           <motion.div
             className="mb-8 mt-6 flex items-center gap-3 self-start rounded-full bg-white/[0.06]"
