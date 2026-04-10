@@ -246,10 +246,10 @@ export default function Hero() {
         className={`relative z-[10] ${HERO_INNER} grid w-full h-screen grid-cols-1 items-center gap-[clamp(1.75rem,3.5vw,4rem)] lg:grid-cols-[1.05fr_0.95fr]`}
       >
         {/* LEFT — inner constraint removes left-heavy illusion */}
-        <div className="flex flex-col w-full gap-[clamp(1.25rem,2vw,2rem)] lg:pl-[clamp(8px,1.8vw,28px)] mx-auto lg:mx-0" style={{ maxWidth: 'min(100%, clamp(460px, 44vw, 560px))' }}>
-
+        <div className="flex flex-col w-full lg:pl-[clamp(8px,1.8vw,28px)] mx-auto lg:mx-0" style={{ maxWidth: 'min(100%, clamp(460px, 44vw, 560px))' }}>
+        <div className="flex flex-col gap-[4px]">
           <motion.div
-            className="gap-16 items-center"
+            className="items-center"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.52, delay: 0.12, ease: EASE_OUT }}
@@ -258,7 +258,7 @@ export default function Hero() {
           </motion.div>
 
           <motion.h1
-            className="space-y-16 font-bold leading-[1.08] tracking-[-0.045em] text-white"
+            className="font-bold leading-[1.08] tracking-[-0.045em] text-white"
             style={{ fontSize: 'clamp(2.3rem, 4.2vw, 4.2rem)' }}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -268,16 +268,20 @@ export default function Hero() {
             <br />
             <RotatingWord />
           </motion.h1>
+          </div>
 
+          <div className="mt-[6px]">
           <motion.p
-            className="mb-8 text-[clamp(0.95rem,1vw,1.05rem)] leading-[1.75] text-white/60 max-w-[58ch]"
+            className="text-[clamp(0.95rem,1vw,1.05rem)] leading-[1.75] text-white/60 max-w-[58ch]"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.40, ease: EASE_OUT }}
           >
             Manage admissions, fees, and students - all in one powerful dashboard.
           </motion.p>
+          </div>
 
+          <div className="mt-[4px] flex flex-wrap items-center gap-3">
           <motion.div
             className="mb-4 flex flex-wrap items-center gap-3"
             initial={{ opacity: 0, y: 14 }}
@@ -292,16 +296,21 @@ export default function Hero() {
               Watch Demo (2 min) 
             </Button>
           </motion.div>
+          </div>
 
+          <div className="mt-[4px]">
           <motion.p
-            className="mb-10 text-[12.5px] tracking-[0.01em] text-white/42"
+            className="text-[12.5px] tracking-[0.01em] text-white/42"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.45, delay: 0.56 }}
           >
             No Technical skills needed · No Setup cost · Cancel anytime
           </motion.p>
+          </div>
 
+
+          <div className="mt-[8px] flex flex-wrap items-center gap-4">
           <motion.div
             className="flex flex-wrap items-center gap-4"
             initial={{ opacity: 0, y: 10 }}
@@ -327,6 +336,7 @@ export default function Hero() {
               <span className="ml-1 text-[12px] font-semibold text-white/75">4.9</span>
             </div>
           </motion.div>
+        </div>
         </div>
 
         {/* RIGHT — controlled alignment, not full-center */}
