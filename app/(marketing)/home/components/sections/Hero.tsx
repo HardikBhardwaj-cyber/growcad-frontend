@@ -249,7 +249,7 @@ export default function Hero() {
 
           {/* Heading — 4px below badge */}
           <motion.h1
-            className="mt-[4px] font-bold leading-[1.08] tracking-[-0.045em] text-white"
+            className="mt-[10px] font-bold leading-[1.08] tracking-[-0.045em] text-white"
             style={{ fontSize: 'clamp(2.3rem, 4.2vw, 4.2rem)' }}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -262,7 +262,7 @@ export default function Hero() {
 
           {/* Subtext — 6px below heading */}
           <motion.p
-            className="mt-[6px] text-[clamp(0.95rem,1vw,1.05rem)] leading-[1.75] text-white/60 max-w-[52ch]"
+            className="mt-[16px] text-[clamp(0.95rem,1vw,1.05rem)] leading-[1.75] text-white/60 max-w-[52ch]"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.40, ease: EASE_OUT }}
@@ -271,7 +271,7 @@ export default function Hero() {
           </motion.p>
 
           {/* CTAs — 4px below subtext */}
-          <div className="mt-[4px] flex flex-wrap items-center gap-3">
+          <div className="mt-[18px] flex flex-wrap items-center gap-3">
             <motion.div
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
@@ -295,7 +295,7 @@ export default function Hero() {
 
           {/* Microcopy — 4px below CTAs */}
           <motion.p
-            className="mt-[4px] text-[12.5px] tracking-[0.01em] text-white/42"
+            className="mt-[12px] text-[12.5px] tracking-[0.01em] text-white/42"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.45, delay: 0.56 }}
@@ -305,7 +305,7 @@ export default function Hero() {
 
           {/* Social proof — 8px below microcopy */}
           <motion.div
-            className="mt-[8px] flex flex-wrap items-center gap-3"
+            className="mt-[18px] flex flex-wrap items-center gap-3"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.62, ease: EASE_OUT }}
