@@ -242,10 +242,10 @@ export default function Hero() {
       {/* Content grid */}
       <motion.div
         style={{ y: contentY, opacity: rawOp }}
-        className={`relative z-[10] ${CONTAINER.page} grid w-full h-screen items-center gap-12 lg:grid-cols-2 lg:gap-20 lg:justify-items-center`}
+        className={`relative z-[10] ${CONTAINER.page} grid w-full h-screen items-center gap-12 lg:grid-cols-2 lg:gap-20`}
       >
         {/* LEFT — max-w constrains text for balance */}
-        <div className="flex flex-col w-full max-w-[540px] justify-self-start">
+        <div className="flex flex-col w-full max-w-[540px] pl-2 sm:pl-0">
 
           <motion.div
             className="mb-8 mt-6 flex items-center gap-3 self-start rounded-full bg-white/[0.06]"
@@ -330,7 +330,7 @@ export default function Hero() {
         </div>
 
         {/* RIGHT — dashboard, slight inward push for balance */}
-        <div className="relative hidden lg:flex lg:items-center lg:justify-end lg:pl-8">
+        <div className="relative hidden justify-center lg:flex lg:items-center lg:justify-end lg:pl-8">
           <div className="w-full">
             <DashPreview />
           </div>
