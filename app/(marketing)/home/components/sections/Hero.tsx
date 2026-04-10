@@ -229,14 +229,14 @@ export default function Hero() {
 
       {/* Content grid — scroll parallax only, no spacing role */}
       <motion.div
-        style={{ y: contentY, opacity: rawOp }}
-        className={`relative z-[10] grid w-full grid-cols-1 items-start min-h-screen pt-[clamp(80px,12vh,140px)] pb-[clamp(40px,8vh,100px)]  lg:grid-cols-[1.05fr_0.95fr]`}
-      >
+  style={{ y: contentY, opacity: rawOp }}
+  className="relative z-[10] w-full max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 items-start min-h-screen pt-[100px] pb-[60px] px-6 gap-12"
+>
 
         {/* LEFT — single flat flex-col, spacing via mt-* only */}
         <div
           className="flex flex-col w-full]"
-          style={{ maxWidth: 'min(100%, clamp(480px, 42vw, 560px))' }}
+          
         >
           {/* Badge */}
           <motion.div
