@@ -230,13 +230,13 @@ export default function Hero() {
       {/* Content grid — scroll parallax only, no spacing role */}
       <motion.div
         style={{ y: contentY, opacity: rawOp }}
-        className={`relative z-[10] ${HERO_INNER} grid w-full grid-cols-1 items-center gap-[clamp(1.75rem,3.5vw,4rem)] lg:grid-cols-[1.05fr_0.95fr]`}
+        className={`relative z-[10] ${HERO_INNER} grid w-full grid-cols-1 items-center gap-[clamp(1.75rem,3.5vw,4rem)] lg:grid-cols-[1.1fr_0.9fr]`}
       >
 
         {/* LEFT — single flat flex-col, spacing via mt-* only */}
         <div
           className="flex flex-col w-full lg:pl-[clamp(8px,1.8vw,28px)]"
-          style={{ maxWidth: 'min(100%, clamp(460px, 44vw, 560px))' }}
+          style={{ maxWidth: 'min(100%, clamp(520px, 52vw, 720px))' }}
         >
           {/* Badge */}
           <motion.div
@@ -277,7 +277,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.48, ease: EASE_OUT }}
             >
-              <MagneticButton variant="primary" className="!py-[14px] !px-8 animate-glow-pulse">
+              <MagneticButton variant="primary" className="!py-[14px] !px-8">
                 Start Free — Setup Your Institute <ArrowRight size={14} />
               </MagneticButton>
             </motion.div>
