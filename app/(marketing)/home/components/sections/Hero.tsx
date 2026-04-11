@@ -199,7 +199,7 @@ export default function Hero() {
     <section
       ref={sectionRef}
       data-scene={SCENES.hero}
-      className={`relative flex min-h-[min(100svh,900px)] items-center ${SECTION_PY.hero}`}
+      className={`relative flex min-h-[min(100svh,900px)] items-start ${SECTION_PY.hero}`}
     >
       {/* WebGL — absolute, no layout impact */}
       <motion.div
@@ -235,7 +235,7 @@ export default function Hero() {
 
         {/* LEFT — single flat flex-col, spacing via mt-* only */}
         <div
-          className="flex flex-col w-full]"
+          className="flex flex-col w-full"
           
         >
           {/* Badge */}
