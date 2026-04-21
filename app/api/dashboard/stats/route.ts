@@ -1,11 +1,12 @@
 // app/api/dashboard/stats/route.ts
-// GET /api/dashboard/stats
 
+import { NextRequest } from "next/server";
 import { withTenant } from "@/server/middleware/auth";
 import { ok, serverError } from "@/server/lib/response";
 import db from "@/server/lib/db";
 
-export const GET = withTenant(async (req, ctx) => {
+// ✅ EXPLICIT TYPE WRAPPER (IMPORTANT)
+export const GET = withTenant(async (req: NextRequest, ctx) => {
   const tenantId = ctx.tenantId!;
 
   try {
@@ -23,7 +24,6 @@ export const GET = withTenant(async (req, ctx) => {
       feesLastMonth,
       pendingDues,
     ] = await Promise.all([
-      // ✅ Total active students
       db.student.count({
         where: {
           tenantId,
@@ -32,7 +32,6 @@ export const GET = withTenant(async (req, ctx) => {
         },
       }),
 
-      // ✅ Students till last month
       db.student.count({
         where: {
           tenantId,
@@ -42,7 +41,6 @@ export const GET = withTenant(async (req, ctx) => {
         },
       }),
 
-      // ✅ New admissions this month
       db.student.count({
         where: {
           tenantId,
@@ -51,7 +49,6 @@ export const GET = withTenant(async (req, ctx) => {
         },
       }),
 
-      // ✅ New admissions last month
       db.student.count({
         where: {
           tenantId,
@@ -60,48 +57,37 @@ export const GET = withTenant(async (req, ctx) => {
         },
       }),
 
-      // ✅ Fees collected this month
       db.fee.aggregate({
         where: {
           tenantId,
           paidAt: { gte: thisMonthStart },
           status: { in: ["paid", "partial"] },
         },
-        _sum: {
-          paid: true, // ✔ MUST exist in schema
-        },
+        _sum: { paid: true },
       }),
 
-      // ✅ Fees collected last month
       db.fee.aggregate({
         where: {
           tenantId,
           paidAt: { gte: lastMonthStart, lt: thisMonthStart },
           status: { in: ["paid", "partial"] },
         },
-        _sum: {
-          paid: true,
-        },
+        _sum: { paid: true },
       }),
 
-      // ✅ Pending dues (FIXED)
       db.fee.aggregate({
         where: {
           tenantId,
           status: { in: ["partial", "overdue"] },
         },
-        _sum: {
-          amount: true, // 🔥 CHANGE THIS → must match your schema field
-        },
+        _sum: { amount: true },
       }),
     ]);
 
-    // ✅ SAFE EXTRACTION
     const feesCollected = feesThisMonth._sum.paid ?? 0;
     const feesLast = feesLastMonth._sum.paid ?? 0;
     const pendingTotal = pendingDues._sum.amount ?? 0;
 
-    // ✅ Growth %
     const pct = (a: number, b: number) =>
       b === 0 ? 0 : Math.round(((a - b) / b) * 100);
 
