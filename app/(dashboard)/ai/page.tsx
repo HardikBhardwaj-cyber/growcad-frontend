@@ -1,10 +1,11 @@
-import { Suspense } from "react";
-import AIClient from "./AIClient";
+// app/(dashboard)/ai/page.tsx
+
+import dynamic from "next/dynamic";
+
+const AIClient = dynamic(() => import("./AIClient"), {
+  ssr: false, // 🔥 THIS LINE FIXES YOUR ERROR
+});
 
 export default function Page() {
-  return (
-    <Suspense fallback={<div className="p-6 text-white">Loading AI...</div>}>
-      <AIClient />
-    </Suspense>
-  );
+  return <AIClient />;
 }
