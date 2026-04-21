@@ -1,30 +1,52 @@
-import axios from "axios";
-import { logout } from "./auth.service";
+// services/api.ts
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
 
-api.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    const subdomain = window.location.hostname.split(".")[0];
-    config.headers["X-Tenant-ID"] = subdomain;
+/* ─────────────────────────────────────────────────────────────
+   REQUEST INTERCEPTOR (SSR SAFE)
+───────────────────────────────────────────────────────────── */
 
-    const token = localStorage.getItem("access_token");
+api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  if (typeof window === "undefined") return config;
+
+  try {
+    const headers = config.headers ?? {};
+
+    // Tenant
+    const subdomain = window.location.hostname.split(".")[0];
+    headers["X-Tenant-ID"] = subdomain;
+
+    // Token
+    const token = window.localStorage?.getItem("access_token");
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      headers.Authorization = `Bearer ${token}`;
     }
+
+    config.headers = headers;
+  } catch {
+    // silent fail (never break request)
   }
 
   return config;
 });
 
+/* ─────────────────────────────────────────────────────────────
+   RESPONSE INTERCEPTOR (SSR SAFE)
+───────────────────────────────────────────────────────────── */
+
 api.interceptors.response.use(
   (res) => res,
-  (err) => {
+  async (err: AxiosError) => {
     if (err.response?.status === 401) {
-      logout();
+      if (typeof window !== "undefined") {
+        const { logout } = await import("./auth.service");
+        logout();
+      }
     }
+
     return Promise.reject(err);
   }
 );
