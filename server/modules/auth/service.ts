@@ -100,7 +100,7 @@ export async function createTenantAndAdmin(input: {
     return { tenant, user };
   });
 
-  const token = signToken({
+  const token = await signToken({
     userId:    user.id,
     tenantId:  tenant.id,
     role:      'admin',
@@ -126,7 +126,7 @@ export async function verifyPhoneAndActivate(
   throw new Error(`Invalid role from DB: ${user.role}`);
 }
 
-const token = signToken({
+const token = await signToken({
   userId: user.id,
   tenantId: user.tenantId,
   role: user.role, // ✅ now typed correctly
@@ -157,7 +157,7 @@ export async function loginWithEmail(
   throw new Error(`Invalid role from DB: ${user.role}`);
 }
 
-const token = signToken({
+const token = await signToken({
   userId: user.id,
   tenantId: user.tenantId,
   role: user.role, // ✅ now typed correctly
