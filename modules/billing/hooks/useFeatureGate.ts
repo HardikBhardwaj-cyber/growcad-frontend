@@ -31,19 +31,17 @@ interface FeatureGateResponse {
   feature: FeatureKey;
   allowed: boolean;
   planId:  PlanId;
+  requiredPlan: PlanId | null;
 }
 
 // ─── Hook return type ─────────────────────────────────────────────────────────
 
 export interface UseFeatureGateResult {
-  /** Whether the tenant's current plan includes this feature. */
-  allowed:  boolean;
-  /** True while the initial request is in-flight. */
-  loading:  boolean;
-  /** Human-readable error message if the request failed. */
-  error?:   string;
-  /** The plan ID that was checked. Undefined until the query resolves. */
-  planId?:  PlanId;
+  allowed: boolean;
+  loading: boolean;
+  error?: string;
+  planId?: PlanId;
+  requiredPlan?: PlanId | null; // ✅ ADD THIS
 }
 
 // ─── Cache key factory ────────────────────────────────────────────────────────
@@ -96,10 +94,11 @@ export function useFeatureGate(feature: FeatureKey): UseFeatureGateResult {
   }
 
   return {
-    allowed: data?.allowed ?? false,
-    loading: false,
-    planId:  data?.planId,
-  };
+  allowed: data?.allowed ?? false,
+  loading: false,
+  planId:  data?.planId,
+  requiredPlan: data?.requiredPlan ?? null, // ✅ ADD
+};
 }
 
 // Re-export FEATURE so callers can import from a single path:

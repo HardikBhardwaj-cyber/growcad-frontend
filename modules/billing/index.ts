@@ -8,7 +8,8 @@ export { useSubscription, useCurrentUsage, useActiveStudentCount,
          useResolvedLimits, useUsageSummary, useLimitCheck,
          useGeminiQuota, BILLING_KEYS } from './hooks/useBilling';
 export { useRazorpayUpgrade, useCashUpgrade } from './hooks/useUpgrade';
-export { useFeatureGate, usePlanLevel } from './hooks/useFeatureGate';
+export { useFeatureGate } from './hooks/useFeatureGate';
+export { usePlanLevel } from './hooks/usePlanLevel';
 export { useGeminiFlash, useGuidedAIContent, useUpsertGuidedContent, useAISearch } from './hooks/useAI';
 export { UsageMeter }    from './components/UsageMeter';
 export { UpgradeBanner } from './components/UpgradeBanner';
