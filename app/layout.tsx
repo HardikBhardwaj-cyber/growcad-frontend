@@ -1,7 +1,7 @@
 import "./globals.css";
 
 import { Toaster } from "react-hot-toast";
-import Providers from "./providers";
+import { Providers } from "./providers";
 import Cursor from "@/components/ui/Cursor";
 
 import { Inter } from "next/font/google";

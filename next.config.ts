@@ -1,136 +1,43 @@
+// next.config.ts
 import type { NextConfig } from 'next';
 
-const isDev  = process.env.NODE_ENV === 'development';
-const isProd = process.env.NODE_ENV === 'production';
-
-const nextConfig: NextConfig = {
-  reactStrictMode: true,
-
-  // ─────────────────────────────────────────────────────────────
-  // COMPILER
-  // ─────────────────────────────────────────────────────────────
-  compiler: {
-    removeConsole: isProd
-      ? { exclude: ['error', 'warn'] }
-      : false,
-  },
-
-  // ─────────────────────────────────────────────────────────────
-  // TRANSPILATION (WebGL + Motion stack)
-  // ─────────────────────────────────────────────────────────────
-  transpilePackages: [
-    'three',
-    '@react-three/fiber',
-    '@react-three/drei',
-    'lenis',
-  ],
-
-  // ─────────────────────────────────────────────────────────────
-  // IMAGES (Performance + future-proof)
-  // ─────────────────────────────────────────────────────────────
+const config: NextConfig = {
+  // Allow images from R2 public URL and common CDNs
   images: {
-    formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
-    minimumCacheTTL: 86400,
-
-    // Allow all HTTPS images (safe for SaaS + CDN + user uploads)
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
+      { protocol: 'https', hostname: 'files.growcad.in'                    },
+      { protocol: 'https', hostname: '*.r2.cloudflarestorage.com'          },
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com'           }, // Google avatars
     ],
   },
 
-  // ─────────────────────────────────────────────────────────────
-  // SECURITY HEADERS (HARDENED + WebGL SAFE)
-  // ─────────────────────────────────────────────────────────────
+  // CORS headers for R2 presigned URL uploads (OPTIONS preflight)
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source:  '/api/:path*',
         headers: [
-          // Basic security
-          { key: 'X-DNS-Prefetch-Control', value: 'on' },
-          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-
-          // Permissions
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
-          },
-
-          // HTTPS enforcement
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload',
-          },
-
-          // Content Security Policy (balanced for WebGL + safety)
-          {
-            key: 'Content-Security-Policy',
-            value: isProd
-              ? [
-                  "default-src 'self'",
-                  "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
-                  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-                  "font-src 'self' https://fonts.gstatic.com",
-                  "img-src 'self' data: blob: https:",
-                  "connect-src 'self' https:",
-                  "worker-src blob:",
-                  "child-src blob:",
-                ].join('; ')
-              : '',
-          },
-        ].filter(Boolean),
-      },
-
-      // Static asset caching (fonts, etc.)
-      {
-        source: '/fonts/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
+          { key: 'Access-Control-Allow-Credentials', value: 'true'                         },
+          { key: 'Access-Control-Allow-Origin',      value: process.env.NEXT_PUBLIC_APP_URL ?? '*' },
+          { key: 'Access-Control-Allow-Methods',     value: 'GET,POST,PUT,DELETE,OPTIONS'  },
+          { key: 'Access-Control-Allow-Headers',     value: 'Content-Type,Authorization,x-tenant-id' },
         ],
       },
     ];
   },
 
-  // ─────────────────────────────────────────────────────────────
-  // PERFORMANCE + BUNDLE OPTIMIZATION
-  // ─────────────────────────────────────────────────────────────
+  // Experimental: server actions + Turbopack in dev
   experimental: {
-    optimizePackageImports: [
-      'framer-motion',
-      'lucide-react',
-      'gsap',
-    ],
-    scrollRestoration: true,
-
-    // Only enable turbo in dev (safe)
-  //  turbo: isDev ? {} : undefined,
+    serverActions: { allowedOrigins: ['app.growcad.in', 'localhost:3000'] },
   },
 
-  // ─────────────────────────────────────────────────────────────
-  // WEBPACK (Three.js compatibility)
-  // ─────────────────────────────────────────────────────────────
-//  webpack(config) {
-//    config.resolve = {
-//      ...config.resolve,
-//      fallback: {
-//        ...config.resolve?.fallback,
-//        fs: false,
-//        path: false,
-//        crypto: false,
-//      },
-//    };
-
-//    return config;
-//  },
+  // Webpack: allow jsonwebtoken + bcryptjs in server components
+  webpack(config, { isServer }) {
+    if (isServer) {
+      config.externals = [...(config.externals ?? []), 'bcryptjs'];
+    }
+    return config;
+  },
 };
 
-export default nextConfig;
+export default config;

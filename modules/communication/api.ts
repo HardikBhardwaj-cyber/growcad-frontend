@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import { post } from "@/lib/api";
 
 // ✅ TYPES
 
@@ -21,20 +21,12 @@ type APIResponse = {
 export const sendSMS = async (
   data: SMSPayload
 ): Promise<APIResponse> => {
-  const res = await api.post<APIResponse>(
-    "/comm/sms",
-    data
-  );
-  return res.data;
+  return await post<APIResponse>("/comm/sms", data);
 };
 
 // ✅ SEND WHATSAPP
 export const sendWhatsApp = async (
   data: WhatsAppPayload
 ): Promise<APIResponse> => {
-  const res = await api.post<APIResponse>(
-    "/comm/whatsapp",
-    data
-  );
-  return res.data;
+  return await post<APIResponse>("/comm/whatsapp", data);
 };

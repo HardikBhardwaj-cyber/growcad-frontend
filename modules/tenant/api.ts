@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import { get, post, put } from "@/lib/api";
 
 // ✅ TYPE
 export type Tenant = {
@@ -26,8 +26,7 @@ export type Tenant = {
 
 // ✅ GET TENANTS
 export const getTenants = async (): Promise<Tenant[]> => {
-  const res = await api.get<Tenant[]>("/admin/tenants");
-  return res.data;
+  return await get<Tenant[]>("/admin/tenants");
 };
 
 // ✅ UPDATE TENANT
@@ -35,34 +34,23 @@ export const updateTenant = async (
   id: string,
   data: Partial<Tenant>
 ): Promise<Tenant> => {
-  const res = await api.put<Tenant>(
-    `/admin/tenant/${id}`,
-    data
-  );
-  return res.data;
+  return await put<Tenant>(`/admin/tenant/${id}`, data);
 };
 
-
-// ========================================
-// 🔥 ADD THESE (YOUR MISSING PART)
-// ========================================
-
-// ✅ CREATE TENANT (USED IN ONBOARDING)
+// ✅ CREATE TENANT
 export const createTenant = async (data: {
   name: string;
   subdomain: string;
   plan: string;
 }): Promise<Tenant> => {
-  const res = await api.post<Tenant>("/tenant", data);
-  return res.data;
+  return await post<Tenant>("/tenant", data);
 };
 
 // ✅ CHECK SUBDOMAIN
 export const checkSubdomain = async (
   subdomain: string
 ): Promise<{ available: boolean }> => {
-  const res = await api.get<{ available: boolean }>(
-    `/tenant/check?subdomain=${subdomain}`
-  );
-  return res.data;
+  return await get<{ available: boolean }>("/tenant/check", {
+    subdomain,
+  });
 };

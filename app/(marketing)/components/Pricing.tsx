@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 
 const plans = [
   {
@@ -57,7 +57,7 @@ export default function Pricing() {
               {p.desc}
             </p>
 
-            <Button variant="gradient" className="mt-6 w-full">
+            <Button variant="primary" className="mt-6 w-full">
               Choose Plan
             </Button>
           </motion.div>

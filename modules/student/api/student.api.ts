@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import { get, post } from "@/lib/api";
 
 // ✅ TYPES
 export type Student = {
@@ -9,7 +9,7 @@ export type Student = {
   course?: string;
 };
 
-// 👇 INPUT TYPE (VERY IMPORTANT)
+// 👇 INPUT TYPE
 export type CreateStudentInput = {
   name: string;
   phone: string;
@@ -19,14 +19,12 @@ export type CreateStudentInput = {
 
 // ✅ GET STUDENTS
 export const getStudents = async (): Promise<Student[]> => {
-  const res = await api.get<Student[]>("/students");
-  return res.data;
+  return await get<Student[]>("/students");
 };
 
-// ✅ CREATE STUDENT (NO ANY ❌)
+// ✅ CREATE STUDENT
 export const createStudent = async (
   data: CreateStudentInput
 ): Promise<Student> => {
-  const res = await api.post<Student>("/students", data);
-  return res.data;
+  return await post<Student>("/students", data);
 };

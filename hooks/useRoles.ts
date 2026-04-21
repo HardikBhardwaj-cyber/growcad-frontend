@@ -1,21 +1,23 @@
-import { useAuthStore } from "@/store/auth.store";
-import { ROUTES } from "@/config/routes";
+// hooks/useRoles.ts
+'use client';
+// ─────────────────────────────────────────────────────────────────────────────
+// useRoles — reads the current user's role from the auth store.
+// UserRole is imported from types/auth.ts — no local redefinition.
+// ─────────────────────────────────────────────────────────────────────────────
 
-export const useRole = () => {
+import { useAuthStore } from '@/store/auth.store';
+import type { UserRole } from '@/types/auth';
+
+export function useRoles() {
   const user = useAuthStore((s) => s.user);
-
-  const role = user?.role;
-
-  const allowedRoutes =
-    ROUTES[role as keyof typeof ROUTES] || [];
-
-  const canAccess = (path: string) => {
-    return allowedRoutes.includes(path);
-  };
+  const role: UserRole = user?.role ?? 'staff';
 
   return {
     role,
-    allowedRoutes,
-    canAccess,
+    isSuperAdmin: role === 'superadmin',
+    isAdmin:      role === 'admin' || role === 'superadmin',
+    isTeacher:    role === 'teacher',
+    isStaff:      role === 'staff',
+    hasRole:      (r: UserRole): boolean => role === r,
   };
-};
+}

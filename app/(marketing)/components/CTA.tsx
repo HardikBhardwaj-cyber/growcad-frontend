@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 
 export default function CTA() {
   return (
@@ -10,7 +10,7 @@ export default function CTA() {
       </h2>
 
       <div className="mt-6">
-        <Button variant="gradient">
+        <Button variant="primary">
           Create Your Institute
         </Button>
       </div>

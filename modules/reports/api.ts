@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import { get } from "@/lib/api";
 
 // ✅ TYPES
 export type ReportData = {
@@ -9,6 +9,5 @@ export type ReportData = {
 
 // ✅ API
 export const getReports = async (): Promise<ReportData> => {
-  const res = await api.get<ReportData>("/reports");
-  return res.data; // 🔥 CRITICAL
+  return await get<ReportData>("/reports");
 };

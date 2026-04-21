@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Check, Eye, EyeOff } from "lucide-react";
 
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import Reveal from "@/components/ui/Reveal";
 import { useAuth } from "@/hooks/useAuth";
 

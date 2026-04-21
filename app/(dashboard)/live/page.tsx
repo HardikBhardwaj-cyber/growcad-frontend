@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createLive, getLive } from "@/modules/live/api";
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { useFeatureAccess } from "@/hooks/useFeatureAccess";
 
 // ✅ TYPES

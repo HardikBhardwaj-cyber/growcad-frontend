@@ -1,0 +1,250 @@
+// prisma/schema.prisma
+// ─────────────────────────────────────────────────────────────────────────────
+// Growcad database schema — PostgreSQL via Prisma ORM.
+// Multi-tenant: every tenant-scoped model has tenantId FK.
+// Soft deletes: deletedAt nullable DateTime (null = active).
+// Indexes: all foreign keys + tenant-scoped query columns are indexed.
+// ─────────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Tenant ───────────────────────────────────────────────────────────────────
+
+model Tenant {
+  id          String   @id @default(cuid())
+  slug        String   @unique        // URL-safe identifier e.g. "apex-academy"
+  name        String
+  logo        String?
+  plan        String   @default("basic")  // basic | academic | advanced
+  features    String[] @default([])
+  trialEndsAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  users         User[]
+  students      Student[]
+  subscriptions Subscription[]
+  usageRecords  UsageRecord[]
+  payments      Payment[]
+  fees          Fee[]
+  attendance    Attendance[]
+
+  @@index([slug])
+}
+
+// ─── User ─────────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  tenantId     String?                         // null for superadmin
+  name         String
+  email        String   @unique
+  phone        String?  @unique
+  passwordHash String?
+  role         String   @default("admin")      // superadmin|admin|teacher|staff
+  avatar       String?
+  phoneVerified Boolean @default(false)
+  lastLoginAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime?
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([email])
+  @@index([phone])
+}
+
+// ─── OTP ──────────────────────────────────────────────────────────────────────
+
+model Otp {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String                            // 6-digit, stored hashed
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([phone])
+}
+
+// ─── Student ──────────────────────────────────────────────────────────────────
+
+model Student {
+  id             String   @id @default(cuid())
+  tenantId       String
+  name           String
+  email          String?
+  phone          String?
+  course         String
+  batch          String
+  status         String   @default("active")  // active|inactive|graduated
+  feesStatus     String   @default("pending") // paid|partial|pending
+  admissionDate  DateTime @default(now())
+  avatar         String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  deletedAt      DateTime?
+
+  tenant     Tenant       @relation(fields: [tenantId], references: [id])
+  fees       Fee[]
+  attendance Attendance[]
+
+  @@index([tenantId])
+  @@index([tenantId, status])       // active student count query
+  @@index([tenantId, deletedAt])
+}
+
+// ─── Fee ──────────────────────────────────────────────────────────────────────
+
+model Fee {
+  id          String   @id @default(cuid())
+  tenantId    String
+  studentId   String
+  amount      Float
+  paid        Float    @default(0)
+  dueDate     DateTime
+  status      String   @default("pending")  // paid|partial|overdue
+  method      String?                        // cash|upi|bank
+  paidAt      DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id])
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@index([tenantId])
+  @@index([studentId])
+  @@index([tenantId, status])
+}
+
+// ─── Attendance ───────────────────────────────────────────────────────────────
+
+model Attendance {
+  id        String   @id @default(cuid())
+  tenantId  String
+  studentId String
+  date      DateTime @db.Date
+  status    String                // present|absent|late
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id])
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@unique([studentId, date])    // one record per student per day
+  @@index([tenantId, date])
+}
+
+// ─── Subscription ─────────────────────────────────────────────────────────────
+
+model Subscription {
+  id            String   @id @default(cuid())
+  tenantId      String
+  planId        String                         // basic|academic|advanced
+  status        String   @default("pending")   // active|expired|pending|cancelled
+  cycle         String   @default("monthly")   // monthly|annual
+  startDate     DateTime
+  endDate       DateTime
+  autoRenew     Boolean  @default(true)
+  paymentMethod String                         // razorpay|cash
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id])
+  payments Payment[]
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@index([endDate])              // expiry reminders cron
+}
+
+// ─── Payment ──────────────────────────────────────────────────────────────────
+
+model Payment {
+  id             String   @id @default(cuid())
+  tenantId       String
+  subscriptionId String
+  amount         Int                            // paise (Razorpay convention)
+  method         String                         // razorpay|cash
+  status         String   @default("pending")   // pending|completed|failed|refunded
+  transactionId  String?  @unique               // Razorpay payment/order ID
+  invoiceUrl     String?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant       Tenant       @relation(fields: [tenantId], references: [id])
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+
+  @@index([tenantId])
+  @@index([subscriptionId])
+  @@index([transactionId])
+}
+
+// ─── Usage record ─────────────────────────────────────────────────────────────
+
+model UsageRecord {
+  id                     String   @id @default(cuid())
+  tenantId               String
+  month                  String                        // 'YYYY-MM'
+  smsUsed                Int      @default(0)
+  whatsappUtilityUsed    Int      @default(0)
+  whatsappMarketingUsed  Int      @default(0)
+  emailUsed              Int      @default(0)
+  studyMaterialStorageMb Float    @default(0)
+  recordingStorageMb     Float    @default(0)
+  geminiQueriesUsedToday Int      @default(0)
+  geminiQueriesDate      String?                       // 'YYYY-MM-DD' — daily reset
+  updatedAt              DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, month], name: "tenantId_month")   // one record per tenant per month
+  @@index([tenantId])
+}
+
+// ─── Guided AI content ────────────────────────────────────────────────────────
+
+model GuidedAiContent {
+  id        String   @id @default(cuid())
+  tenantId  String
+  teacherId String
+  subject   String
+  topic     String
+  content   String   @db.Text
+  embedding Float[]  @default([])    // pgvector — semantic search
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([tenantId, subject])
+}
+
+// ─── Communication log ────────────────────────────────────────────────────────
+
+model CommunicationLog {
+  id        String   @id @default(cuid())
+  tenantId  String
+  channel   String                  // sms|email|whatsapp_utility|whatsapp_marketing
+  recipient String                  // phone or email
+  subject   String?
+  body      String   @db.Text
+  status    String   @default("pending")  // pending|sent|failed
+  externalId String?                // provider message ID
+  sentAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([tenantId, channel])
+  @@index([tenantId, createdAt])
+}

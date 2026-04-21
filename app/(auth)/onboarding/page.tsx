@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { createTenant, checkSubdomain } from "@/modules/tenant/api";
-import { api } from "@/lib/api";
+import { post } from "@/lib/api";
 
 const invalidSubdomains = ["www", "admin", "api"];
 
@@ -56,7 +56,7 @@ export default function Onboarding() {
       await createTenant(data);
 
       // 🔥 analytics hook
-      await api.post("/analytics/onboarded");
+      await post("/tenant/create", data);
 
       window.location.href = `https://${data.subdomain}.growcad.in/dashboard`;
     } catch {

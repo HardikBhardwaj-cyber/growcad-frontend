@@ -1,19 +1,19 @@
-"use client";
+// app/providers.tsx
+'use client';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { ReactNode } from 'react';
+import { queryClient } from '@/lib/query-client';
+import { ToastProvider } from '@/components/ui/Toast';
+import { env } from '@/config/env';
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
-
-export default function Providers({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  // ✅ create once per app
-  const [queryClient] = useState(() => new QueryClient());
-
+export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <ToastProvider>
+        {children}
+      </ToastProvider>
+      {env.isDev && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );
 }

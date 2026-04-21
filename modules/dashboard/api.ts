@@ -1,6 +1,6 @@
-import { api } from "@/lib/api";
+import { get } from "@/lib/api";
 
-// ✅ TYPE
+// TYPE
 export type DashboardStats = {
   total_students: number;
   revenue: number;
@@ -8,14 +8,11 @@ export type DashboardStats = {
   attendance: number;
 };
 
-// ✅ RESPONSE WRAPPER (IMPORTANT)
-type DashboardResponse = {
-  data: DashboardStats;
-};
-
-// ✅ API CALL (FULLY TYPED)
+// API CALL (clean + typesafe)
 export const getDashboard = async (): Promise<DashboardStats> => {
-  const res = await api.get<DashboardResponse>("/dashboard");
-
-  return res.data.data; // ✅ NOW TYPESAFE
+  return await get<DashboardStats>("/dashboard");
 };
+
+
+
+

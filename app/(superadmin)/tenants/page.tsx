@@ -7,7 +7,7 @@ import {
   updateTenant,
   Tenant,
 } from "@/modules/tenant/api";
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 
 export default function TenantsPage() {
   const [search, setSearch] = useState("");

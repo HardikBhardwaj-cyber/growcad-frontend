@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect } from "react";
 import { useTenantStore } from "@/store/tenant.store";
 
@@ -9,9 +11,13 @@ export const useTenant = () => {
     const subdomain = host.split(".")[0];
 
     if (subdomain !== "www" && subdomain !== "growcad") {
-      setTenant(subdomain);
+      setTenant({
+        id: subdomain,
+        slug: subdomain,
+        name: subdomain,
+      });
     }
-  }, []);
+  }, [setTenant]);
 
   return useTenantStore();
 };

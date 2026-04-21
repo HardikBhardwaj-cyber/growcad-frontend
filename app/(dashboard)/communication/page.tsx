@@ -6,7 +6,7 @@ import {
   sendSMS,
   sendWhatsApp,
 } from "@/modules/communication/api";
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 
 // 🔥 OPTIONAL: Replace with real hook later
 const useFeatureAccess = () => {

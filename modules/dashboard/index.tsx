@@ -1,13 +1,18 @@
-"use client";
+// modules/dashboard/index.tsx
+// modules/dashboard/index.tsx
 
-import Stats from "./components/Stats";
-import RevenueChart from "./components/RevenueChart";
+// ✅ DEFAULT PAGE EXPORT (FIX)
 
-export default function DashboardPage() {
-  return (
-    <div className="space-y-6">
-      <Stats />
-      <RevenueChart />
-    </div>
-  );
-}
+
+// existing exports
+export { Stats } from './components/Stats';
+export { RevenueChart } from './components/RevenueChart';
+export { ActivityFeed } from './components/ActivityFeed';
+
+export {
+  useDashboardStats,
+  useRevenueChart,
+  useRecentAdmissions
+} from './hooks/useDashboard';
+
+export { getDashboard } from './api';

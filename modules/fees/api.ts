@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import { get, post } from "@/lib/api";
 
 // ✅ TYPES
 export type Fee = {
@@ -13,14 +13,13 @@ export type FeesResponse = {
   total_pending: number;
 };
 
+
 // ✅ GET FEES
 export const getFees = async (): Promise<FeesResponse> => {
-  const res = await api.get<FeesResponse>("/fees");
-  return res.data; // 🔥 CLEAN
+  return await get<FeesResponse>("/fees");
 };
 
 // ✅ MARK PAID
 export const markPaid = async (id: string) => {
-  const res = await api.post(`/fees/${id}/pay`);
-  return res.data;
+  return await post(`/fees/${id}/pay`);
 };

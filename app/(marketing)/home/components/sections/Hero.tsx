@@ -110,7 +110,7 @@ function DashPreview() {
                 <span className="absolute h-full w-full animate-ping rounded-full bg-emerald-400 opacity-55" />
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
               </span>
-              <span className="text-[10px] text-white/30">app.growcad.io</span>
+              <span className="text-[10px] text-white/30">app.growcad.in</span>
             </div>
           </div>
 
@@ -199,7 +199,7 @@ export default function Hero() {
     <section
       ref={sectionRef}
       data-scene={SCENES.hero}
-      className={`relative flex min-h-[min(100svh,900px)] items-start ${SECTION_PY.hero}`}
+      className={`relative flex min-h-[min(100svh,900px)] items-center ${SECTION_PY.hero}`}
     >
       {/* WebGL — absolute, no layout impact */}
       <motion.div
@@ -229,14 +229,14 @@ export default function Hero() {
 
       {/* Content grid — scroll parallax only, no spacing role */}
       <motion.div
-  style={{ y: contentY, opacity: rawOp }}
-  className="relative z-[10] w-full max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 items-start min-h-screen pt-[100px] pb-[60px] px-6 gap-12"
->
+        style={{ y: contentY, opacity: rawOp }}
+        className={`relative z-[10] ${HERO_INNER} grid w-full grid-cols-1 items-center gap-[clamp(1.75rem,3.5vw,4rem)] lg:grid-cols-[1.05fr_0.95fr]`}
+      >
 
         {/* LEFT — single flat flex-col, spacing via mt-* only */}
         <div
-          className="flex flex-col w-full"
-          
+          className="flex flex-col w-full lg:pl-[clamp(8px,1.8vw,28px)]"
+          style={{ maxWidth: 'min(100%, clamp(460px, 44vw, 560px))' }}
         >
           {/* Badge */}
           <motion.div
@@ -249,20 +249,20 @@ export default function Hero() {
 
           {/* Heading — 4px below badge */}
           <motion.h1
-            className="mt-[10px] font-bold leading-[1.08] tracking-[-0.045em] text-white"
+            className="mt-[4px] font-bold leading-[1.08] tracking-[-0.045em] text-white"
             style={{ fontSize: 'clamp(2.3rem, 4.2vw, 4.2rem)' }}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.62, delay: 0.26, ease: EASE_OUT }}
           >
-            Your institute runs.
+            Your institute runs itself.
             <br />
             <RotatingWord />
           </motion.h1>
 
           {/* Subtext — 6px below heading */}
           <motion.p
-            className="mt-[16px] text-[clamp(0.95rem,1vw,1.05rem)] leading-[1.75] text-white/60 max-w-[52ch]"
+            className="mt-[6px] text-[clamp(0.95rem,1vw,1.05rem)] leading-[1.75] text-white/60 max-w-[52ch]"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.40, ease: EASE_OUT }}
@@ -271,13 +271,13 @@ export default function Hero() {
           </motion.p>
 
           {/* CTAs — 4px below subtext */}
-          <div className="mt-[18px] flex flex-wrap items-center gap-3">
+          <div className="mt-[4px] flex flex-wrap items-center gap-3">
             <motion.div
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.48, ease: EASE_OUT }}
             >
-              <MagneticButton variant="primary" className="!py-[14px] !px-8">
+              <MagneticButton variant="primary" className="!py-[14px] !px-8 animate-glow-pulse">
                 Start Free — Setup Your Institute <ArrowRight size={14} />
               </MagneticButton>
             </motion.div>
@@ -295,17 +295,17 @@ export default function Hero() {
 
           {/* Microcopy — 4px below CTAs */}
           <motion.p
-            className="mt-[12px] text-[12.5px] tracking-[0.01em] text-white/42"
+            className="mt-[4px] text-[12.5px] tracking-[0.01em] text-white/42"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.45, delay: 0.56 }}
           >
-            No Technical skills needed · No card needed · Cancel anytime
+            Free forever on Starter · No card needed · Cancel in one click
           </motion.p>
 
           {/* Social proof — 8px below microcopy */}
           <motion.div
-            className="mt-[18px] flex flex-wrap items-center gap-3"
+            className="mt-[8px] flex flex-wrap items-center gap-3"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.62, ease: EASE_OUT }}

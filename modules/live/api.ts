@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import { get, post } from "@/lib/api";
 
 // ✅ TYPES
 export type LiveClass = {
@@ -19,12 +19,10 @@ export type LiveResponse = {
 
 // ✅ GET LIVE
 export const getLive = async (): Promise<LiveResponse> => {
-  const res = await api.get<LiveResponse>("/live");
-  return res.data; // 🔥 REMOVE AXIOS WRAPPER
+  return await get<LiveResponse>("/live");
 };
 
 // ✅ CREATE LIVE
 export const createLive = async () => {
-  const res = await api.post("/live");
-  return res.data;
+  return await post("/live");
 };

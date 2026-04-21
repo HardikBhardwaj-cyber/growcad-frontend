@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 export function useAuthGuard() {
-  useEffect(() => {
-    const token = localStorage.getItem("access_token");
+  const router = useRouter();
 
-    if (!token) {
-      window.location.href = "/login";
-    }
+  const isAuthenticated = useMemo(() => {
+    const token = localStorage.getItem("access_token");
+    return !!token;
   }, []);
+
+  if (!isAuthenticated) {
+    router.replace("/login"); // ✅ better UX
+  }
+
+  return { isAuthenticated };
 }

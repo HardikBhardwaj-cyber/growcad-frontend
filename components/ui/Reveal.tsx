@@ -2,18 +2,18 @@
 
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
-import { fadeIn, slideUp, scaleIn } from "@/lib/motion";
+import { fadeIn, fadeUp, scaleIn } from "@/lib/motion";
 
 type RevealProps = {
   children: ReactNode;
-  variant?: "fade" | "slideUp" | "scale";
+  variant?: "fade" | "fadeUp" | "scale";
   delay?: number;
   className?: string;
 };
 
 export default function Reveal({
   children,
-  variant = "slideUp",
+  variant = "fadeUp",
   delay = 0,
   className = "",
 }: RevealProps) {
@@ -23,13 +23,13 @@ export default function Reveal({
       ? fadeIn
       : variant === "scale"
       ? scaleIn
-      : slideUp;
+      : fadeUp;
 
   return (
     <motion.div
       variants={variants}
       initial="hidden"
-      whileInView="show"
+      whileInView="visible"
       viewport={{
         once: true,
         margin: "-50px", // 🔥 triggers earlier (premium feel)

@@ -1,21 +1,46 @@
-import { api } from "@/lib/api";
+import { get } from "@/lib/api";
 
-// ✅ TYPE
+/* =========================
+   TYPES
+========================= */
+
 export type AdminStats = {
-  tenants: number;
-  revenue: number;
-  active_users: number;
-  growth: number;
+  totalTenants: number;
+  activeSubs: number;
+  totalStudents: number;
+  totalRevenueRupees: number;
+  pendingCashApprovals: number;
+  recentSignups: {
+    id: string;
+    name: string;
+    createdAt: string;
+    plan: string;
+  }[];
 };
 
-// ✅ RESPONSE TYPE (if backend wraps)
-type AdminResponse = {
-  data: AdminStats;
+export type ExpiringItem = {
+  tenant: {
+    id: string;
+    name: string;
+  };
+  subscription: {
+    planId: string;
+  };
+  daysLeft: number;
 };
 
-// ✅ API FUNCTION (FIXED)
-export const getAdminStats = async (): Promise<AdminStats> => {
-  const res = await api.get<AdminResponse>("/admin/stats");
+/* =========================
+   API
+========================= */
 
-  return res.data.data; // 🔥 unwrap properly
+export const superadminApi = {
+  stats: async (): Promise<AdminStats> => {
+    return get<AdminStats>("/admin/stats");
+  },
+
+  billing: {
+    expiring: async (days: number): Promise<ExpiringItem[]> => {
+      return get<ExpiringItem[]>(`/admin/billing/expiring?days=${days}`);
+    },
+  },
 };

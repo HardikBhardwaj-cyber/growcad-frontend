@@ -1,4 +1,6 @@
-import { api } from "@/lib/api";
+// modules/ai/api.ts
+
+import { get, post } from "@/lib/api";
 
 // ✅ TYPES
 type GenerateResponse = {
@@ -20,26 +22,36 @@ type Doubt = {
 export const generateDoubt = async (
   topic: string
 ): Promise<GenerateResponse> => {
-  const res = await api.post<GenerateResponse>(
-    "/ai/generate",
-    { topic }
-  );
-  return res.data;
+  return await post<GenerateResponse>("/ai/generate", { topic });
 };
 
 // ✅ PUBLISH
 export const publishDoubt = async (
   data: PublishPayload
 ): Promise<{ success: boolean }> => {
-  const res = await api.post<{ success: boolean }>(
-    "/ai/publish",
-    data
-  );
-  return res.data;
+  return await post<{ success: boolean }>("/ai/publish", data);
 };
 
 // ✅ GET DOUBTS
 export const getDoubts = async (): Promise<Doubt[]> => {
-  const res = await api.get<Doubt[]>("/ai/doubts");
-  return res.data;
+  return await get<Doubt[]>("/ai/doubts");
+};
+
+// modules/ai/api.ts
+
+
+
+export type AIChat = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+export const aiApi = {
+  chat: async (messages: AIChat[]): Promise<AIChat> => {
+    return await post<AIChat>("/ai/chat", { messages });
+  },
+
+  insights: async (): Promise<{ title: string }[]> => {
+    return await get<{ title: string }[]>("/ai/insights");
+  },
 };

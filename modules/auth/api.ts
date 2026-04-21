@@ -1,30 +1,42 @@
-import { api } from "@/lib/api";
+// modules/auth/api.ts
+// ─────────────────────────────────────────────────────────────────────────────
+// Auth API client — all shapes imported from types/auth.ts.
+// No local interface duplicates AuthResult or SignupResult.
+// ─────────────────────────────────────────────────────────────────────────────
 
-type VerifyOTPResponse = {
-  token: string;
-  user: {
-    id: string;
+import { post, put, get }                from '@/lib/api';
+import type { AuthResult, SignupResult } from '@/types/auth';
+
+export type { AuthResult, SignupResult };
+
+export const authApi = {
+  signup: (d: {
+    name:      string;
+    email:     string;
+    phone:     string;
+    institute: string;
+  }) => post<SignupResult>('/auth/signup', d),
+
+  login: (d: {
+    email:    string;
+    password: string;
+  }) => post<AuthResult>('/auth/login', d),
+
+  sendOtp: (phone: string) =>
+    post('/auth/otp', { phone }),
+
+  verifyOtp: (d: {
     phone: string;
-    role: "admin" | "teacher" | "student";
-  };
+    otp:   string;
+  }) => put<AuthResult>('/auth/otp/verify', d),
+
+  me: () => get<AuthResult['user']>('/auth/me'),
+
+  logout: () => post('/auth/logout'),
+
+  onboarding: (d: {
+    institute: string;
+    students:  string;
+    course:    string;
+  }) => post('/auth/onboarding', d),
 };
-
-export const sendOTP = (phone: string) =>
-  api.post("/auth/send-otp", { phone });
-
-
-
-export const verifyOTP = async (
-  phone: string,
-  otp: string
-): Promise<VerifyOTPResponse> => {
-  const res = await api.post<VerifyOTPResponse>(
-    "/auth/verify-otp",
-    { phone, otp }
-  );
-
-  return res.data; // ✅ IMPORTANT
-};
-
-export const googleLogin = (token: string) =>
-  api.post("/auth/google", { token });
