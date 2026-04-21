@@ -25,9 +25,9 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 /* ── 1. Imports ──────────────────────────────────────────────────────────── */
-@import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600&display=swap');
 
+/* @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600&display=swap');*/
+@import "tailwindcss";
 /* ── 2. Design tokens ────────────────────────────────────────────────────── */
 :root {
   /* Base backgrounds */
@@ -131,7 +131,7 @@ html.page-exit {
 }
 
 body {
-  font-family: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
   background: var(--bg);
   color: #fff;
   -webkit-font-smoothing: antialiased;
@@ -166,7 +166,7 @@ h2 { letter-spacing: -0.026em; line-height: 1.08; font-weight: 700; font-size: c
 h3 { letter-spacing: -0.016em; line-height: 1.14; font-weight: 600; font-size: clamp(1.125rem, 1.8vw, 1.625rem); }
 h4, h5, h6 { letter-spacing: -0.015em; line-height: 1.2; font-weight: 600; }
 p  { line-height: 1.72; }
-code, kbd, pre, samp { font-family: 'Geist Mono', monospace; }
+code, kbd, pre, samp { font-family: var(--font-geist-mono), monospace; }
 
 /* ── 5. Lenis smooth scroll ──────────────────────────────────────────────── */
 

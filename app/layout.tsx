@@ -4,13 +4,18 @@ import { Toaster } from "react-hot-toast";
 import { Providers } from "./providers";
 import Cursor from "@/components/ui/Cursor";
 
-import { Inter } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 
 /* ---------------- FONT ---------------- */
 
-const inter = Inter({
+const geist = Geist({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-geist",
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
 });
 
 /* ---------------- METADATA ---------------- */
@@ -28,7 +33,7 @@ export const metadata = {
     "student management system",
     "Growcad",
   ],
-  metadataBase: new URL("https://growcad.in"), // change when live
+  metadataBase: new URL("https://growcad.in"),
 };
 
 /* ---------------- ROOT LAYOUT ---------------- */
@@ -39,12 +44,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html
+      lang="en"
+      className={`${geist.variable} ${geistMono.variable}`}
+    >
       <body className="bg-[#0a0a0f] text-white antialiased overflow-x-hidden">
 
         <Providers>
 
-          {/* 🔥 GLOBAL CURSOR (TOP LAYER) */}
+          {/* 🔥 GLOBAL CURSOR */}
           <div className="pointer-events-none fixed inset-0 z-9999">
             <Cursor />
           </div>
@@ -54,7 +62,7 @@ export default function RootLayout({
             {children}
           </main>
 
-          {/* 🔥 TOASTER (PREMIUM STYLE) */}
+          {/* 🔥 TOASTER */}
           <Toaster
             position="top-right"
             gutter={8}
