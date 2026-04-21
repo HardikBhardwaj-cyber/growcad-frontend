@@ -1,11 +1,16 @@
 // app/(dashboard)/layout.tsx
-'use client';
-
-import { ReactNode } from 'react';
-import { usePageView } from '@/hooks/usePageView';
+import { ReactNode, Suspense } from 'react';
 import { AppShell } from '@/components/layout/app-shell';
+import PageViewTracker from './PageViewTracker';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  usePageView();
-  return <AppShell>{children}</AppShell>;
+  return (
+    <AppShell>
+      <Suspense fallback={null}>
+        <PageViewTracker />
+      </Suspense>
+
+      {children}
+    </AppShell>
+  );
 }
