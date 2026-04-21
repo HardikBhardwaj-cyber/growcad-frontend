@@ -4,9 +4,9 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Users, Building2, IndianRupee, Clock, TrendingUp, AlertCircle } from 'lucide-react';
 
-import { Card }     from '@/components/ui/Card';
+import { Card }     from '@/components/ui/card';
 import { Badge }    from '@/components/ui/Badge';
-import { Skeleton } from '@/components/ui/Skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 
 import { superadminApi } from '@/modules/superadmin/api';
 import { formatCurrency, formatDate } from '@/lib/utils';

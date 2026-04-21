@@ -8,7 +8,7 @@ import  PageWrapper  from '@/components/shared/PageWrapper';
 import { Section }     from '@/components/ui/section';
 import { Button }      from '@/components/ui/Button';
 import { Input }       from '@/components/ui/Input';
-import { Modal }       from '@/components/ui/Modal';
+import { Modal }       from '@/components/ui/modal';
 import { StudentTable } from '@/modules/student/components/StudentTable';
 import { StudentForm }  from '@/modules/student/components/StudentForm';
 

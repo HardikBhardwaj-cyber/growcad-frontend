@@ -1,6 +1,6 @@
 // components/shared/DashboardSkeleton.tsx
 // Phase 5: uses shimmer Skeleton (directional sweep, not just pulse)
-import { Skeleton, SkeletonText, SkeletonAvatar } from '@/components/ui/Skeleton';
+import { Skeleton, SkeletonText, SkeletonAvatar } from '@/components/ui/skeleton';
 
 export function DashboardSkeleton() {
   return (

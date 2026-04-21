@@ -9,12 +9,12 @@ import {
 
 import { PageWrapper } from '@/components/layout/PageWrapper';
 import { Section } from '@/components/ui/section';
-import { Card } from '@/components/ui/Card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Modal } from '@/components/ui/Modal';
-import { Skeleton } from '@/components/ui/Skeleton';
+import { Modal } from '@/components/ui/modal';
+import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/shared/State';
 import { useToast } from '@/components/ui/Toast';
 
