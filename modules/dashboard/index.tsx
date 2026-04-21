@@ -2,7 +2,7 @@
 // modules/dashboard/index.tsx
 
 // ✅ DEFAULT PAGE EXPORT (FIX)
-
+export { default } from "@/app/(dashboard)/dashboard/page";
 
 // existing exports
 export { Stats } from './components/Stats';
