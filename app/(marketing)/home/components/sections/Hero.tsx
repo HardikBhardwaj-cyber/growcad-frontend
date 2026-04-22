@@ -255,9 +255,11 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.62, delay: 0.26, ease: EASE_OUT }}
           >
-            Your institute runs itself.
-            <br />
-            <RotatingWord />
+            Run your coaching institute on autopilot.
+<br />
+<span className="bg-gradient-to-r from-violet-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
+  <RotatingWord />
+</span>
           </motion.h1>
 
           {/* Subtext — 6px below heading */}
@@ -267,7 +269,7 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.40, ease: EASE_OUT }}
           >
-            Manage admissions, fees, and students — all in one simple dashboard.
+            Admissions, fees, attendance & reports — everything automated in one powerful dashboard.
           </motion.p>
 
           {/* CTAs — 4px below subtext */}
@@ -277,9 +279,18 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.48, ease: EASE_OUT }}
             >
-              <MagneticButton variant="primary" className="!py-[14px] !px-8 animate-glow-pulse">
-                Start Free — Setup Your Institute <ArrowRight size={14} />
-              </MagneticButton>
+              <MagneticButton
+  variant="primary"
+  className="!py-[14px] !px-7 relative overflow-hidden group"
+>
+  <span className="relative z-10 flex items-center gap-2">
+    Start Free Dashboard
+    <ArrowRight size={14} />
+  </span>
+
+  {/* Glow sweep */}
+  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-500" />
+</MagneticButton>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 14 }}
@@ -300,7 +311,7 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.45, delay: 0.56 }}
           >
-            Free forever on Starter · No card needed · Cancel in one click
+            No credit card required · Setup in 2 minutes · Cancel anytime
           </motion.p>
 
           {/* Social proof — 8px below microcopy */}
