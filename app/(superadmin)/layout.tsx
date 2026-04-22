@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic"; // 🔥 REQUIRED
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -30,7 +32,7 @@ export default function SuperAdminLayout({
               key={item.href}
               href={item.href}
               className={`px-3 py-2 rounded-lg ${
-                path === item.href
+                path.startsWith(item.href) // ✅ better
                   ? "bg-purple-600/20"
                   : "text-gray-400"
               }`}
