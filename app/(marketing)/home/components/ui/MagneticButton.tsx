@@ -9,13 +9,15 @@ interface MagneticButtonProps {
   variant?:   'primary' | 'outline';
   className?: string;
   onClick?:   () => void;
+  loading?: boolean; //
 }
 
 export default function MagneticButton({
   children,
-  variant  = 'primary',
+  variant = 'primary',
   className,
   onClick,
+  loading = false, // ✅ ADD THIS
 }: MagneticButtonProps) {
   const ref      = useRef<HTMLButtonElement>(null);
   const [hovered, setHovered]   = useState(false);

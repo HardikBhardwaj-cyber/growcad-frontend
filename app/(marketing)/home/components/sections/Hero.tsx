@@ -11,9 +11,10 @@ import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 import WebGLErrorBoundary from '../core/WebGLErrorBoundary';
 import {
-  HERO_INNER, SECTION_PY, SCENES,
+  HERO_INNER, SCENES,
   HERO_PHASES, T, EASE_OUT,
 } from '../../systems/design';
+import { useAppNavigation } from '@/hooks/useAppNavigation';
 
 const BlobCanvas = lazy(() => import('../webgl/BlobCanvas'));
 const Particles  = lazy(() => import('../webgl/Particles'));
@@ -110,7 +111,7 @@ function DashPreview() {
                 <span className="absolute h-full w-full animate-ping rounded-full bg-emerald-400 opacity-55" />
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
               </span>
-              <span className="text-[10px] text-white/30">app.growcad.in</span>
+              <span className="text-[10px] text-white/30">app.growcad.io</span>
             </div>
           </div>
 
@@ -188,6 +189,7 @@ function DashPreview() {
 }
 
 export default function Hero() {
+  const { navigate, isLoading } = useAppNavigation();
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] });
 
@@ -199,7 +201,7 @@ export default function Hero() {
     <section
       ref={sectionRef}
       data-scene={SCENES.hero}
-      className={`relative flex min-h-[min(100svh,900px)] items-center ${SECTION_PY.hero}`}
+      className="relative flex min-h-screen items-center pt-[clamp(5rem,10vh,7rem)] pb-[clamp(4rem,7.5vw,8.5rem)] px-[clamp(1.25rem,4vw,2.5rem)]"
     >
       {/* WebGL — absolute, no layout impact */}
       <motion.div
@@ -230,14 +232,11 @@ export default function Hero() {
       {/* Content grid — scroll parallax only, no spacing role */}
       <motion.div
         style={{ y: contentY, opacity: rawOp }}
-        className={`relative z-[10] ${HERO_INNER} grid w-full grid-cols-1 items-center gap-[clamp(1.75rem,3.5vw,4rem)] lg:grid-cols-[1.05fr_0.95fr]`}
+        className={`relative z-[10] ${HERO_INNER} grid w-full grid-cols-1 items-center lg:grid-cols-[1.05fr_0.95fr]`}
       >
 
-        {/* LEFT — single flat flex-col, spacing via mt-* only */}
-        <div
-          className="flex flex-col w-full lg:pl-[clamp(8px,1.8vw,28px)]"
-          style={{ maxWidth: 'min(100%, clamp(460px, 44vw, 560px))' }}
-        >
+        {/* LEFT — flex-col, each child controls its own top spacing via mt-* */}
+        <div className="flex flex-col w-full max-w-[clamp(460px,44vw,560px)] lg:pl-[clamp(0px,1.5vw,24px)]">
           {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -249,48 +248,42 @@ export default function Hero() {
 
           {/* Heading — 4px below badge */}
           <motion.h1
-            className="mt-[4px] font-bold leading-[1.08] tracking-[-0.045em] text-white"
+            className="mt-2 font-bold leading-[1.08] tracking-[-0.045em] text-white"
             style={{ fontSize: 'clamp(2.3rem, 4.2vw, 4.2rem)' }}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.62, delay: 0.26, ease: EASE_OUT }}
           >
-            Run your coaching institute on autopilot.
-<br />
-<span className="bg-gradient-to-r from-violet-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
-  <RotatingWord />
-</span>
+            Your institute runs itself.
+            <br />
+            <RotatingWord />
           </motion.h1>
 
           {/* Subtext — 6px below heading */}
           <motion.p
-            className="mt-[6px] text-[clamp(0.95rem,1vw,1.05rem)] leading-[1.75] text-white/60 max-w-[52ch]"
+            className="mt-3 text-[clamp(0.95rem,1vw,1.05rem)] leading-[1.75] text-white/60 max-w-[52ch]"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.40, ease: EASE_OUT }}
           >
-            Admissions, fees, attendance & reports — everything automated in one powerful dashboard.
+            Manage admissions, fees, and students — all in one simple dashboard.
           </motion.p>
 
           {/* CTAs — 4px below subtext */}
-          <div className="mt-[4px] flex flex-wrap items-center gap-3">
+          <div className="mt-5 flex flex-wrap items-center gap-3">
             <motion.div
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.48, ease: EASE_OUT }}
             >
               <MagneticButton
-  variant="primary"
-  className="!py-[14px] !px-7 relative overflow-hidden group"
->
-  <span className="relative z-10 flex items-center gap-2">
-    Start Free Dashboard
-    <ArrowRight size={14} />
-  </span>
-
-  {/* Glow sweep */}
-  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-500" />
-</MagneticButton>
+                variant="primary"
+                className="!py-[14px] !px-8 animate-glow-pulse"
+                onClick={() => navigate('signup', { location: 'hero', label: 'Start Free — Setup Your Institute' })}
+                loading={isLoading}
+              >
+                Start Free — Setup Your Institute <ArrowRight size={14} />
+              </MagneticButton>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 14 }}
@@ -306,17 +299,17 @@ export default function Hero() {
 
           {/* Microcopy — 4px below CTAs */}
           <motion.p
-            className="mt-[4px] text-[12.5px] tracking-[0.01em] text-white/42"
+            className="mt-2.5 text-[12.5px] tracking-[0.01em] text-white/42"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.45, delay: 0.56 }}
           >
-            No credit card required · Setup in 2 minutes · Cancel anytime
+            Free forever on Starter · No card needed · Cancel in one click
           </motion.p>
 
           {/* Social proof — 8px below microcopy */}
           <motion.div
-            className="mt-[8px] flex flex-wrap items-center gap-3"
+            className="mt-4 flex flex-wrap items-center gap-3"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.62, ease: EASE_OUT }}
@@ -343,7 +336,7 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* RIGHT — dashboard */}
+        {/* RIGHT — dashboard, hidden on mobile, spacing comes from its own mt on mobile if shown */}
         <div className="relative hidden lg:flex lg:items-center lg:justify-end lg:pr-[clamp(6px,1.2vw,20px)]">
           <div className="w-full -translate-y-[1.25%] 2xl:scale-[0.992] 3xl:scale-[0.978] 4xl:scale-[0.965]">
             <DashPreview />
