@@ -450,7 +450,7 @@ export default function Hero() {
         transition={{ duration: 9, repeat: Infinity, ease: [0.45, 0, 0.55, 1], repeatType: 'mirror' }}
         aria-hidden="true"
       >
-        <div style={{ position: 'absolute', top: '4%',    left: '-8%',  width: 720, height: 720, background: 'radial-gradient(circle, rgba(109,40,217,0.09) 0%, transparent 62%)', filter: 'blur(90px)' }} />
+        <div style={{ position: 'absolute', top: '4%',    left: '-8%',  width: 720, height: 720, background: 'radial-gradient(circle, rgba(37,99,235,0.04) 0%, transparent 62%)', filter: 'blur(90px)' }} />
         <div style={{ position: 'absolute', top: '28%',   right: '-6%', width: 560, height: 560, background: 'radial-gradient(circle, rgba(37,99,235,0.07)  0%, transparent 62%)', filter: 'blur(80px)' }} />
         <div style={{ position: 'absolute', bottom: '5%', left: '30%',  width: 460, height: 460, background: 'radial-gradient(circle, rgba(109,40,217,0.05) 0%, transparent 65%)', filter: 'blur(110px)'}} />
       </motion.div>
@@ -458,10 +458,10 @@ export default function Hero() {
       {/* Content — two columns with scroll parallax */}
       <motion.div
         style={{ y: contentY, opacity: rawOp }}
-        className={`relative z-[10] ${HERO_INNER} grid w-full grid-cols-1 items-center lg:grid-cols-[1.05fr_0.95fr]`}
+        className={`relative z-[10] ${HERO_INNER} grid w-full grid-cols-1 items-center lg:grid-cols-[1.2fr_0.8fr]`}
       >
         {/* ── LEFT COLUMN ─────────────────────────────────────────────────── */}
-        <div className="flex flex-col w-full max-w-[clamp(460px,44vw,568px)] lg:pl-[clamp(0px,1.5vw,24px)]">
+        <div className="flex flex-col w-full max-w-[clamp(460px,44vw,568px)] ml-[clamp(1.5rem,6vw,4rem)]">
 
           {/* 1. Badge — first element to appear */}
           <motion.div
