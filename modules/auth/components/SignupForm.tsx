@@ -1,83 +1,68 @@
 // modules/auth/components/SignupForm.tsx
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Mail, Phone, User, School, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
-import { Input }  from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { Card }   from '@/components/ui/card';
-import { fadeUp, EASE_OUT } from '@/lib/motion';
-import { theme }  from '@/styles/theme';
-import { ROUTES } from '@/config/routes';
-import { signupSchema } from '../schema';
-import { authApi } from '../api';
-import { useAuthStore } from '@/store/auth.store';
-import { useRouter } from 'next/navigation';
-import { AuthLogo } from './LoginForm';
-import { LucideIcon } from "lucide-react";
+import { useState }                          from 'react';
+import { motion }                            from 'framer-motion';
+import { Mail, Phone, User, School, ArrowRight, type LucideIcon } from 'lucide-react';
+import Link                                  from 'next/link';
+import { Input }                             from '@/components/ui/Input';
+import { Button }                            from '@/components/ui/Button';
+import { Card }                              from '@/components/ui/card';   // ← capital C
+import { fadeUp }                            from '@/lib/motion';
+import { ROUTES }                            from '@/config/routes';
+import { signupSchema }                      from '../schema';
+import { useSignup }                         from '../hooks/useAuth';        // ← hook, not raw authApi
+import { AuthLogo }                          from './LoginForm';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Field config ─────────────────────────────────────────────────────────────
 
 type FieldKey = 'name' | 'email' | 'phone' | 'institute';
 
-const FIELDS: { key: FieldKey; label: string; placeholder: string; type?: string; Icon: LucideIcon }[] = [
-  { key: 'name',      label: 'Your name',      placeholder: 'Rahul Kumar',         Icon: User   },
-  { key: 'email',     label: 'Work email',     placeholder: 'you@institute.com',   Icon: Mail,  type: 'email' },
-  { key: 'phone',     label: 'Mobile number',  placeholder: '+91 98765 43210',     Icon: Phone, type: 'tel'   },
-  { key: 'institute', label: 'Institute name', placeholder: 'e.g. Apex Academy',   Icon: School },
+const FIELDS: {
+  key:         FieldKey;
+  label:       string;
+  placeholder: string;
+  type?:       string;
+  Icon:        LucideIcon;
+}[] = [
+  { key: 'name',      label: 'Your name',      placeholder: 'Rahul Kumar',        Icon: User   },
+  { key: 'email',     label: 'Work email',     placeholder: 'you@institute.com',  Icon: Mail,  type: 'email' },
+  { key: 'phone',     label: 'Mobile number',  placeholder: '+91 98765 43210',    Icon: Phone, type: 'tel'   },
+  { key: 'institute', label: 'Institute name', placeholder: 'e.g. Apex Academy',  Icon: School },
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function SignupForm() {
-  const router  = useRouter();
-  const { setUser, setToken } = useAuthStore();
+  const [form,   setForm]   = useState({ name: '', email: '', phone: '', institute: '' });
+  const [errors, setErrors] = useState<Partial<Record<FieldKey, string>>>({});
 
-  const [form, setForm]         = useState({ name: '', email: '', phone: '', institute: '' });
-  const [errors, setErrors]     = useState<Partial<Record<FieldKey, string>>>({});
-  const [apiError, setApiError] = useState('');
-  const [loading, setLoading]   = useState(false);
+  // useSignup handles: token, tenant store, analytics, toast, and redirect
+  // to /auth/otp?phone=<phone> — no manual wiring needed here.
+  const { signup, loading, error: apiError } = useSignup();
 
   const set = (k: FieldKey) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const result = signupSchema.safeParse(form);
+    // Client-side validation first — avoids a round-trip for obvious errors
+    const result = signupSchema.safeParse(form);
+    if (!result.success) {
+      const fe = result.error.flatten().fieldErrors;
+      setErrors({
+        name:      fe.name?.[0],
+        email:     fe.email?.[0],
+        phone:     fe.phone?.[0],
+        institute: fe.institute?.[0],
+      });
+      return;
+    }
 
-  if (!result.success) {
-    const fe = result.error.flatten().fieldErrors;
-
-    setErrors({
-      name: fe.name?.[0],
-      email: fe.email?.[0],
-      phone: fe.phone?.[0],
-      institute: fe.institute?.[0],
-    });
-
-    return;
-  }
-
-  setErrors({});
-  setApiError("");
-  setLoading(true);
-
-  try {
-    const res = await authApi.signup(form);
-
-    // ✅ only token
-    setToken(res.token);
-
-    router.push(ROUTES.otp);
-  } catch {
-    setApiError("Something went wrong. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
+    setErrors({});
+    await signup(form); // useSignup handles all side-effects + redirect
+  };
 
   return (
     <motion.div
@@ -102,7 +87,11 @@ export function SignupForm() {
               key={key}
               label={label}
               type={type ?? 'text'}
-              autoComplete={key === 'email' ? 'email' : key === 'phone' ? 'tel' : undefined}
+              autoComplete={
+                key === 'email' ? 'email'
+                : key === 'phone' ? 'tel'
+                : undefined
+              }
               value={form[key]}
               onChange={set(key)}
               placeholder={placeholder}
@@ -111,8 +100,11 @@ export function SignupForm() {
             />
           ))}
 
+          {/* apiError comes from useSignup — server messages (duplicate email, etc.) */}
           {apiError && (
-            <p className="text-[12.5px] text-rose-400">{apiError}</p>
+            <p className="text-[12.5px] text-rose-400" role="alert">
+              {apiError}
+            </p>
           )}
 
           <Button type="submit" loading={loading} fullWidth className="mt-1">

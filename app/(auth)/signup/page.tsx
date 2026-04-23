@@ -1,76 +1,47 @@
-"use client";
+// app/(auth)/signup/page.tsx
+'use client';
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Check, Eye, EyeOff } from "lucide-react";
+import Link                                    from 'next/link';
+import { useState }                            from 'react';
+import { AnimatePresence, motion }             from 'framer-motion';
+import { ArrowRight, Check, Eye, EyeOff, Phone } from 'lucide-react';
+import { Button }                              from '@/components/ui/Button';
+import { Reveal }                              from '@/components/ui/Reveal';  // named export
+import { useSignup }                           from '@/modules/auth/hooks/useAuth';
+import { signupSchema }                        from '@/modules/auth/schema';
+import { ROUTES }                              from '@/config/routes';
 
-import { Button } from "@/components/ui/Button";
-import Reveal from "@/components/ui/Reveal";
-import { useAuth } from "@/hooks/useAuth";
+// ─── Left-panel feature list ──────────────────────────────────────────────────
 
-interface FormState {
-  fullName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
-
-interface FormErrors {
-  fullName?: string;
-  email?: string;
-  password?: string;
-  confirmPassword?: string;
-  form?: string;
-}
-
-interface FieldProps {
-  id: keyof FormState;
-  label: string;
-  type: "text" | "email" | "password";
-  value: string;
-  placeholder: string;
-  autoComplete: string;
-  error?: string;
-  showToggle?: boolean;
-  isVisible?: boolean;
-  onToggle?: () => void;
-  onChange: (field: keyof FormState, value: string) => void;
-}
-
-const initialForm: FormState = {
-  fullName: "",
-  email: "",
-  password: "",
-  confirmPassword: "",
-};
-
-const features = [
-  "Set up admissions, fees, and attendance in one workspace.",
-  "Give staff a clean system that scales with your institute.",
-  "Launch with reporting and operations from day one.",
+const FEATURES = [
+  'Set up admissions, fees, and attendance in one workspace.',
+  'Give staff a clean system that scales with your institute.',
+  'Launch with reporting and operations from day one.',
 ];
+
+// ─── Ambient glow (purely decorative) ────────────────────────────────────────
 
 function BackgroundGlow() {
   return (
-    <div className="absolute inset-0 pointer-events-none">
+    <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
       <motion.div
-        className="absolute left-[8%] top-[4%] h-72 w-72 rounded-full bg-purple-600/18 blur-3xl"
+        className="absolute left-[8%] top-[4%] h-72 w-72 rounded-full bg-purple-600/[0.18] blur-3xl"
         animate={{ scale: [1, 1.05, 1], opacity: [0.18, 0.24, 0.18] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
       />
       <motion.div
-        className="absolute right-[10%] top-[18%] h-80 w-80 rounded-full bg-blue-500/12 blur-3xl"
-        animate={{ scale: [1.03, 1, 1.03], opacity: [0.14, 0.2, 0.14] }}
-        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="absolute right-[10%] top-[18%] h-80 w-80 rounded-full bg-blue-500/[0.12] blur-3xl"
+        animate={{ scale: [1.03, 1, 1.03], opacity: [0.14, 0.20, 0.14] }}
+        transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
       />
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.45) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
+          backgroundImage: [
+            'linear-gradient(rgba(255,255,255,0.45) 1px, transparent 1px)',
+            'linear-gradient(90deg, rgba(255,255,255,0.45) 1px, transparent 1px)',
+          ].join(', '),
+          backgroundSize: '48px 48px',
         }}
       />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_35%,#070709_100%)]" />
@@ -78,19 +49,38 @@ function BackgroundGlow() {
   );
 }
 
-function Field({
-  id,
-  label,
-  type,
-  value,
-  placeholder,
-  autoComplete,
-  error,
-  showToggle = false,
-  isVisible = false,
-  onToggle,
-  onChange,
-}: FieldProps) {
+// ─── Form field types ─────────────────────────────────────────────────────────
+// Must match signupSchema and authApi.signup exactly.
+// Fields: name / email / phone / institute (no password — auth is OTP-based)
+
+type FieldKey = 'name' | 'email' | 'phone' | 'institute';
+
+interface FormState extends Record<FieldKey, string> {
+  name:      string;
+  email:     string;
+  phone:     string;
+  institute: string;
+}
+
+// ─── Single field component ───────────────────────────────────────────────────
+
+// Static per-field config (no runtime values)
+interface FieldConfig {
+  id:           FieldKey;
+  label:        string;
+  type:         'text' | 'email' | 'tel';
+  placeholder:  string;
+  autoComplete: string;
+}
+
+// Full props passed to the Field component at render time
+interface FieldProps extends FieldConfig {
+  value:    string;
+  error?:   string;
+  onChange: (field: FieldKey, value: string) => void;
+}
+
+function Field({ id, label, type, value, placeholder, autoComplete, error, onChange }: FieldProps) {
   return (
     <div className="space-y-2.5">
       <label
@@ -100,133 +90,87 @@ function Field({
         {label}
       </label>
 
-      <div className="relative">
-        <input
-          id={id}
-          type={showToggle && isVisible ? "text" : type}
-          value={value}
-          placeholder={placeholder}
-          autoComplete={autoComplete}
-          onChange={(e) => onChange(id, e.target.value)}
-          aria-invalid={Boolean(error)}
-          aria-describedby={error ? `${id}-error` : undefined}
-          className={[
-            "w-full rounded-xl border bg-white/[0.04] px-4 py-3.5 text-sm text-white",
-            "outline-none transition-all duration-200 placeholder:text-white/20",
-            "focus:border-purple-400/65 focus:ring-4 focus:ring-purple-500/8",
-            showToggle ? "pr-11" : "",
-            error
-              ? "border-red-500/35 focus:border-red-400/60 focus:ring-red-500/8"
-              : "border-white/9",
-          ].join(" ")}
-        />
-
-        {showToggle && onToggle ? (
-          <button
-            type="button"
-            onClick={onToggle}
-            aria-label={isVisible ? "Hide password" : "Show password"}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/28 transition-colors hover:text-white/60"
-          >
-            {isVisible ? <EyeOff size={16} /> : <Eye size={16} />}
-          </button>
-        ) : null}
-      </div>
+      <input
+        id={id}
+        type={type}
+        value={value}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        onChange={e => onChange(id, e.target.value)}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? `${id}-error` : undefined}
+        className={[
+          'w-full rounded-xl border bg-white/[0.04] px-4 py-3.5 text-sm text-white',
+          'outline-none transition-all duration-200 placeholder:text-white/20',
+          'focus:border-purple-400/65 focus:ring-4 focus:ring-purple-500/8',
+          error
+            ? 'border-red-500/35 focus:border-red-400/60 focus:ring-red-500/8'
+            : 'border-white/[0.09]',
+        ].join(' ')}
+      />
 
       <AnimatePresence initial={false}>
-        {error ? (
+        {error && (
           <motion.p
             id={`${id}-error`}
+            role="alert"
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
+            exit={{    opacity: 0, y: -4 }}
             className="text-xs text-red-400"
           >
             {error}
           </motion.p>
-        ) : null}
+        )}
       </AnimatePresence>
     </div>
   );
 }
 
+// ─── Field config ─────────────────────────────────────────────────────────────
+
+const FIELDS: FieldConfig[] = [
+  { id: 'name',      label: 'Full name',      type: 'text',  placeholder: 'Rohit Sharma',        autoComplete: 'name' },
+  { id: 'email',     label: 'Email',          type: 'email', placeholder: 'admin@growcad.in',    autoComplete: 'email' },
+  { id: 'phone',     label: 'Mobile number',  type: 'tel',   placeholder: '+91 98765 43210',     autoComplete: 'tel' },
+  { id: 'institute', label: 'Institute name', type: 'text',  placeholder: 'e.g. Apex Academy',   autoComplete: 'off' },
+];
+
+const INITIAL_FORM: FormState = { name: '', email: '', phone: '', institute: '' };
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function SignupPage() {
-  const router = useRouter();
-  const { user } = useAuth();
+  const [form,   setForm]   = useState<FormState>(INITIAL_FORM);
+  const [errors, setErrors] = useState<Partial<Record<FieldKey, string>>>({});
 
-  const [form, setForm] = useState<FormState>(initialForm);
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // useSignup: handles token → cookie, tenant store, analytics, toast,
+  // and redirect to /auth/otp?phone=<phone>
+  const { signup, loading, error: apiError } = useSignup();
 
-  useEffect(() => {
-    if (user) {
-      router.replace("/dashboard");
-    }
-  }, [router, user]);
-
-  const updateField = (field: keyof FormState, value: string) => {
-    setForm((current) => ({
-      ...current,
-      [field]: value,
-    }));
-
-    setErrors((current) => ({
-      ...current,
-      [field]: undefined,
-      form: undefined,
-    }));
-  };
-
-  const validateForm = (values: FormState) => {
-    const nextErrors: FormErrors = {};
-
-    if (!values.fullName.trim()) {
-      nextErrors.fullName = "Full name is required.";
-    }
-
-    if (!values.email.trim()) {
-      nextErrors.email = "Email is required.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-      nextErrors.email = "Enter a valid email address.";
-    }
-
-    if (!values.password) {
-      nextErrors.password = "Password is required.";
-    } else if (values.password.length < 8) {
-      nextErrors.password = "Use at least 8 characters.";
-    }
-
-    if (!values.confirmPassword) {
-      nextErrors.confirmPassword = "Please confirm your password.";
-    } else if (values.password !== values.confirmPassword) {
-      nextErrors.confirmPassword = "Passwords do not match.";
-    }
-
-    return nextErrors;
+  const updateField = (field: FieldKey, value: string) => {
+    setForm(f => ({ ...f, [field]: value }));
+    setErrors(e => ({ ...e, [field]: undefined }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const nextErrors = validateForm(form);
-
-    if (Object.keys(nextErrors).length > 0) {
-      setErrors(nextErrors);
+    // Client-side validation via the canonical Zod schema
+    const result = signupSchema.safeParse(form);
+    if (!result.success) {
+      const fe = result.error.flatten().fieldErrors;
+      setErrors({
+        name:      fe.name?.[0],
+        email:     fe.email?.[0],
+        phone:     fe.phone?.[0],
+        institute: fe.institute?.[0],
+      });
       return;
     }
 
-    setLoading(true);
-
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 900));
-      setErrors({
-        form: "Signup is not connected to a backend yet. The UI and validation are ready.",
-      });
-    } finally {
-      setLoading(false);
-    }
+    setErrors({});
+    await signup(form); // all side-effects + redirect handled inside useSignup
   };
 
   return (
@@ -234,8 +178,10 @@ export default function SignupPage() {
       <BackgroundGlow />
 
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl items-center px-6 py-12 lg:px-10">
-        <div className="grid w-full gap-14 lg:grid-cols-[minmax(0,1fr)_460px] lg:gap-18">
-          <Reveal variant="slideUp" className="flex flex-col justify-center">
+        <div className="grid w-full gap-14 lg:grid-cols-[minmax(0,1fr)_460px]">
+
+          {/* ── LEFT: brand + feature list ── */}
+          <Reveal variant="fadeUp" className="flex flex-col justify-center">
             <div className="max-w-[520px]">
               <Link
                 href="/"
@@ -263,14 +209,10 @@ export default function SignupPage() {
               </div>
 
               <div className="mt-11 space-y-4">
-                {features.map((feature, index) => (
-                  <Reveal
-                    key={feature}
-                    variant="fade"
-                    delay={0.06 * index}
-                  >
+                {FEATURES.map((feature, idx) => (
+                  <Reveal key={feature} variant="fade" delay={0.06 * idx}>
                     <div className="flex items-start gap-3.5">
-                      <span className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-purple-300/90">
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-purple-300/90">
                         <Check size={12} />
                       </span>
                       <p className="text-sm leading-6 text-white/56">{feature}</p>
@@ -281,13 +223,15 @@ export default function SignupPage() {
             </div>
           </Reveal>
 
-          <Reveal variant="slideUp" delay={0.12} className="flex items-center justify-center lg:justify-end">
+          {/* ── RIGHT: signup form ── */}
+          <Reveal variant="fadeUp" delay={0.12} className="flex items-center justify-center lg:justify-end">
             <motion.div
               whileHover={{ y: -1.5 }}
               transition={{ duration: 0.22 }}
               className="w-full max-w-[460px] rounded-[28px] border border-white/10 bg-white/[0.045] shadow-[0_32px_80px_rgba(0,0,0,0.52)] backdrop-blur-2xl"
             >
-              <div className="h-px w-full bg-gradient-to-r from-transparent via-white/18 to-transparent" />
+              {/* Top shimmer line */}
+              <div className="h-px w-full rounded-t-[28px] bg-gradient-to-r from-transparent via-white/18 to-transparent" />
 
               <div className="px-6 py-7 sm:px-8 sm:py-9">
                 <div className="mb-9">
@@ -298,72 +242,39 @@ export default function SignupPage() {
                     Build your Growcad workspace
                   </h2>
                   <p className="mt-3 max-w-sm text-sm leading-6 text-white/40">
-                    Set up your account in under a minute. Institute details can be configured after sign up.
+                    Set up your account in under a minute. A verification code
+                    will be sent to your mobile number.
                   </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5.5">
-                  <Field
-                    id="fullName"
-                    label="Full Name"
-                    type="text"
-                    value={form.fullName}
-                    placeholder="Rohit Sharma"
-                    autoComplete="name"
-                    error={errors.fullName}
-                    onChange={updateField}
-                  />
+                <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+                  {FIELDS.map(({ id, label, type, placeholder, autoComplete }) => (
+                    <Field
+                      key={id}
+                      id={id}
+                      label={label}
+                      type={type}
+                      value={form[id]}
+                      placeholder={placeholder}
+                      autoComplete={autoComplete}
+                      error={errors[id]}
+                      onChange={updateField}
+                    />
+                  ))}
 
-                  <Field
-                    id="email"
-                    label="Email"
-                    type="email"
-                    value={form.email}
-                    placeholder="admin@growcad.in"
-                    autoComplete="email"
-                    error={errors.email}
-                    onChange={updateField}
-                  />
-
-                  <Field
-                    id="password"
-                    label="Password"
-                    type="password"
-                    value={form.password}
-                    placeholder="At least 8 characters"
-                    autoComplete="new-password"
-                    error={errors.password}
-                    showToggle
-                    isVisible={showPassword}
-                    onToggle={() => setShowPassword((current) => !current)}
-                    onChange={updateField}
-                  />
-
-                  <Field
-                    id="confirmPassword"
-                    label="Confirm Password"
-                    type="password"
-                    value={form.confirmPassword}
-                    placeholder="Re-enter your password"
-                    autoComplete="new-password"
-                    error={errors.confirmPassword}
-                    showToggle
-                    isVisible={showConfirmPassword}
-                    onToggle={() => setShowConfirmPassword((current) => !current)}
-                    onChange={updateField}
-                  />
-
+                  {/* API-level error (email/phone already registered, network, etc.) */}
                   <AnimatePresence initial={false}>
-                    {errors.form ? (
-                      <motion.div
+                    {apiError && (
+                      <motion.p
+                        role="alert"
                         initial={{ opacity: 0, y: -6 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -6 }}
-                        className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-6 text-white/58"
+                        exit={{    opacity: 0, y: -6 }}
+                        className="rounded-xl border border-red-500/20 bg-red-500/[0.06] px-4 py-3 text-sm leading-6 text-red-300"
                       >
-                        {errors.form}
-                      </motion.div>
-                    ) : null}
+                        {apiError}
+                      </motion.p>
+                    )}
                   </AnimatePresence>
 
                   <div className="space-y-4 pt-1">
@@ -372,22 +283,25 @@ export default function SignupPage() {
                       loading={loading}
                       className="w-full justify-center py-3.5 text-sm shadow-[0_10px_24px_rgba(124,58,237,0.24)]"
                     >
-                      <span className="inline-flex items-center gap-2">
-                        Create Account
-                        {!loading ? <ArrowRight size={15} /> : null}
-                      </span>
+                      {!loading && (
+                        <>
+                          Create Account
+                          <ArrowRight size={15} className="ml-2" />
+                        </>
+                      )}
                     </Button>
 
                     <p className="text-center text-xs leading-5 text-white/26">
-                      By creating an account, you agree to our Terms & Conditions and Privacy Policy.
+                      By creating an account you agree to our{' '}
+                      <span className="text-white/42">Terms &amp; Privacy Policy</span>.
                     </p>
                   </div>
                 </form>
 
                 <p className="mt-8 text-center text-sm text-white/40">
-                  Already have an account?{" "}
+                  Already have an account?{' '}
                   <Link
-                    href="/login"
+                    href={ROUTES.login}
                     className="font-medium text-purple-300/90 transition-colors hover:text-purple-200"
                   >
                     Sign in
@@ -396,6 +310,7 @@ export default function SignupPage() {
               </div>
             </motion.div>
           </Reveal>
+
         </div>
       </div>
     </div>
