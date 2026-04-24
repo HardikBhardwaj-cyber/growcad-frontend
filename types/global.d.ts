@@ -16,5 +16,10 @@ declare global {
       update?: () => void;
       refresh?: () => void;
     };
+
+    /**
+     * Tenant ID for multi-tenant SaaS
+     */
+    gc_tenant?: string;
   }
 }
